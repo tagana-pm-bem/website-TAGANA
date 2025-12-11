@@ -1,5 +1,27 @@
-import AdminLayout from "@/admin/layout/page";
+"use client";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <AdminLayout>{children}</AdminLayout>;
+import React from "react";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex">
+        <div className="w-64 bg-gray-900 text-white min-h-screen fixed">
+          <AdminSidebar />
+        </div>
+
+        <div className="ml-64 flex-1">
+          <div className="bg-white border-b border-gray-200">
+            <AdminHeader />
+          </div>
+
+          <main className="p-6">
+            {children}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -1,16 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { InfoModal } from '@/components/ui/modal_desa';
 import Image from "next/image";
 
-export default function Navbar() {
-  const pathname = usePathname();
-
-  // Do not render the global navbar on admin routes (middleware protects admin)
-  if (pathname && pathname.startsWith('/admin')) return null;
-
+export function Navbar() {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<string>("");
   const [isScrolled, setIsScrolled] = useState(false);
@@ -95,7 +90,7 @@ export default function Navbar() {
             <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-3">
               {/* Login Button */}
                 <button
-                onClick={() => router.push('/admin/dashboard')}
+                onClick={() => router.push('/auth/login')}
                 className="flex cursor-pointer items-center space-x-0.5 sm:space-x-1 md:space-x-1.5 px-2 sm:px-2.5 md:px-4 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-md sm:rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 group"
                 >
                 <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
