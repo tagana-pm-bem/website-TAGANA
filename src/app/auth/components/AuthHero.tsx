@@ -5,7 +5,7 @@ import React from "react";
 
 export function AuthHero() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="hidden lg:flex lg:w-full h-screen relative bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="absolute inset-0">
         <Image
           src="/assets/desa-background.jpg"
