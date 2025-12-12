@@ -45,9 +45,9 @@ interface Dusun {
 // Custom marker icons based on risk level
 const createCustomIcon = (riskLevel: string, isMobile: boolean = false) => {
   const colors = {
-    low: "#10b981", // green
+    low: "#f59e0b", // green
     medium: "#f59e0b", // yellow/orange
-    high: "#ef4444", // red
+    high: "#f59e0b", // red
   };
 
   const color = colors[riskLevel as keyof typeof colors] || colors.medium;
@@ -690,24 +690,7 @@ export default function PetaSriharjo({ selectedDusunId = null, onDusunSelect }: 
                   </div>
                   
                   <div className="space-y-3 md:space-y-3">
-                    {/* Zona Risiko Section */}
-                    <div>
-                      <p className="text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Zona Risiko</p>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-green-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Aman</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-yellow-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Waspada</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Bahaya</span>
-                        </div>
-                      </div>
-                    </div>
+                    
 
                     {/* Batas & Jalur Section */}
                     <div className="border-t border-gray-200 pt-2">

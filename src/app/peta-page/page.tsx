@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { InfoModal } from '@/components/ui/modal_desa';
 import Controls from './components/Controls';
 import MapArea from './components/MapArea';
-import StatsCards from './components/StatsCards';
 import LegendCard from './components/LegendCard';
 
 export default function Home() {
@@ -93,9 +92,9 @@ export default function Home() {
 
             <MapArea selectedDusunId={selectedDusunId} onDusunSelect={setSelectedDusunId} />
 
-            <StatsCards />
+            
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
               <LegendCard />
 
               <div className="bg-white rounded-xl shadow-[1px_1px_41px_2px_rgba(17,_12,_46,_0.15)] p-6">
@@ -120,7 +119,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
           </div>
         </main>

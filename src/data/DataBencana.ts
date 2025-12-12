@@ -66,6 +66,7 @@ export const disasterDataByDusun: { [key: string]: DisasterDetail[] } = {
       description: "Rawan banjir bandang saat musim hujan", 
       icon: "flood" 
     },
+    
    
   ],
   "Trukan": [

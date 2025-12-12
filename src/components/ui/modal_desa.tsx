@@ -126,7 +126,7 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
                 </div>
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <p className="text-sm text-gray-500">Ketinggian</p>
-                  <p className="text-lg font-bold text-[#044BB1]">50-200 mdpl</p>
+                  <p className="text-lg font-bold text-[#044BB1]">25 MDPL</p>
                 </div>
               </div>
             </div>
@@ -153,24 +153,7 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
               <h3 className="text-xl font-bold text-orange-600">Potensi Bencana & Sebaran Zona</h3>
             </div>
             <div className="space-y-3">
-              {/* Zona Risk Summary */}
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-bold text-gray-800 mb-3">Sebaran Zona Risiko</h4>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-green-50 rounded-lg p-3 border-2 border-green-500 text-center">
-                    <p className="text-2xl font-bold text-green-600">{zonaAman}</p>
-                    <p className="text-xs text-gray-600">Dusun Zona Aman</p>
-                  </div>
-                  <div className="bg-yellow-50 rounded-lg p-3 border-2 border-yellow-500 text-center">
-                    <p className="text-2xl font-bold text-yellow-600">{zonaWaspada}</p>
-                    <p className="text-xs text-gray-600">Dusun Zona Waspada</p>
-                  </div>
-                  <div className="bg-red-50 rounded-lg p-3 border-2 border-red-500 text-center">
-                    <p className="text-2xl font-bold text-red-600">{zonaBahaya}</p>
-                    <p className="text-xs text-gray-600">Dusun Zona Bahaya</p>
-                  </div>
-                </div>
-              </div>
+              
 
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <div className="flex items-start space-x-3">

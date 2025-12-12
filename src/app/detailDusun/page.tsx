@@ -71,7 +71,7 @@ function DetailDusunContent() {
           <div className="lg:col-span-2 space-y-6">
             {/* Risk Card Component */}
             <RiskCard 
-              riskLevel={dusun.riskLevel}
+              
               dusunName={dusun.name}
               disasters={dusun.disasters}
               population={dusun.population}
