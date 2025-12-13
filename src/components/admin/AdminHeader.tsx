@@ -4,12 +4,13 @@ import { usePathname } from "next/navigation";
 
 interface HeaderProps {
   mainMenuItems: { label: string; path: string }[];
+  otherMenuItems?: { label: string; path: string }[];
   settingsItems: { label: string; path: string }[];
 }
 
-export function AdminHeader({ mainMenuItems, settingsItems }: HeaderProps) {
+export function AdminHeader({ mainMenuItems, settingsItems, otherMenuItems }: HeaderProps) {
   const pathname = usePathname();
-  const allMenuItems = [...mainMenuItems, ...settingsItems];
+  const allMenuItems = [...mainMenuItems, ...(otherMenuItems || []), ...settingsItems];
 
   const currentRoute =
     allMenuItems.find(item => pathname.startsWith(item.path)) ?? null;
