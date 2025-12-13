@@ -8,12 +8,21 @@ export default function PetaWilayah() {
   const [selected, setSelected] = useState("Pilih Lokasi");
 
   const options = [
-    "Yogyakarta",
-    "Solo",
-    "Semarang",
-    "Magelang",
-    "Bantul",
-  ];
+  "Miri",
+  "Jati",
+  "Mojohuro",
+  "Pelemadu",
+  "Sungapan",
+  "Gondosuli",
+  "Trukan",
+  "Dogongan",
+  "Ketos",
+  "Ngrancah",
+  "Pengkol",
+  "Sompok",
+  "Wunut"
+];
+
 
   return (
     <div className="flex flex-col gap-2 w-full">

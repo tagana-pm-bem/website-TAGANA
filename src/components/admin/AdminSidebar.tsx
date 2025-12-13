@@ -8,6 +8,7 @@ interface MenuItem {
   icon: React.ReactNode;
   label: string;
   path: string;
+  
 }
 
 export function AdminSidebar() {
@@ -82,6 +83,7 @@ export function AdminSidebar() {
         </svg>
       ),
       label: "Keluar",
+      
       path: "/splash",
     },
   ];
@@ -104,10 +106,10 @@ export function AdminSidebar() {
     <aside className="w-64 h-screen bg-gray-100 shadow-lg text-black flex flex-col overflow-y-auto">
       {/* Logo */}
       <div className="p-6  flex flex-row gap-3 items-center justify-center w-full">
-        <div className="w-11 h-11 flex items-center justify-center bg-blue-400 rounded-xl" >
+        <div className="w-11 h-11 flex items-center justify-center bg-blue-500 rounded-xl" >
           <LayoutDashboard size={30} color="white" />
         </div>
-        <p className="text-2xl font-semibold text-blue-400">Admin Desa</p>
+        <p className="text-2xl font-semibold text-blue-500">Admin Desa</p>
       </div>
 
       {/* Main Menu */}
@@ -118,7 +120,7 @@ export function AdminSidebar() {
             onClick={() => handleMenuClick(item)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
-                ? "bg-blue-400 text-white"
+                ? "bg-blue-500 text-white"
                 : "text-blue-400 hover:bg-blue-400 hover:text-white"
             }`}
           >
@@ -136,7 +138,7 @@ export function AdminSidebar() {
             onClick={() => handleMenuClick(item)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
-                ? "bg-blue-300 text-white"
+                ? "bg-blue-500 text-white"
                 : "text-blue-400 hover:bg-blue-400 hover:text-white"
             }`}
           >

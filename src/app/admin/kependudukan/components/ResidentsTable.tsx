@@ -40,8 +40,8 @@ export function ResidentsTable({ data }: { data: PopulationData[] }) {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm space-x-2">
-                  <button className="text-blue-600 hover:text-blue-900 font-medium">Edit</button>
-                  <button className="text-red-600 hover:text-red-900 font-medium">Hapus</button>
+                  <button className="cursor-pointer text-blue-600 hover:text-blue-900 font-medium">Edit</button>
+                  <button className="cursor-pointer text-red-600 hover:text-red-900 font-medium">Hapus</button>
                 </td>
               </tr>
             ))}

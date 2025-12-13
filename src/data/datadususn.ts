@@ -369,11 +369,62 @@ export const dusunData: Dusun[] = [
   }
 ];
 
+// Helper functions untuk kalkulasi statistik
+export const calculateTotalPopulation = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.population, 0);
+};
+
+export const calculateTotalMale = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahLakiLaki, 0);
+};
+
+export const calculateTotalFemale = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahPerempuan, 0);
+};
+
+export const calculateTotalKK = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahKK, 0);
+};
+
+export const calculateTotalBalita = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahBalita, 0);
+};
+
+export const calculateTotalLansia = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahLansia, 0);
+};
+
+export const calculateTotalIbuHamil = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahIbuHamil, 0);
+};
+
+export const calculateTotalDisabilitas = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahPenyandangDisabilitas, 0);
+};
+
+export const calculateTotalPendudukMiskin = (): number => {
+  return dusunData.reduce((total, dusun) => total + dusun.jumlahPendudukMiskin, 0);
+};
+
+// Object untuk semua statistik
+export const populationStats = {
+  totalPopulation: calculateTotalPopulation(),
+  totalMale: calculateTotalMale(),
+  totalFemale: calculateTotalFemale(),
+  totalKK: calculateTotalKK(),
+  totalBalita: calculateTotalBalita(),
+  totalLansia: calculateTotalLansia(),
+  totalIbuHamil: calculateTotalIbuHamil(),
+  totalDisabilitas: calculateTotalDisabilitas(),
+  totalPendudukMiskin: calculateTotalPendudukMiskin()
+};
+
 // Export all data in one object for easy access
 export const allData = {
   dusunData,
   rtDataByDusun,
-  getRTDataForDusun
+  getRTDataForDusun,
+  populationStats
 };
 
 export default dusunData;
