@@ -55,11 +55,10 @@ export interface DusunDetailDB extends DusunDB {
 }
 
 export const dusunService = {
-  // Ambil Semua Data Dusun (Termasuk Koordinat untuk Peta Utama)
   getAll: async () => {
     const { data, error } = await supabase
       .from('dusun')
-      .select('*') // Ini akan mengambil lat, long, level_resiko, dll
+      .select('*') 
       .order('id', { ascending: true });
     
     if (error) throw error;

@@ -1,14 +1,16 @@
-import type { NextConfig } from "next";
-
-const isProd = process.env.NODE_ENV === 'production';
-
-const nextConfig: NextConfig = {
-  output: 'export',
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Pastikan TIDAK ADA baris "output: 'export'" di sini
+  
   images: {
-    unoptimized: true,
+    // Supaya gambar dari Supabase/Unsplash bisa muncul
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Ini mengizinkan gambar dari semua domain (termasuk Supabase)
+      },
+    ],
   },
-  basePath: isProd ? '/TAGANA_WEB' : '',
-  assetPrefix: isProd ? '/TAGANA_WEB/' : '',
 };
 
 export default nextConfig;
