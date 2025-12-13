@@ -2,8 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { dusunData } from "@/data/datadususn";
-import { getDusunImageById, getDusunAltText } from "@/data/image";
+import { dusunService, DusunDetailDB } from "@/services/dusunService"; 
+
 import Header from "./components/Header";
 import PhotoAndDescription from "./components/PhotoAndDescription";
 import RiskCard from "./components/RiskCard";
@@ -15,18 +15,30 @@ import RTListCard from "./components/RTListCard";
 function DetailDusunContent() {
   const searchParams = useSearchParams();
   const dusunId = searchParams.get("id");
-  const [dusun, setDusun] = useState<any>(null);
+  const [dusun, setDusun] = useState<DusunDetailDB | null>(null);
+  const [loading, setLoading] = useState(true);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
-    if (dusunId) {
-      const foundDusun = dusunData.find((d) => d.id === parseInt(dusunId));
-      setDusun(foundDusun || null);
-    }
+    const fetchDusun = async () => {
+      if (dusunId) {
+        setLoading(true);
+        try {
+          const data = await dusunService.getDetailById(parseInt(dusunId));
+          setDusun(data);
+        } catch (error) {
+          console.error("Gagal mengambil data dusun:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchDusun();
     setMapReady(true);
   }, [dusunId]);
 
-  if (!dusun) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -37,87 +49,96 @@ function DetailDusunContent() {
     );
   }
 
-  // Generate preparedness message based on risk level
+  if (!dusun) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-red-500 font-semibold">Data Dusun tidak ditemukan.</p>
+      </div>
+    );
+  }
+
   const getPreparednessMessage = (riskLevel: string): string => {
     switch (riskLevel) {
-      case "high":
-        return "Warga diimbau selalu siaga dan mengikuti arahan tim TAGANA. Pastikan jalur evakuasi dan titik kumpul diketahui.";
-      case "medium":
-        return "Tingkatkan kewaspadaan terutama saat musim hujan. Siapkan tas siaga bencana untuk keluarga.";
-      case "low":
-      default:
-        return "Tetap waspada dan ikuti informasi dari BPBD. Lakukan simulasi evakuasi secara berkala.";
+      case "high": return "Warga diimbau selalu siaga dan mengikuti arahan tim TAGANA. Pastikan jalur evakuasi diketahui.";
+      case "medium": return "Tingkatkan kewaspadaan terutama saat musim hujan. Siapkan tas siaga bencana.";
+      default: return "Tetap waspada dan ikuti informasi dari BPBD. Lakukan simulasi evakuasi secara berkala.";
     }
   };
 
+  const mappedDisasters = dusun.bencana?.map(b => ({
+    type: b.jenis_bencana,
+    severity: b.level_resiko,
+    description: b.deskripsi,
+    icon: b.icon
+  }));
+
   return (
     <div className="w-full min-h-screen bg-white">
-      {/* Header Component */}
-      <Header dusunName={dusun.name} population={dusun.population} />
+      <Header dusunName={dusun.nama} population={dusun.jumlah_penduduk} />
 
-      {/* Photo and Description Component */}
       <PhotoAndDescription 
-        dusunName={dusun.name}
-        description={dusun.description}
-        imageUrl={getDusunImageById(dusun.id)}
-        imageAlt={getDusunAltText(dusun.id)}
-        population={dusun.population}
+        dusunName={dusun.nama}
+        description={dusun.deskripsi} 
+        imageUrl={dusun.gambar_url || "/placeholder-image.jpg"} 
+        imageAlt={`Foto Dusun ${dusun.nama}`}
+        population={dusun.jumlah_penduduk}
       />
 
       {/* Main Content Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          
           {/* Left Column - Info Cards */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Risk Card Component */}
+            
             <RiskCard 
-              riskLevel={dusun.riskLevel}
-              dusunName={dusun.name}
-              disasters={dusun.disasters}
-              population={dusun.population}
-              preparednessMessage={getPreparednessMessage(dusun.riskLevel)}
+              riskLevel={dusun.level_resiko}
+              dusunName={dusun.nama}
+              disasters={mappedDisasters}
+              population={dusun.jumlah_penduduk}
+              preparednessMessage={getPreparednessMessage(dusun.level_resiko)}
             />
 
-            {/* Demographics Card Component */}
             <DemographicsCard 
-              dusunName={dusun.name}
+              dusunName={dusun.nama}
               demographicData={{
-                jumlahKK: dusun.jumlahKK,
-                jumlahLakiLaki: dusun.jumlahLakiLaki,
-                jumlahPerempuan: dusun.jumlahPerempuan,
-                jumlahBalita: dusun.jumlahBalita,
-                jumlahLansia: dusun.jumlahLansia,
-                jumlahIbuHamil: dusun.jumlahIbuHamil,
-                jumlahPenyandangDisabilitas: dusun.jumlahPenyandangDisabilitas,
-                jumlahPendudukMiskin: dusun.jumlahPendudukMiskin,
+                jumlahKK: dusun.jumlah_kk,
+                jumlahLakiLaki: dusun.jumlah_laki_laki,
+                jumlahPerempuan: dusun.jumlah_perempuan,
+                jumlahBalita: dusun.jumlah_balita,
+                jumlahLansia: dusun.jumlah_lansia,
+                jumlahIbuHamil: dusun.jumlah_ibu_hamil,
+                jumlahPenyandangDisabilitas: dusun.jumlah_disabilitas, 
+                jumlahPendudukMiskin: dusun.jumlah_miskin,
               }}
             />
           </div>
 
           {/* Right Column - Map and Location */}
           <div className="space-y-6">
-            {/* Coordinates Card Component */}
+            {/* Coordinates Card */}
             <CoordinatesCard 
-              latitude={dusun.position[0]}
-              longitude={dusun.position[1]}
+              latitude={dusun.latitude}
+              longitude={dusun.longitude}
             />
 
-            {/* Map Card Component */}
+            {/* Map Card */}
             {mapReady && (
               <MapCard 
-                position={dusun.position}
-                dusunName={dusun.name}
-                population={dusun.population}
+                position={[dusun.latitude, dusun.longitude]} // MapCard biasanya butuh array [lat, long]
+                dusunName={dusun.nama}
+                population={dusun.jumlah_penduduk}
                 mapReady={mapReady}
               />
             )}
           </div>
         </div>
 
-        {/* RT List Card Component */}
+        {/* RT List Card */}
+        {/* Pastikan komponen RTListCard bisa menerima struktur data dari DB atau mapping dulu */}
         <RTListCard 
-          dusunName={dusun.name}
-          rtData={dusun.rtData}
+          dusunName={dusun.nama}
+          rtData={dusun.rt} // DB mengembalikan array RT di dalam objek dusun
         />
       </div>
     </div>
@@ -130,7 +151,7 @@ export default function DetailDusunPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Memuat Data Dusun...</p>
+          <p className="text-gray-600 font-semibold">Memuat...</p>
         </div>
       </div>
     }>

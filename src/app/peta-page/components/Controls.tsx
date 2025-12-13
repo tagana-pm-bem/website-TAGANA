@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React from "react";
-import { dusunData } from "@/data/datadususn";
+import React, { useEffect, useState } from "react";
+import { dusunService } from "@/services/dusunService";
 
 interface Props {
   selectedDusunId: number | null;
@@ -11,6 +11,20 @@ interface Props {
 }
 
 export default function Controls({ selectedDusunId, onDusunChange, onReset, onOpenInfo }: Props) {
+  const [dusunList, setDusunList] = useState<{ id: number; nama: string }[]>([]);
+
+  useEffect(() => {
+    const fetchDusun = async () => {
+      try {
+        const data = await dusunService.getAllNames();
+        setDusunList(data || []);
+      } catch (error) {
+        console.error("Gagal load dusun:", error);
+      }
+    };
+    fetchDusun();
+  }, []);
+
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
       <div className="bg-[#044BB1] px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -23,45 +37,48 @@ export default function Controls({ selectedDusunId, onDusunChange, onReset, onOp
               id="dusun-select"
               value={selectedDusunId ?? ""}
               onChange={onDusunChange}
-              className="w-full px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl border-2 border-white/30 bg-gradient-to-r from-white/15 to-white/10 text-white font-semibold text-sm sm:text-base focus:outline-none focus:border-white/60 focus:ring-4 focus:ring-white/20 transition-all duration-300 cursor-pointer appearance-none shadow-lg hover:from-white/20 hover:to-white/15 hover:border-white/40 hover:shadow-xl backdrop-blur-sm"
+              className="w-full px-4 sm:px-5 py-2.5 bg-white/10 text-white border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 appearance-none font-medium transition-all cursor-pointer hover:bg-white/20"
             >
-              <option value="" className="bg-[#1a4a9c] text-white py-2">Semua Dusun</option>
-              {dusunData.map((dusun) => (
-                <option key={dusun.id} value={dusun.id} className="bg-[#1a4a9c] text-white py-2">
-                  {dusun.name}
+              <option value="" className="text-gray-900 bg-white">Semua Dusun</option>
+              {dusunList.map((dusun) => (
+                <option key={dusun.id} value={dusun.id} className="text-gray-900 bg-white">
+                  {dusun.nama}
                 </option>
               ))}
             </select>
-
-            <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 pointer-events-none transition-transform duration-300 group-hover:scale-110">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-white/70 group-hover:text-white transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
-
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400/30 to-purple-400/30 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 -z-10 blur-sm group-hover:blur-0"></div>
           </div>
         </div>
-        {selectedDusunId !== null && (
+        
+        {/* Tombol Reset & Info tetap sama */}
+        <div className="flex gap-2">
+          {selectedDusunId !== null && (
+            <button
+              onClick={onReset}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Reset</span>
+            </button>
+          )}
+          
           <button
-            onClick={onReset}
-            className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
+            onClick={onOpenInfo}
+            className="bg-white text-[#044BB1] hover:bg-blue-50 px-4 py-2 rounded-lg text-sm sm:text-base font-bold shadow-md transition-all duration-200 flex items-center justify-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Reset
+            <span className="hidden sm:inline">Info Desa</span>
+            <span className="sm:hidden">Info</span>
           </button>
-        )}
-      </div>
-
-      <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <button
-          onClick={onOpenInfo}
-          className="bg-[#044BB1] hover:bg-[#033a8c] text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-        >
-          Info Lengkap Desa
-        </button>
+        </div>
       </div>
     </div>
   );

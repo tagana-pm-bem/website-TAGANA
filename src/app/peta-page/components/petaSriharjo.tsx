@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -6,12 +6,11 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap, Polyg
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { InfoModal } from "@/components/ui/modal_desa";
-import { desaBoundary } from "@/data/PetaSriharjoBoundary";
-import { dusunData } from "@/data/datadususn";
+import { desaBoundary } from "@/data/PetaSriharjoBoundary"; 
 import { sriharjoKMLBoundaries } from "@/data/sriharjoKMLData";
 import { sriharjoFloodBoundaries } from "@/data/zonabanjir";
+import { dusunService, DusunDetailDB } from "@/services/dusunService";
 
-// Fix default marker icon issue in Next.js
 if (typeof window !== "undefined") {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -21,1090 +20,208 @@ if (typeof window !== "undefined") {
   });
 }
 
-// Define the Dusun interface for type safety
-interface Dusun {
-  id: number;
-  name: string;
-  position: [number, number];
-  population: number; // Jumlah Penduduk total
-  riskLevel: string;
-  description: string;
-  jumlahKK: number;
-  jumlahLakiLaki: number;
-  jumlahPerempuan: number;
-  jumlahBalita: number;
-  jumlahLansia: number;
-  jumlahIbuHamil: number;
-  jumlahPenyandangDisabilitas: number;
-  jumlahPendudukMiskin: number;
-}
+function MapController({ selectedDusun, allDusun }: { selectedDusun: DusunDetailDB | null, allDusun: DusunDetailDB[] }) {
+  const map = useMap();
 
-// Data dusun di Sriharjo dengan koordinat yang akurat dan data demografi dari DAFTAR RUTA IKS 2025
-// dusunData is now imported from ../data/datadususn
-
-// Custom marker icons based on risk level
-const createCustomIcon = (riskLevel: string, isMobile: boolean = false) => {
-  const colors = {
-    low: "#10b981", // green
-    medium: "#f59e0b", // yellow/orange
-    high: "#ef4444", // red
-  };
-
-  const color = colors[riskLevel as keyof typeof colors] || colors.medium;
-
-  // Adjust sizes based on device
-  const markerSize = isMobile ? 22 : 25;
-  const innerCircleSize = isMobile ? 8 : 12;
-  const borderWidth = isMobile ? 1 : 2;
-
-  return L.divIcon({
-    className: "custom-marker",
-    html: `
-      <div style="position: relative;">
-        <div style="
-          width: ${markerSize}px;
-          height: ${markerSize}px;
-          background: ${color};
-          border: ${borderWidth}px solid white;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        ">
-          <div style="
-            width: ${innerCircleSize}px;
-            height: ${innerCircleSize}px;
-            background: white;
-            border-radius: 50%;
-            transform: rotate(45deg);
-          "></div>
-        </div>
-      </div>
-    `,
-    iconSize: [markerSize, markerSize],
-    iconAnchor: [markerSize / 2, markerSize],
-    popupAnchor: [0, -markerSize],
-  });
-};
-
-interface DusunModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  dusun: Dusun | null;
-}
-
-function DusunModal({ isOpen, onClose, dusun }: DusunModalProps) {
-  const router = useRouter();
-  
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
+    if (selectedDusun) {
+      map.flyTo([selectedDusun.latitude, selectedDusun.longitude], 16, {
+        duration: 1.5,
+      });
     } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
-
-  if (!isOpen || !dusun) return null;
-
-  // Create a non-null alias so TypeScript knows this is defined for the rest of the component
-  const d = dusun as Dusun;
-
-  const riskColors = {
-    low: {
-      bg: "bg-green-50",
-      border: "border-green-500",
-      text: "text-green-700",
-      badge: "bg-green-500",
-    },
-    medium: {
-      bg: "bg-yellow-50",
-      border: "border-yellow-500",
-      text: "text-yellow-700",
-      badge: "bg-yellow-500",
-    },
-    high: {
-      bg: "bg-red-50",
-      border: "border-red-500",
-      text: "text-red-700",
-      badge: "bg-red-500",
-    },
-  };
-
-  const risk = riskColors[d.riskLevel as keyof typeof riskColors];
-
-  const handleViewDetail = () => {
-    if (d) {
-      router.push(`/detailDusun?id=${d.id}`);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-1000 flex items-center justify-center p-4 bg-black/15 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto animate-fade-in">
-        {/* Header */}
-        <div className="sticky top-0 bg-linear-to-r from-[#044BB1] to-[#0566d6] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-white bg-opacity-20 rounded-lg p-2">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold">{d.name}</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Risk Level Badge */}
-          <div
-            className={`${risk.bg} rounded-xl p-4 border-l-4 ${risk.border}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 font-medium mb-1">
-                  Status Risiko Bencana
-                </p>
-                <div className="flex items-center space-x-2">
-                  <div
-                    className={`${risk.badge} w-3 h-3 rounded-full animate-pulse`}
-                  ></div>
-                  <span className={`${risk.text} font-bold text-lg capitalize`}>
-                    {d.riskLevel === "low"
-                      ? "Rendah"
-                      : d.riskLevel === "medium"
-                      ? "Sedang"
-                      : "Tinggi"}
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600 font-medium mb-1">
-                  Total Penduduk
-                </p>
-                <p className="text-3xl font-bold text-[#044BB1]">
-                  {d.population}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h3 className="font-bold text-gray-800 mb-2 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-[#044BB1]"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Deskripsi
-            </h3>
-            <p className="text-gray-700 leading-relaxed">{d.description}</p>
-          </div>
-
-          {/* Koordinat */}
-          <div className="bg-blue-50 rounded-xl p-4">
-            <h3 className="font-bold text-gray-800 mb-2 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-[#044BB1]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                />
-              </svg>
-              Koordinat
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Latitude</p>
-                <p className="font-mono font-semibold text-[#044BB1]">
-                  {d.position[0].toFixed(4)}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Longitude</p>
-                <p className="font-mono font-semibold text-[#044BB1]">
-                  {d.position[1].toFixed(4)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Demographic Data */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <h3 className="font-bold text-gray-800 mb-3 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-[#044BB1]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 12h.01M12 12h.01M15 12h.01M12 17h.01M15 17h.01M12 7h.01M15 7h.01M12 12h.01M15 12h.01"
-                />
-              </svg>
-              Data Demografi (DAFTAR RUTA IKS 2025)
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah KK:</span>
-                <span className="font-semibold">{d.jumlahKK}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah Laki-laki:</span>
-                <span className="font-semibold">{d.jumlahLakiLaki}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah Perempuan:</span>
-                <span className="font-semibold">{d.jumlahPerempuan}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah Balita:</span>
-                <span className="font-semibold">{d.jumlahBalita}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah Lansia:</span>
-                <span className="font-semibold">{d.jumlahLansia}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Jumlah Ibu Hamil:</span>
-                <span className="font-semibold">{d.jumlahIbuHamil}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Penyandang Disabilitas:</span>
-                <span className="font-semibold">{d.jumlahPenyandangDisabilitas}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-100">
-                <span className="text-gray-600">Penduduk Miskin:</span>
-                <span className="font-semibold">{d.jumlahPendudukMiskin}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleViewDetail}
-              className="flex-1 bg-[#044BB1] hover:bg-[#033a8c] text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Lihat Detail Lengkap</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg font-semibold transition-all duration-200"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Component to handle map centering and boundaries
-function MapController({
-  center,
-  zoom,
-  isMobile,
-}: {
-  center: [number, number];
-  zoom: number;
-  isMobile: boolean;
-}) {
-  const map = useMap();
-
- useEffect(() => {
-  if (!map) return;
-  
-  // Check if map is loaded safely
-  const mapInstance = map as any;
-  if (!mapInstance._loaded) return;
-
-  // Use setTimeout to ensure map is fully initialized
-  const timeoutId = setTimeout(() => {
-    try {
-      map.setView(center, zoom, { animate: true, duration: 0.5 });
-      // ...existing code...
-    } catch (error) {
-      console.error('Error setting map view:', error);
-    }
-  }, 100);
-
-  return () => clearTimeout(timeoutId);
-}, [map, center, zoom, isMobile]);
-
-  return null;
-}
-
-// Component for grayscale overlay outside boundary
-function BoundaryOverlay() {
-  const map = useMap();
-
-  useEffect(() => {
-    // Create outer boundary (world boundary)
-    const worldBounds: [number, number][] = [
-      [-90, -180],
-      [-90, 180],
-      [90, 180],
-      [90, -180],
-      [-90, -180],
-    ];
-
-    // Create polygon with hole (inverse of Sriharjo boundary)
-    const overlayPolygon = L.polygon([worldBounds, desaBoundary], {
-      color: "transparent",
-      fillColor: "#000000",
-      fillOpacity: 0.3,
-      stroke: false,
-      interactive: false,
-    });
-
-    overlayPolygon.addTo(map);
-
-    // Add grayscale filter to tiles outside boundary
-    const style = document.createElement("style");
-    style.textContent = `
-      .leaflet-tile-container {
-        filter: none;
+      if (allDusun.length > 0) {
+        const avgLat = allDusun.reduce((sum, d) => sum + d.latitude, 0) / allDusun.length;
+        const avgLng = allDusun.reduce((sum, d) => sum + d.longitude, 0) / allDusun.length;
+        map.flyTo([avgLat, avgLng], 14, { duration: 1.5 });
+      } else {
+         map.flyTo([-7.942, 110.395], 14, { duration: 1.5 });
       }
-      .boundary-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 400;
-        background: linear-gradient(
-          rgba(0,0,0,0.2) 0%,
-          rgba(0,0,0,0.1) 50%,
-          rgba(0,0,0,0.2) 100%
-        );
-        mix-blend-mode: multiply;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      map.removeLayer(overlayPolygon);
-      document.head.removeChild(style);
-    };
-  }, [map]);
+    }
+  }, [selectedDusun, map, allDusun]);
 
   return null;
 }
 
-// Component for toggle buttons
-function MapToggleButtons({
-  showFloodZone,
-  showKMLBoundaries,
-  onToggleFloodZone,
-  onToggleKMLBoundaries,
-}: {
-  showFloodZone: boolean;
-  showKMLBoundaries: boolean;
-  onToggleFloodZone: () => void;
-  onToggleKMLBoundaries: () => void;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-    container.style.backgroundColor = 'transparent';
-    container.style.border = 'none';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = '8px';
-
-    const CustomControl = L.Control.extend({
-      onAdd: function () {
-        return container;
-      },
-    });
-
-    const control = new CustomControl({ position: 'topright' });
-    control.addTo(map);
-
-    return () => {
-      map.removeControl(control);
-    };
-  }, [map]);
-
-  return null;
+interface Props {
+  selectedDusunId: number | null;
+  onDusunSelect: (id: number | null) => void;
 }
 
-interface PetaSriharjoProps {
-  selectedDusunId?: number | null;
-  onDusunSelect?: (id: number | null) => void;
-}
-
-
-
-export default function PetaSriharjo({ selectedDusunId = null, onDusunSelect }: PetaSriharjoProps) {
+export default function PetaSriharjo({ selectedDusunId, onDusunSelect }: Props) {
   const router = useRouter();
-  const [selectedDusun, setSelectedDusun] = useState<Dusun | null>(null);
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
-  const [mapReady, setMapReady] = useState(false);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([
-    -7.946, 110.404,
-  ]);
-  const [mapZoom, setMapZoom] = useState(14);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isLegendMinimized, setIsLegendMinimized] = useState(true);
-  const [showKMLBoundaries, setShowKMLBoundaries] = useState(true);
-  const [showFloodZone, setShowFloodZone] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // State Data Dusun dari DB
+  const [dusunList, setDusunList] = useState<DusunDetailDB[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Calculate center point of Sriharjo boundary - Use useMemo to prevent recalculation
-  const boundaryCenter = useMemo((): [number, number] => {
-    const lats = desaBoundary.map((coord) => coord[0]);
-    const lngs = desaBoundary.map((coord) => coord[1]);
-    const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
-    const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-    return [centerLat, centerLng];
-    const mapRef = useRef<any>(null);
-  }, []); // Empty dependency array since desaBoundary is static
-
+  // Load Data
   useEffect(() => {
-    setMapReady(true);
-    
-    // Detect mobile device
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      // Adjust initial zoom when switching between mobile/desktop
-      if (selectedDusunId === null) {
-        setMapZoom(mobile ? 13 : 14);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await dusunService.getAll(); 
+        setDusunList(data as any[]); 
+      } catch (err) {
+        console.error("Gagal load peta:", err);
+      } finally {
+        setLoading(false);
       }
     };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    fetchData();
   }, []);
 
-  const handleResetToSriharjo = () => {
-    if (selectedDusunId !== null && onDusunSelect) {
-      onDusunSelect(null);
+  const selectedDusun = useMemo(() => {
+    return dusunList.find(d => d.id === selectedDusunId) || null;
+  }, [dusunList, selectedDusunId]);
+
+  const getMarkerColor = (risk: string) => {
+    switch (risk) {
+      case 'high': return 'red';
+      case 'medium': return 'orange';
+      case 'low': return 'blue'; 
+      default: return 'blue';
     }
-    setMapCenter(boundaryCenter);
-    setMapZoom(isMobile ? 13 : 14);
   };
 
-  const handleViewDetailFromPopup = (dusun: Dusun) => {
-    router.push(`/detailDusun?id=${dusun.id}`);
+  const handleDetailClick = (id: number) => {
+    router.push(`/detailDusun?id=${id}`);
   };
 
-  const handleOpenModalFromPopup = (dusun: Dusun) => {
-    setSelectedDusun(dusun);
-  };
-
-  // Update map when selectedDusunId changes from parent
-  useEffect(() => {
-    if (selectedDusunId === null) {
-      setMapCenter(boundaryCenter);
-      setMapZoom(isMobile ? 13 : 14);
-    } else {
-      const selectedDusun = dusunData.find(d => d.id === selectedDusunId);
-      if (selectedDusun) {
-        setMapCenter(selectedDusun.position);
-        setMapZoom(isMobile ? 16 : 17);
-      }
-    }
-  }, [selectedDusunId, isMobile, boundaryCenter]);
-
-  // Filter markers berdasarkan dusun yang dipilih
-  const filteredDusunData = selectedDusunId 
-    ? dusunData.filter(d => d.id === selectedDusunId)
-    : dusunData;
-
-  if (!mapReady) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Memuat Peta...</p>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <div className="h-full w-full flex items-center justify-center bg-gray-100">Memuat Peta...</div>;
   }
 
   return (
-    <div className="relative w-full h-full">
+    <>
+      <style jsx global>{`
+        .leaflet-container {
+          width: 100%;
+          height: 100%;
+          z-index: 10;
+        }
+        /* Style Popup Leaflet Custom */
+        .custom-popup .leaflet-popup-content-wrapper {
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          padding: 0;
+          overflow: hidden;
+        }
+        .custom-popup .leaflet-popup-content {
+          margin: 0;
+          width: 280px !important;
+        }
+      `}</style>
+
+      <InfoModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+
       <MapContainer
-        center={boundaryCenter}
-        zoom={isMobile ? 13 : 14}
-        className="w-full h-full rounded-none md:rounded-xl"
-        style={{ height: "100%", width: "100%", zIndex: 1 }}
-        zoomControl={false}
+        center={[-7.942, 110.395]} 
+        zoom={14}
         scrollWheelZoom={true}
-        doubleClickZoom={true}
-        dragging={true}
-        touchZoom={true}
+        zoomControl={false}
+        className="w-full h-full rounded-xl overflow-hidden shadow-inner"
       >
-        <MapController center={mapCenter} zoom={mapZoom} isMobile={isMobile} />
-
-        {/* All Controls Container - Responsive positioning */}
-        <div className="leaflet-control-container" style={{ zIndex: 500 }}>
-          {/* Toggle Buttons - Top Right */}
-          <div className="leaflet-top leaflet-right">
-            <div className="leaflet-control" style={{ marginTop: '10px', marginRight: '10px' }}>
-              <div className="flex flex-col gap-2">
-                {/* Reset View Button */}
-                <button
-                  onClick={handleResetToSriharjo}
-                  className="bg-white hover:bg-blue-50 text-[#044BB1] p-2.5 md:p-3 rounded-lg shadow-lg border-2 border-[#044BB1] transition-all duration-200 hover:shadow-xl flex items-center justify-center"
-                  title="Fokus ke Peta Sriharjo"
-                  aria-label="Fokus ke Peta Sriharjo"
-                >
-                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-
-                {/* Toggle Flood Zone Button */}
-                <button
-                  onClick={() => setShowFloodZone(!showFloodZone)}
-                  className={`${showFloodZone ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-white hover:bg-gray-50 text-gray-700'} px-3 py-2 rounded-lg shadow-lg border-2 ${showFloodZone ? 'border-red-600' : 'border-gray-200'} text-xs md:text-sm font-semibold transition-all duration-200 flex items-center space-x-2 whitespace-nowrap`}
-                  title={showFloodZone ? "Sembunyikan Zona Banjir" : "Tampilkan Zona Banjir"}
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                  </svg>
-                  <span className="hidden sm:inline">Zona Banjir</span>
-                </button>
-
-                {/* Toggle KML Boundaries Button */}
-                <button
-                  onClick={() => setShowKMLBoundaries(!showKMLBoundaries)}
-                  className={`${showKMLBoundaries ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-white hover:bg-gray-50 text-gray-700'} px-3 py-2 rounded-lg shadow-lg border-2 ${showKMLBoundaries ? 'border-orange-600' : 'border-gray-200'} text-xs md:text-sm font-semibold transition-all duration-200 flex items-center space-x-2 whitespace-nowrap`}
-                  title={showKMLBoundaries ? "Sembunyikan Batas Detail" : "Tampilkan Batas Detail"}
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  <span className="hidden sm:inline">Batas Detail</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Legend - Enhanced with minimize button */}
-          <div className="leaflet-bottom leaflet-left ">
-            <div className={`leaflet-control bg-white rounded-lg md:rounded-xl shadow-xl border-2 border-gray-200 mb-1 md:mb-2 ml-1 md:ml-2 transition-all duration-300 ${isLegendMinimized ? 'p-2' : 'p-3 md:p-4'} ${isLegendMinimized ? 'max-w-[40px]' : 'max-w-[180px] md:max-w-sm'} ${isMobile ? 'text-xs' : ''}`}>
-              {isLegendMinimized ? (
-                <button
-                  onClick={() => setIsLegendMinimized(false)}
-                  className="w-full h-full flex items-center justify-center text-[#044BB1] hover:bg-gray-50 rounded transition-colors"
-                  title="Tampilkan Legenda"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                </button>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-2 md:mb-3">
-                    <h3 className="font-bold text-gray-800 flex items-center text-sm md:text-base border-b-2 border-[#044BB1] pb-2 flex-1">
-                      <svg
-                        className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 text-[#044BB1] flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                        />
-                      </svg>
-                      <span className="truncate">Legenda Peta</span>
-                    </h3>
-                    <button
-                      onClick={() => setIsLegendMinimized(true)}
-                      className="ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded p-1 transition-colors flex-shrink-0"
-                      title="Sembunyikan Legenda"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-3 md:space-y-3">
-                    {/* Zona Risiko Section */}
-                    <div>
-                      <p className="text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Zona Risiko</p>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-green-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Aman</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-yellow-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Waspada</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full border-2 border-white shadow-md flex-shrink-0"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Bahaya</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Batas & Jalur Section */}
-                    <div className="border-t border-gray-200 pt-2">
-                      <p className="text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Batas & Jalur</p>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-shrink-0 w-6 md:w-8 h-0.5 border-t-2 border-dashed white-" ></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Batas Desa</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-shrink-0 w-6 md:w-8 h-3 bg-red-500 opacity-25 border border-red-500"></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Zona Rawan Banjir</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-shrink-0 w-6 md:w-8 h-0.5 bg-yellow-400" style={{ height: '3px' }}></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Jalan Utama</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-shrink-0 w-6 md:w-8 h-0.5 bg-green-500" style={{ height: '3px' }}></div>
-                          <span className="text-xs md:text-sm text-gray-700 font-medium">Jalur Evakuasi</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Titik Penting Section */}
-                    
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Layer Control - Moved to topleft to replace zoom controls */}
-        <LayersControl position="topleft">
-          <LayersControl.BaseLayer name="Peta Jalan">
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="OpenStreetMap">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           </LayersControl.BaseLayer>
-
-          <LayersControl.BaseLayer checked name="Satelit">
+          <LayersControl.BaseLayer name="Satelit (Esri)">
             <TileLayer
-              attribution=""
+              attribution='Tiles &copy; Esri'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              maxZoom={18}
-            />
-          </LayersControl.BaseLayer>
-
-          <LayersControl.BaseLayer name="Satelit + Label">
-            <TileLayer
-              attribution=""
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              maxZoom={18}
-            />
-            
-          </LayersControl.BaseLayer>
-
-          <LayersControl.BaseLayer name="Terrain">
-            <TileLayer
-              attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
-              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-              maxZoom={17}
             />
           </LayersControl.BaseLayer>
         </LayersControl>
 
-        {/* Batas Desa - Enhanced styling */}
-        <Polyline
-          positions={desaBoundary}
-          pathOptions={{
-            color: "#FFFFFF",
-            weight: 2,
-            opacity: 1,
-            lineCap: "round",
-            lineJoin: "round",
-          }}
-        />
+        <MapController selectedDusun={selectedDusun} allDusun={dusunList} />
 
-        {/* Area Highlight inside boundary */}
         <Polygon
           positions={desaBoundary}
-          pathOptions={{
-            color: "transparent",
-            fillColor: "#044BB1",
-            fillOpacity: 0.08,
-            weight: 0,
-          }}
+          pathOptions={{ color: '#044BB1', weight: 3, fillOpacity: 0.05, dashArray: '5, 5' }}
         />
 
-        {/* Detailed Sriharjo polygon from imported coordinates (renders more detailed outline)
-        <Polygon
-          positions={sriharjoCoordinates}
-          pathOptions={{
-            color: "#ffffff",
-            weight: 2,
-            opacity: 0.9,
-            lineJoin: "round",
-          }}
-          // subtle fill so area is visible but doesn't overpower the main highlight
-          fillColor="#FF5722"
-          fillOpacity={0.06}
-        /> */}
+        {Array.isArray(sriharjoKMLBoundaries) && sriharjoKMLBoundaries.map((boundary, idx) => (
+           <Polygon
+             key={`kml-${idx}`}
+             positions={boundary.coordinates || []}
+             pathOptions={{
+               color: boundary.color || '#3388ff',
+               weight: 2,
+               fillOpacity: 0.1
+             }}
+           >
+             <Tooltip sticky>{boundary.name}</Tooltip>
+           </Polygon>
+        ))}
 
-        {/* Markers untuk setiap dusun dengan label permanen - FILTERED */}
-        {filteredDusunData.map((dusun) => (
+        {Array.isArray(sriharjoFloodBoundaries) && sriharjoFloodBoundaries.map((flood, idx) => (
+          <Polygon
+            key={`flood-${idx}`}
+            positions={flood.coordinates || []} 
+            pathOptions={{
+              color: 'red',
+              weight: 0, 
+              fillColor: '#ef4444',
+              fillOpacity: 0.3
+            }}
+          >
+             <Tooltip sticky>Zona Rawan Banjir</Tooltip>
+          </Polygon>
+        ))}
+
+        {dusunList.map((dusun) => (
           <Marker
             key={dusun.id}
-            position={dusun.position}
-            icon={createCustomIcon(dusun.riskLevel, isMobile)}
+            position={[dusun.latitude || 0, dusun.longitude || 0]}
+            eventHandlers={{
+              click: () => onDusunSelect(dusun.id),
+            }}
           >
-            {/* Tooltip permanen menampilkan nama dusun */}
-            <Tooltip
-              permanent
-              direction="top"
-              offset={[0, isMobile ? -24 : -40]}
-              className="custom-tooltip"
-            >
-              <div
-                style={{
-                  background: "white",
-                  padding: isMobile ? "2px 3px" : "4px 8px",
-                  borderRadius: "30px",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                  border: `2px solid ${
-                    dusun.riskLevel === "low"
-                      ? "#10b981"
-                      : dusun.riskLevel === "medium"
-                      ? "#f59e0b"
-                      : "#ef4444"
-                  }`,
-                  fontWeight: "bold",
-                  fontSize: isMobile ? "9px" : "11px",
-                  color: "#1f2937",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {dusun.name.replace("Dusun ", "")}
-              </div>
-            </Tooltip>
-
-            {/* Popup detail saat marker diklik */}
-            <Popup maxWidth={isMobile ? 240 : 280}>
-              <div className="p-2 min-w-[220px]">
-                <h3 className="font-bold text-[#044BB1] mb-2 text-base">
-                  {dusun.name}
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <svg
-                      className="w-4 h-4 text-gray-600"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                    </svg>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Penduduk:</span>{" "}
-                      {dusun.population} jiwa
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <svg
-                      className="w-4 h-4 text-gray-600"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Risiko:</span>{" "}
-                      <span
-                        className={`font-bold ${
-                          dusun.riskLevel === "low"
-                            ? "text-green-600"
-                            : dusun.riskLevel === "medium"
-                            ? "text-yellow-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {dusun.riskLevel === "low"
-                          ? "Rendah"
-                          : dusun.riskLevel === "medium"
-                          ? "Sedang"
-                          : "Tinggi"}
+            <Popup className="custom-popup">
+               <div className="flex flex-col">
+                  {/* Header Popup */}
+                  <div className="bg-[#044BB1] text-white p-3">
+                    <h3 className="font-bold text-lg">{dusun.nama}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase bg-white/20`}>
+                        {dusun.level_resiko || 'Medium'} Risk
                       </span>
-                    </p>
-                  </div>
-                  {/* Add demographic info summary */}
-                  <div className="border-t pt-2 mt-2">
-                    <p className="text-xs font-medium text-gray-600 mb-1">Demografi:</p>
-                    <div className="grid grid-cols-2 gap-1 text-xs">
-                      <span className="text-gray-700">KK: {dusun.jumlahKK}</span>
-                      <span className="text-gray-700">Balita: {dusun.jumlahBalita}</span>
-                      <span className="text-gray-700">Lansia: {dusun.jumlahLansia}</span>
-                      <span className="text-gray-700">Miskin: {dusun.jumlahPendudukMiskin}</span>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-2 pt-1">
-                    <svg
-                      className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                  
+                  {/* Body Popup */}
+                  <div className="p-4 bg-white">
+                    <div className="grid grid-cols-2 gap-y-2 text-sm mb-4">
+                      <div className="text-gray-500">Populasi</div>
+                      <div className="font-semibold text-right">{dusun.jumlah_penduduk || 0} Jiwa</div>
+                      
+                      <div className="text-gray-500">Kepala Keluarga</div>
+                      <div className="font-semibold text-right">{dusun.jumlah_kk || 0} KK</div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDetailClick(dusun.id)}
+                      className="w-full bg-[#044BB1] hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
-                      {dusun.description}
-                    </p>
+                      Lihat Detail
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => handleViewDetailFromPopup(dusun)}
-                    className="flex-1 bg-[#044BB1] hover:bg-[#033a8c] text-white px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center space-x-1"
-                  >
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span>Detail Halaman</span>
-                  </button>
-                </div>
-              </div>
+               </div>
             </Popup>
           </Marker>
         ))}
 
-        {/* Zona Banjir (Flood Zone) - Red with 25% opacity */}
-        {showFloodZone && (
-          <Polygon
-            positions={sriharjoFloodBoundaries.floodZone}
-            pathOptions={{
-              color: "#ef4444",
-              weight: 2,
-              opacity: 0.25,
-              fillColor: "#ef4444",
-              fillOpacity: 0.26,
-              lineCap: "round",
-              lineJoin: "round",
-            }}
-          >
-           
-          </Polygon>
-        )}
-
-        {/* Jalan/Roads - Yellow lines */}
-        {showFloodZone && sriharjoFloodBoundaries.roads.map((road, index) => (
-          <Polyline
-            key={`road-${index}`}
-            positions={road.coordinates}
-            pathOptions={{
-              color: "#fbbf24",
-              weight: 5,
-              opacity: 0.9,
-              lineCap: "round",
-              lineJoin: "round",
-            }}
-          >
-            <Tooltip>
-              <div className="text-xs font-semibold">
-                {road.name || `Jalan ${index + 1}`}
-              </div>
-            </Tooltip>
-          </Polyline>
-        ))}
-
-        {/* KML Main Boundary - Enhanced polygon */}
-        {showKMLBoundaries && (
-          <Polygon
-            positions={sriharjoKMLBoundaries.mainBoundary}
-            pathOptions={{
-              color: "#fffff",
-              weight: 3,
-              opacity: 0.8,
-              fillColor: "#fffff",
-              fillOpacity: 0.1,
-              lineCap: "round",
-              lineJoin: "round",
-            }}
-          >
-            <Tooltip permanent={false}>
-              <div className="text-xs font-semibold">
-                Batas Detail Sriharjo (KML)
-              </div>
-            </Tooltip>
-          </Polygon>
-        )}
-
-        {/* KML Measurements - Jalur/Polylines */}
-        {showKMLBoundaries && sriharjoKMLBoundaries.measurements.map((measurement, index) => (
-          <Polyline
-            key={`measurement-${index}`}
-            positions={measurement.coordinates}
-            pathOptions={{
-              color: "#D9E9CF",
-              weight: 1,
-              // opacity: ,
-              lineCap: "round",
-              lineJoin: "round",
-            }}
-          >
-            <Tooltip>
-              <div className="text-xs">
-                {measurement.name || `Jalur ${index + 1}`}
-              </div>
-            </Tooltip>
-          </Polyline>
-        ))}
       </MapContainer>
-
-      {/* Custom CSS - Enhanced with mobile responsiveness */}
-      <style jsx global>{`
-        .custom-tooltip {
-          background: transparent !important;
-          border: none !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-        }
-        .custom-tooltip::before {
-          display: none !important;
-        }
-        .leaflet-tooltip-left.custom-tooltip::before,
-        .leaflet-tooltip-right.custom-tooltip::before {
-          display: none !important;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-          .leaflet-control-layers {
-            transform: scale(0.85);
-            transform-origin: top right;
-            margin: 4px !important;
-          }
-          
-          .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-          }
-          
-          .leaflet-popup-content {
-            margin: 8px 10px;
-            font-size: 13px;
-          }
-          
-          .leaflet-container {
-            font-size: 12px;
-          }
-          
-          /* Make layer control more compact */
-          .leaflet-control-layers-list {
-            font-size: 12px;
-          }
-
-          /* Adjust toggle buttons on mobile */
-          .leaflet-top.leaflet-right .leaflet-control {
-            margin-top: 4px !important;
-            margin-right: 4px !important;
-          }
-        }
-        
-        /* Ensure map takes full height on mobile */
-        @media (max-width: 768px) {
-          .leaflet-container {
-            height: 100vh !important;
-            height: 100dvh !important; /* Dynamic viewport height for mobile browsers */
-          }
-        }
-      `}</style>
-
-      {/* Modals - Highest z-index */}
-      <DusunModal
-        isOpen={selectedDusun !== null}
-        onClose={() => setSelectedDusun(null)}
-        dusun={selectedDusun}
-      />
-      <InfoModal
-        isOpen={isInfoModalOpen}
-        onClose={() => setIsInfoModalOpen(false)}
-      />
-    </div>
+    </>
   );
 }
