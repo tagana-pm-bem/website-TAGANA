@@ -11,7 +11,8 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isAuthRoute = pathname.startsWith("/auth");
-  const showLayout = !isAdminRoute && !isAuthRoute;
+  const isSplashRoute = pathname === "/splash";
+  const showLayout = !isAdminRoute && !isAuthRoute && !isSplashRoute;
 
   return (
     <>

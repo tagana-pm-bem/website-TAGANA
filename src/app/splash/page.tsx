@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Router } from 'next/router';
 
 function Homepage() {
   const router = useRouter();
@@ -159,7 +160,7 @@ function Homepage() {
             >
               Selengkapnya
             </button>
-            <button className="btn secondary">Login</button>
+            <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>Login</button>
           </div>
         </div>
         <div className="hero-stats">

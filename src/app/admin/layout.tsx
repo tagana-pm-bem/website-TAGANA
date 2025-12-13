@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { mainMenuItems, settingsItems } from "@/components/admin/adminMenu";
+import { AdminSidebar  } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="ml-64 flex-1">
           <div className="bg-white border-b border-gray-200">
-            <AdminHeader />
+            <AdminHeader
+          mainMenuItems={mainMenuItems}
+          settingsItems={settingsItems}
+        />
           </div>
 
           <main className="p-6">

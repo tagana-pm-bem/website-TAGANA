@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { LayoutDashboard } from "lucide-react";
 
 interface MenuItem {
   icon: React.ReactNode;
@@ -100,13 +101,13 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 h-screen bg-gray-900 text-white flex flex-col overflow-y-auto">
+    <aside className="w-64 h-screen bg-gray-100 shadow-lg text-black flex flex-col overflow-y-auto">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
-        <h1 className="text-2xl font-black bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          TAGANA
-        </h1>
-        <p className="text-xs text-gray-400 mt-1">Admin Panel</p>
+      <div className="p-6  flex flex-row gap-3 items-center justify-center w-full">
+        <div className="w-11 h-11 flex items-center justify-center bg-blue-400 rounded-xl" >
+          <LayoutDashboard size={30} color="white" />
+        </div>
+        <p className="text-2xl font-semibold text-blue-400">Admin Desa</p>
       </div>
 
       {/* Main Menu */}
@@ -115,10 +116,10 @@ export function AdminSidebar() {
           <button
             key={item.label}
             onClick={() => handleMenuClick(item)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                ? "bg-blue-400 text-white"
+                : "text-blue-400 hover:bg-blue-400 hover:text-white"
             }`}
           >
             {item.icon}
@@ -128,15 +129,15 @@ export function AdminSidebar() {
       </nav>
 
       {/* Settings Menu */}
-      <nav className="px-4 py-4 space-y-2 border-t border-gray-700">
+      <nav className="px-4 py-4 space-y-2 ">
         {settingsItems.map((item) => (
           <button
             key={item.label}
             onClick={() => handleMenuClick(item)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                ? "bg-blue-300 text-white"
+                : "text-blue-400 hover:bg-blue-400 hover:text-white"
             }`}
           >
             {item.icon}
