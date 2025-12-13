@@ -170,6 +170,16 @@ export default function ManajemenRisiko() {
         />
       </div>
 
+      {/* KETERANGAN */}
+      <div className="flex flex-col gap-3 w-full">
+        <label className="text-blue-500 font-medium">Keterangan Tambahan</label>
+        <textarea
+          placeholder="Masukkan keterangan atau catatan tambahan..."
+          className="w-full px-4 py-3 rounded-xl shadow-md border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+          rows={4}
+        />
+      </div>
+
       <div className="border-b w-full mt-3 border-gray-400" />
 
       <div className="flex flex-row justify-between items-center">

@@ -1,15 +1,19 @@
 "use client";
 
 import React from "react";
+import { populationStats, dusunData } from "@/data/datadususn";
 
 export function StatsGrid() {
+  const totalDusun = dusunData.length;
+  const totalPopulation = populationStats.totalPopulation;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600 mb-1">Total Berita</p>
-            <h3 className="text-3xl font-bold text-gray-900">124</h3>
+            <h3 className="text-3xl font-bold text-gray-900">0</h3>
             <p className="text-xs text-green-600 mt-1">+12 bulan ini</p>
           </div>
           <div className="bg-blue-100 p-3 rounded-full">
@@ -24,7 +28,9 @@ export function StatsGrid() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600 mb-1">Total Penduduk</p>
-            <h3 className="text-3xl font-bold text-gray-900">9,410</h3>
+            <h3 className="text-3xl font-bold text-gray-900">
+              {totalPopulation.toLocaleString('id-ID')}
+            </h3>
             <p className="text-xs text-gray-500 mt-1">Data IKS 2025</p>
           </div>
           <div className="bg-green-100 p-3 rounded-full">
@@ -39,7 +45,7 @@ export function StatsGrid() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600 mb-1">Jumlah Dusun</p>
-            <h3 className="text-3xl font-bold text-gray-900">17</h3>
+            <h3 className="text-3xl font-bold text-gray-900">{totalDusun}</h3>
             <p className="text-xs text-gray-500 mt-1">Desa Sriharjo</p>
           </div>
           <div className="bg-purple-100 p-3 rounded-full">
@@ -55,7 +61,7 @@ export function StatsGrid() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600 mb-1">Event Mendatang</p>
-            <h3 className="text-3xl font-bold text-gray-900">8</h3>
+            <h3 className="text-3xl font-bold text-gray-900">0</h3>
             <p className="text-xs text-orange-600 mt-1">3 minggu ini</p>
           </div>
           <div className="bg-orange-100 p-3 rounded-full">
