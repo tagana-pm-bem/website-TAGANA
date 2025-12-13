@@ -93,9 +93,9 @@ export default function Home() {
 
             <MapArea selectedDusunId={selectedDusunId} onDusunSelect={setSelectedDusunId} />
 
-            <StatsCards />
+            {/* <StatsCards /> */}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <LegendCard />
 
               <div className="bg-white rounded-xl shadow-[1px_1px_41px_2px_rgba(17,_12,_46,_0.15)] p-6">
@@ -120,7 +120,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
           </div>
         </main>
