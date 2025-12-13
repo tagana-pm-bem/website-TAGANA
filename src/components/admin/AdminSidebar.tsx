@@ -103,13 +103,15 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 h-screen bg-gray-100 shadow-lg text-black flex flex-col overflow-y-auto">
+    <aside className="w-64 h-screen bg-gray-50 shadow-lg text-black flex flex-col overflow-y-auto">
       {/* Logo */}
-      <div className="p-6  flex flex-row gap-3 items-center justify-center w-full">
-        <div className="w-11 h-11 flex items-center justify-center bg-blue-500 rounded-xl" >
-          <LayoutDashboard size={30} color="white" />
+      <div className="p-4  flex flex-col gap-3 items-center justify-center w-full border-b-2 border-blue-400">
+        <div className="flex flex-row gap-3 items-center justify-center">
+          <div className="w-11 h-11 flex items-center justify-center bg-blue-500 rounded-xl" >
+        <LayoutDashboard size={30} color="white" />
+          </div>
+          <p className="text-2xl font-semibold text-blue-500">Admin Desa</p>
         </div>
-        <p className="text-2xl font-semibold text-blue-500">Admin Desa</p>
       </div>
 
       {/* Main Menu */}
@@ -121,7 +123,7 @@ export function AdminSidebar() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
                 ? "bg-blue-500 text-white"
-                : "text-blue-400 hover:bg-blue-400 hover:text-white"
+                : "text-blue-500 hover:bg-blue-400 hover:text-white"
             }`}
           >
             {item.icon}
@@ -139,7 +141,7 @@ export function AdminSidebar() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
               activeMenu === item.label
                 ? "bg-blue-500 text-white"
-                : "text-blue-400 hover:bg-blue-400 hover:text-white"
+                : "text-blue-500 hover:bg-blue-400 hover:text-white"
             }`}
           >
             {item.icon}
