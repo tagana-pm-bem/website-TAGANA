@@ -2,8 +2,21 @@
 
 import React from "react";
 import { populationStats, dusunData } from "@/data/datadususn";
+import { useDusun } from "@/hooks/useDusun.hooks";
+
 
 export function StatsGrid() {
+  const { statsSummary, isLoading } = useDusun();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((index) => (
+          <div key={index} className="h-32 bg-gray-100 rounded-xl animate-pulse border border-gray-200" />
+        ))}
+      </div>
+    )
+  }
   const totalDusun = dusunData.length;
   const totalPopulation = populationStats.totalPopulation;
 
@@ -29,7 +42,7 @@ export function StatsGrid() {
           <div>
             <p className="text-sm text-gray-600 mb-1">Total Penduduk</p>
             <h3 className="text-3xl font-bold text-gray-900">
-              {totalPopulation.toLocaleString('id-ID')}
+              {statsSummary.totalPopulation.toLocaleString('id-ID')}
             </h3>
             <p className="text-xs text-gray-500 mt-1">Data IKS 2025</p>
           </div>
@@ -45,7 +58,7 @@ export function StatsGrid() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600 mb-1">Jumlah Dusun</p>
-            <h3 className="text-3xl font-bold text-gray-900">{totalDusun}</h3>
+            <h3 className="text-3xl font-bold text-gray-900">{statsSummary.totalDusun}</h3>
             <p className="text-xs text-gray-500 mt-1">Desa Sriharjo</p>
           </div>
           <div className="bg-purple-100 p-3 rounded-full">
