@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { dusunData } from "@/data/dataDusun";
+import { useDemographics } from "@/hooks/useDemographics";
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,6 +9,8 @@ interface ModalProps {
 }
 
 export function InfoModal({ isOpen, onClose }: ModalProps) {
+  const stats = useDemographics();
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -22,425 +24,384 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
 
   if (!isOpen) return null;
 
-  // Calculate totals from dusunData
-  const totalPopulation = dusunData.reduce(
-    (sum, dusun) => sum + dusun.population,
-    0
-  );
-  const totalKK = dusunData.reduce((sum, dusun) => sum + dusun.jumlahKK, 0);
-  const totalLakiLaki = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahLakiLaki,
-    0
-  );
-  const totalPerempuan = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahPerempuan,
-    0
-  );
-  const totalBalita = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahBalita,
-    0
-  );
-  const totalLansia = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahLansia,
-    0
-  );
-  const totalIbuHamil = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahIbuHamil,
-    0
-  );
-  const totalDisabilitas = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahPenyandangDisabilitas,
-    0
-  );
-  const totalMiskin = dusunData.reduce(
-    (sum, dusun) => sum + dusun.jumlahPendudukMiskin,
-    0
-  );
-
-  // Calculate kepadatan (assuming luas wilayah 12.5 km²)
   const luasWilayah = 502.36;
-  const kepadatan = Math.round(totalPopulation / luasWilayah);
-
-  // Calculate age composition percentages
-  const totalDewasa = totalPopulation - totalBalita - totalLansia;
-  const persentaseBalita = Math.round((totalBalita / totalPopulation) * 100);
-  const persentaseDewasa = Math.round((totalDewasa / totalPopulation) * 100);
-  const persentaseLansia = Math.round((totalLansia / totalPopulation) * 100);
-
-  // Count risk levels
-  const zonaAman = dusunData.filter((d) => d.riskLevel === "low").length;
-  const zonaWaspada = dusunData.filter((d) => d.riskLevel === "medium").length;
-  const zonaBahaya = dusunData.filter((d) => d.riskLevel === "high").length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/15 backdrop-blur-sm">
-      {/* CSS untuk menyembunyikan scrollbar pada container modal */}
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animasi untuk bar chart */
+        @keyframes growBar {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        @keyframes growHeight {
+          from { height: 0; }
+          to { height: 100%; }
+        }
+        .animate-bar-width {
+          animation: growBar 0.8s ease-out forwards;
+        }
+        .animate-bar-height {
+          animation: growHeight 0.8s ease-out forwards;
+          transform-origin: bottom;
+        }
       `}</style>
 
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in hide-scrollbar">
         {/* Header */}
-        <div className="sticky top-0 bg-linear-to-r from-[#044BB1] to-[#0566d6] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-[#044BB1] to-[#0566d6] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
           <h2 className="text-2xl font-bold">Informasi Desa Sriharjo</h2>
           <button
             onClick={onClose}
             className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Tentang Daerah */}
-          <section className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-l-4 border-[#044BB1]">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-[#044BB1] rounded-lg p-3">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-[#044BB1]">Tentang Desa</h3>
+          {stats.isLoading ? (
+            <div className="animate-pulse space-y-4">
+              <div className="h-40 bg-gray-200 rounded-xl"></div>
+              <div className="h-40 bg-gray-200 rounded-xl"></div>
+              <div className="h-60 bg-gray-200 rounded-xl"></div>
             </div>
-            <div className="space-y-3 text-gray-700">
-              <p className="leading-relaxed">
-                <span className="font-semibold">Sriharjo</span> adalah sebuah
-                desa yang terletak di Kecamatan Imogiri, Kabupaten Bantul,
-                Daerah Istimewa Yogyakarta. Desa ini terdiri dari{" "}
-                <span className="font-semibold">{dusunData.length} dusun</span>{" "}
-                dengan karakteristik geografis yang beragam, dari dataran rendah
-                hingga perbukitan.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-sm text-gray-500">Luas Wilayah</p>
-                  <p className="text-lg font-bold text-[#044BB1]">
-                    {luasWilayah} Ha
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-sm text-gray-500">Jumlah Dusun</p>
-                  <p className="text-lg font-bold text-[#044BB1]">
-                    {dusunData.length}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-sm text-gray-500">Ketinggian</p>
-                  <p className="text-lg font-bold text-[#044BB1]">
-                    50-200 mdpl
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Bencana yang Sering Terjadi */}
-          <section className="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-6 border-l-4 border-orange-500">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-orange-500 rounded-lg p-3">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-orange-600">
-                Potensi Bencana & Sebaran Zona
-              </h3>
-            </div>
-            <div className="space-y-3">
-              {/* Zona Risk Summary */}
-              
-
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-red-100 rounded-lg p-2.5 mt-1">
-                    <svg
-                      className="w-6 h-6 text-red-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                      />
+          ) : (
+            <>
+              {/* Tentang Daerah */}
+              <section className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-l-4 border-[#044BB1]">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-[#044BB1] rounded-lg p-3">
+                    {/* Icon Location */}
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-800">Tanah Longsor</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Terjadi terutama di daerah perbukitan saat musim hujan.
-                      Frekuensi: 2-3 kali/tahun
-                    </p>
+                  <h3 className="text-xl font-bold text-[#044BB1]">Tentang Desa</h3>
+                </div>
+                <div className="space-y-3 text-gray-700">
+                  <p className="leading-relaxed">
+                    <span className="font-semibold">Sriharjo</span> adalah sebuah desa yang terletak di Kecamatan Imogiri...
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <p className="text-sm text-gray-500">Luas Wilayah</p>
+                      <p className="text-lg font-bold text-[#044BB1]">{luasWilayah} Ha</p>
+                    </div>
+                    {/* Data jumlah dusun bisa diambil dari count array nanti jika perlu, atau hardcode */}
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <p className="text-sm text-gray-500">Jumlah Dusun</p>
+                      <p className="text-lg font-bold text-[#044BB1]">13</p> 
+                    </div>
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <p className="text-sm text-gray-500">Ketinggian</p>
+                      <p className="text-lg font-bold text-[#044BB1]">50-200 mdpl</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-blue-100 rounded-lg p-2.5 mt-1">
-                    <svg
-                      className="w-6 h-6 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7l4-4m0 0l4 4m-4-4v18M3 13h3m12 0h3"
-                      />
+            
+
+              {/* --- DEMOGRAFI DARI SUPABASE --- */}
+              <section className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-l-4 border-green-500">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-green-500 rounded-lg p-3">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-800">Banjir</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Banjir lokal di area dataran rendah saat intensitas hujan
-                      tinggi. Frekuensi: 1-2 kali/tahun
-                    </p>
+                  <h3 className="text-xl font-bold text-green-600">
+                    Demografi Penduduk
+                  </h3>
+                </div>
+
+                {/* 1. Total Penduduk, KK, Kepadatan */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-white rounded-lg p-4 shadow-sm text-center">
+                    <p className="text-sm text-gray-500 mb-2">Total Penduduk</p>
+                    <p className="text-3xl font-bold text-[#044BB1]"> {stats.totalPenduduk.toLocaleString('id-ID')}</p>
+                    <p className="text-xs text-gray-400 mt-1">Jiwa</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm text-center">
+                    <p className="text-sm text-gray-500 mb-2">Jumlah KK</p>
+                    <p className="text-3xl font-bold text-green-600"> {stats.totalKK.toLocaleString('id-ID')}</p>
+                    <p className="text-xs text-gray-400 mt-1">Kepala Keluarga</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm text-center">
+                    <p className="text-sm text-gray-500 mb-2">Kepadatan</p>
+                    <p className="text-3xl font-bold text-orange-500"> {stats.kepadatan}</p>
+                    <p className="text-xs text-gray-400 mt-1">Jiwa/Ha</p>
                   </div>
                 </div>
-              </div>
 
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-yellow-100 rounded-lg p-2.5 mt-1">
-                    <svg
-                      className="w-6 h-6 text-yellow-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-800">Kekeringan</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Terjadi pada musim kemarau panjang, terutama di daerah
-                      perbukitan
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Jumlah Penduduk */}
-          <section className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-6 border-l-4 border-green-500">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-green-500 rounded-lg p-3">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-green-600">
-                Demografi Penduduk (IKS 2025)
-              </h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm text-center">
-                <p className="text-sm text-gray-500 mb-2">Total Penduduk</p>
-                <p className="text-3xl font-bold text-[#044BB1]"> ± 9000</p>
-                <p className="text-xs text-gray-400 mt-1">Jiwa</p>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm text-center">
-                <p className="text-sm text-gray-500 mb-2">Jumlah KK</p>
-                <p className="text-3xl font-bold text-green-600"> ± 3500</p>
-                <p className="text-xs text-gray-400 mt-1">Kepala Keluarga</p>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm text-center">
-                <p className="text-sm text-gray-500 mb-2">Kepadatan</p>
-                <p className="text-3xl font-bold text-orange-500"> ± 750</p>
-                <p className="text-xs text-gray-400 mt-1">Jiwa/km²</p>
-              </div>
-            </div>
-
-            {/* Detailed Demographics */}
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-bold text-gray-800 mb-3">
-                  Komposisi Gender
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Laki-laki</span>
-                    <span className="text-lg font-bold text-blue-600">
-                      {" "}
-                      ± 4,650
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Perempuan</span>
-                    <span className="text-lg font-bold text-pink-600">
-                      {" "}
-                      ± 4,760
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-bold text-gray-800 mb-3">
-                  Kelompok Rentan
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Balita (0-5 tahun)</span>
-                    <span className="font-semibold text-gray-600">
-                      {totalBalita}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Lansia (&gt;60 tahun)</span>
-                    <span className="font-semibold text-gray-600">
-                      {totalLansia}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Ibu Hamil</span>
-                    <span className="font-semibold text-gray-600">
-                      {totalIbuHamil}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">
-                      Penyandang Disabilitas
-                    </span>
-                    <span className="font-semibold text-gray-600">
-                      {totalDisabilitas}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-t pt-2">
-                    <span className="text-gray-600 font-medium">
-                      Penduduk Miskin
-                    </span>
-                    <span className="font-bold text-orange-600">
-                      {totalMiskin}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 bg-white rounded-lg p-4 shadow-sm">
-              <h4 className="font-bold text-gray-800 mb-3">Komposisi Usia</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    Balita (0-5 tahun)
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-[#044BB1] h-2 rounded-full"
-                        style={{ width: `${persentaseBalita}%` }}
-                      ></div>
+                {/* 2. CHART GENDER - Horizontal Bar */}
+                <div className="bg-white rounded-lg p-6 shadow-sm mb-4">
+                  <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-blue-500 rounded"></div>
+                    Komposisi Gender
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    {/* Laki-laki */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                          <span className="text-sm font-medium text-gray-700">Laki-laki</span>
+                        </div>
+                        <span className="text-sm font-bold text-blue-600">
+                          {stats.lakiLaki.toLocaleString('id-ID')} ({((stats.lakiLaki / stats.totalPenduduk) * 100).toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000 ease-out"
+                          style={{ width: `${(stats.lakiLaki / stats.totalPenduduk) * 100}%` }}
+                        >
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 w-12 text-right">
-                      {persentaseBalita}%
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    Dewasa (6-60 tahun)
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-green-500 h-2 rounded-full"
-                        style={{ width: `${persentaseDewasa}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-700 w-12 text-right">
-                      {persentaseDewasa}%
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">
-                    Lansia (&gt;60 tahun)
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-orange-500 h-2 rounded-full"
-                        style={{ width: `${persentaseLansia}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-700 w-12 text-right">
-                      {persentaseLansia}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
 
-          {/* Footer */}
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-500">
-              Data per IKS 2025 | Sumber: DAFTAR RUTA IKS 2025 Desa Sriharjo
-            </p>
-          </div>
+                    {/* Perempuan */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-pink-500 rounded"></div>
+                          <span className="text-sm font-medium text-gray-700">Perempuan</span>
+                        </div>
+                        <span className="text-sm font-bold text-pink-600">
+                          {stats.perempuan.toLocaleString('id-ID')} ({((stats.perempuan / stats.totalPenduduk) * 100).toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+                        <div 
+                          className="bg-gradient-to-r from-pink-500 to-pink-600 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-1000 ease-out"
+                          style={{ width: `${(stats.perempuan / stats.totalPenduduk) * 100}%` }}
+                        >
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. CHART KELOMPOK RENTAN - Column Chart */}
+                <div className="bg-white rounded-lg p-6 shadow-sm mb-4">
+                  <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-orange-500 rounded"></div>
+                    Kelompok Rentan
+                  </h4>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    {/* Balita */}
+                    <div className="text-center">
+                      <div className="relative h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        <div 
+                          className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-blue-400 transition-all duration-1000 ease-out"
+                          style={{ height: `${Math.min((stats.balita / stats.totalPenduduk) * 100 * 3, 100)}%` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center z-10">
+                            <p className="text-2xl font-bold text-gray-700">{stats.balita}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2 font-medium">Balita (0-5)</p>
+                    </div>
+
+                    {/* Lansia */}
+                    <div className="text-center">
+                      <div className="relative h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        <div 
+                          className="absolute bottom-0 w-full bg-gradient-to-t from-orange-500 to-orange-400 transition-all duration-1000 ease-out"
+                          style={{ height: `${Math.min((stats.lansia / stats.totalPenduduk) * 100 * 3, 100)}%` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center z-10">
+                            <p className="text-2xl font-bold text-gray-700">{stats.lansia}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2 font-medium">Lansia (&gt;60)</p>
+                    </div>
+
+                    {/* Ibu Hamil */}
+                    <div className="text-center">
+                      <div className="relative h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        <div 
+                          className="absolute bottom-0 w-full bg-gradient-to-t from-pink-500 to-pink-400 transition-all duration-1000 ease-out"
+                          style={{ height: `${Math.min((stats.ibuHamil / stats.totalPenduduk) * 100 * 3, 100)}%` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center z-10">
+                            <p className="text-2xl font-bold text-gray-700">{stats.ibuHamil}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2 font-medium">Ibu Hamil</p>
+                    </div>
+
+                    {/* Disabilitas */}
+                    <div className="text-center">
+                      <div className="relative h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        <div 
+                          className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-purple-400 transition-all duration-1000 ease-out"
+                          style={{ height: `${Math.min((stats.disabilitas / stats.totalPenduduk) * 100 * 3, 100)}%` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center z-10">
+                            <p className="text-2xl font-bold text-gray-700">{stats.disabilitas}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2 font-medium">Disabilitas</p>
+                    </div>
+                  </div>
+
+                  {/* Penduduk Miskin - Highlight */}
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border-l-4 border-orange-500">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-orange-500 rounded-full p-2">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Penduduk Kategori Miskin</p>
+                          <p className="text-2xl font-bold text-orange-600">{stats.miskin.toLocaleString('id-ID')}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-3xl font-bold text-orange-600">
+                          {((stats.miskin / stats.totalPenduduk) * 100).toFixed(1)}%
+                        </p>
+                        <p className="text-xs text-gray-500">dari total</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. PIE CHART KOMPOSISI USIA */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-green-500 rounded"></div>
+                    Komposisi Usia
+                  </h4>
+                  
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    {/* Donut Chart */}
+                    <div className="relative w-48 h-48">
+                      <svg className="transform -rotate-90 w-48 h-48">
+                        <circle cx="96" cy="96" r="80" fill="transparent" stroke="#e5e7eb" strokeWidth="32"/>
+                        
+                        {/* Balita segment */}
+                        <circle 
+                          cx="96" 
+                          cy="96" 
+                          r="80" 
+                          fill="transparent" 
+                          stroke="#3b82f6" 
+                          strokeWidth="32"
+                          strokeDasharray={`${(stats.persenBalita / 100) * 502} 502`}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                        
+                        {/* Dewasa segment */}
+                        <circle 
+                          cx="96" 
+                          cy="96" 
+                          r="80" 
+                          fill="transparent" 
+                          stroke="#22c55e" 
+                          strokeWidth="32"
+                          strokeDasharray={`${(stats.persenDewasa / 100) * 502} 502`}
+                          strokeDashoffset={`-${(stats.persenBalita / 100) * 502}`}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                        
+                        {/* Lansia segment */}
+                        <circle 
+                          cx="96" 
+                          cy="96" 
+                          r="80" 
+                          fill="transparent" 
+                          stroke="#f97316" 
+                          strokeWidth="32"
+                          strokeDasharray={`${(stats.persenLansia / 100) * 502} 502`}
+                          strokeDashoffset={`-${((stats.persenBalita + stats.persenDewasa) / 100) * 502}`}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                      </svg>
+                      
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-gray-800">{stats.totalPenduduk.toLocaleString('id-ID')}</p>
+                          <p className="text-xs text-gray-500">Total Jiwa</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Legend */}
+                    <div className="flex-1 space-y-3 w-full">
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                          <span className="text-sm font-medium text-gray-700">Balita (0-5 tahun)</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-blue-600">{stats.balita}</p>
+                          <p className="text-xs text-gray-500">{stats.persenBalita}%</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-sm font-medium text-gray-700">Dewasa (6-60 tahun)</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-green-600">{stats.totalPenduduk - stats.balita - stats.lansia}</p>
+                          <p className="text-xs text-gray-500">{stats.persenDewasa}%</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                          <span className="text-sm font-medium text-gray-700">Lansia (&gt;60 tahun)</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-orange-600">{stats.lansia}</p>
+                          <p className="text-xs text-gray-500">{stats.persenLansia}%</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Footer */}
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-sm text-gray-500">
+                  Data diambil dari Database SID | Update Terakhir: Hari ini
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
