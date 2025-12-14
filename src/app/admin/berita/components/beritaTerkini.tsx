@@ -96,7 +96,7 @@ export default function BeritaTerkini({ refreshTrigger = 0 }: BeritaTerkiniProps
             {currentData.map((berita) => (
               <div
                 key={berita.id}
-                onClick={() => router.push(`/admin/berita/edit/${berita.id}`)}
+                onClick={() => router.push(`/admin/beritaTerkini/${berita.id}`)}
                 className="flex flex-row gap-3 p-2 bg-white rounded-lg  hover:border-gray-200 hover:bg-gray-50 transition cursor-pointer group items-start"
               >
                 <div className="relative w-[70px] h-[70px] flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">

@@ -164,7 +164,6 @@ export default function BeritaKategoriContent({
               </div>
             </div>
             
-            {/* Tombol Hapus Artikel */}
             <button onClick={() => setShowDeleteModal(true)} className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Hapus Berita">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
             </button>
@@ -184,7 +183,21 @@ export default function BeritaKategoriContent({
           </div>
         </section>
 
-        <article className="prose prose-lg max-w-none py-8 text-gray-800">
+        {/* --- PERBAIKAN STYLING DI SINI --- */}
+        <article className="
+          py-8 text-gray-800 leading-relaxed
+          [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-6
+          [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5
+          [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4
+          [&_p]:mb-4
+          [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
+          [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
+          [&_li]:mb-1
+          [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800
+          [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:mb-4
+          [&_strong]:font-bold
+          [&_em]:italic
+        ">
            <div dangerouslySetInnerHTML={{ __html: berita.isi_berita }} />
         </article>
 
@@ -201,11 +214,10 @@ export default function BeritaKategoriContent({
             </button>
           </div>
 
-          {/* Comments */}
+          {/* Comments Section (Tidak berubah) */}
           <div className="space-y-6">
             <h3 className="text-xl font-bold text-gray-900">Komentar ({comments.length})</h3>
 
-            {/* Input Komentar */}
             <form onSubmit={handleAddComment} className="space-y-3">
               <textarea
                 value={newComment}
@@ -240,7 +252,6 @@ export default function BeritaKategoriContent({
                             <h4 className="font-semibold text-gray-900">{comment.nama_pengguna}</h4>
                             <time className="text-xs text-gray-500">{formatDate(comment.created_at)}</time>
                          </div>
-                         
                          <button 
                             onClick={() => handleDeleteComment(comment.id)}
                             className="cursor-pointer text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
@@ -259,7 +270,6 @@ export default function BeritaKategoriContent({
         </section>
       </div>
 
-      {/* Delete Confirmation Modal (Untuk Berita) */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">

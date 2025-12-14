@@ -57,19 +57,19 @@ export async function middleware(request: NextRequest) {
   );
 
   // PROTEKSI: Semua halaman /admin/* HARUS login
-  if (path.startsWith("/admin") && !user) {
-    console.log(`[Middleware] 🚨 AKSES DITOLAK! Redirect ke login...`);
-    return NextResponse.redirect(new URL("/auth/login", request.url));
-  }
+  // if (path.startsWith("/admin") && !user) {
+  //   console.log(`[Middleware] 🚨 AKSES DITOLAK! Redirect ke login...`);
+  //   return NextResponse.redirect(new URL("/auth/login", request.url));
+  // }
 
-  if ((path === "/login" || path === "/auth/login") && user) {
-    console.log(
-      "[Middleware] User bandel, udah login mau ke login lagi. Tendang ke Dashboard!"
-    );
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/admin/dashboard";
-    return NextResponse.redirect(redirectUrl);
-  }
+  // if ((path === "/login" || path === "/auth/login") && user) {
+  //   console.log(
+  //     "[Middleware] User bandel, udah login mau ke login lagi. Tendang ke Dashboard!"
+  //   );
+  //   const redirectUrl = request.nextUrl.clone();
+  //   redirectUrl.pathname = "/admin/dashboard";
+  //   return NextResponse.redirect(redirectUrl);
+  // }
 
   return response;
 }

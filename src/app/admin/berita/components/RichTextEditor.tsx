@@ -5,7 +5,6 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
-import Heading from "@tiptap/extension-heading";
 import {
   Bold,
   Italic,
@@ -30,12 +29,21 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
       Underline,
       Image,
-      Heading.configure({
-        levels: [1, 2, 3],
-      }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -43,14 +51,15 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       }),
     ],
     content: content,
-    immediatelyRender: false, 
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
-        class:
-          "min-h-[200px] p-4 focus:outline-none text-sm text-gray-800 prose prose-sm max-w-none",
+        // PERBAIKAN UTAMA DI SINI:
+        // String class ini HARUS SATU BARIS LURUS (tanpa enter)
+        class: "min-h-[200px] p-4 focus:outline-none text-sm text-gray-800 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mb-2",
       },
     },
   });
@@ -62,6 +71,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 p-2 bg-blue-50">
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={`${baseBtn} ${editor.isActive("heading", { level: 1 }) ? activeBtn : ""}`}
           title="Heading 1"
@@ -70,6 +80,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`${baseBtn} ${editor.isActive("heading", { level: 2 }) ? activeBtn : ""}`}
           title="Heading 2"
@@ -78,6 +89,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={`${baseBtn} ${editor.isActive("heading", { level: 3 }) ? activeBtn : ""}`}
           title="Heading 3"
@@ -88,6 +100,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`${baseBtn} ${editor.isActive("bold") ? activeBtn : ""}`}
           title="Bold"
@@ -96,6 +109,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={`${baseBtn} ${editor.isActive("italic") ? activeBtn : ""}`}
           title="Italic"
@@ -104,6 +118,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={`${baseBtn} ${editor.isActive("underline") ? activeBtn : ""}`}
           title="Underline"
@@ -114,6 +129,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`${baseBtn} ${editor.isActive("bulletList") ? activeBtn : ""}`}
           title="Bullet List"
@@ -122,6 +138,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`${baseBtn} ${editor.isActive("orderedList") ? activeBtn : ""}`}
           title="Numbered List"
