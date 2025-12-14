@@ -323,53 +323,63 @@ export default function BeritaList() {
             <article
               key={berita.id}
               onClick={() => handleBeritaClick(berita.kategori)}
-              className="flex flex-row gap-3 sm:gap-4 md:gap-5 p-3 sm:p-4 md:p-5 bg-white rounded-lg sm:rounded-xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
+              className="bg-white rounded-lg sm:rounded-xl cursor-pointer hover:shadow-xl transition-all duration-200 border border-gray-200 hover:border-gray-300 overflow-hidden"
             >
-              <div className="flex-shrink-0">
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
-                    src={berita.image}
-                    alt={berita.judul}
-                    fill
-                    sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 112px, 128px"
-                    className="object-cover"
-                    priority={index < 3}
-                  />
-                </div>
+              {/* Featured Image */}
+              <div className="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gray-100 overflow-hidden">
+                <Image
+                  src={berita.image}
+                  alt={berita.judul}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1000px"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  priority={index < 3}
+                />
               </div>
 
-              <div className="flex flex-col gap-2 justify-between min-w-0 flex-1">
-                <h2 className="text-sm sm:text-base md:text-lg font-semibold leading-tight line-clamp-2 text-gray-800 hover:text-blue-600 transition-colors">
-                  {berita.judul}
-                </h2>
-
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
-                  <time
-                    dateTime={berita.tanggal}
-                    className="whitespace-nowrap font-medium"
-                  >
-                    {berita.tanggal}
-                  </time>
-
-                  <span className="hidden sm:inline text-gray-400">•</span>
-
+              {/* Content */}
+              <div className="p-4 sm:p-6 md:p-8 space-y-4">
+                {/* Category Badge */}
+                <div className="flex items-center gap-2">
                   <span
-                    className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium capitalize border ${kategoriBadge(
+                    className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold capitalize border ${kategoriBadge(
                       berita.kategori
                     )}`}
                   >
                     {berita.kategori}
                   </span>
-
-                  <span className="hidden sm:inline text-gray-400">•</span>
-
                   <span
-                    className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium capitalize ${statusBadge(
+                    className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold capitalize ${statusBadge(
                       berita.status
                     )}`}
                   >
                     {berita.status}
                   </span>
+                </div>
+
+                {/* Title */}
+                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight text-gray-900 hover:text-blue-600 transition-colors">
+                  {berita.judul}
+                </h2>
+
+                {/* Author & Date */}
+                <div className="flex items-center gap-3 pt-2">
+                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm sm:text-base">
+                      T
+                    </span>
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900">
+                      Tim TAGANA Sriharjo
+                    </p>
+                    <time
+                      dateTime={berita.tanggal}
+                      className="text-xs sm:text-sm text-gray-500"
+                    >
+                      {berita.tanggal}
+                    </time>
+                  </div>
                 </div>
               </div>
             </article>

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Kategori } from "../types";
 import { KATEGORI_LIST, KATEGORI_CONFIG } from "../constants";
-import BeritaKategoriContent from "./BeritaKategoriContent";
+import BeritaKategoriContent from "./components/BeritaKategoriContent";
 
 // Generate static params for all kategori
 export async function generateStaticParams() {

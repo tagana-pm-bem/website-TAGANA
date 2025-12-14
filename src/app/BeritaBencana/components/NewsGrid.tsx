@@ -3,14 +3,40 @@
 import React from "react";
 import { NewsCard } from "./NewsCard";
 
-export function NewsGrid({ beritaList, getCategoryColor, getStatusColor, formatDate, onReadMore }: any) {
-  return (
-    beritaList.length === 0 ? null : (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {beritaList.map((b: any) => (
-          <NewsCard key={b.id} berita={b} getCategoryColor={getCategoryColor} getStatusColor={getStatusColor} formatDate={formatDate} onReadMore={onReadMore} />
-        ))}
-      </div>
-    )
+interface NewsGridProps {
+  beritaList: Array<{
+    id: number;
+    title: string;
+    description: string;
+    category: string;
+    date: string;
+    image?: string;
+    location?: string;
+  }>;
+  getCategoryColor: (category: string) => string;
+  getStatusColor: (status: string) => string;
+  formatDate: (date: string) => string;
+  onReadMore: (id: number) => void;
+}
+
+export function NewsGrid({
+  beritaList,
+  getCategoryColor,
+  getStatusColor,
+  formatDate,
+  onReadMore,
+}: NewsGridProps) {
+  return beritaList.length === 0 ? null : (
+    <section className="space-y-4" aria-label="Daftar Berita Bencana">
+      {beritaList.map((b) => (
+        <NewsCard
+          key={b.id}
+          berita={b}
+          getCategoryColor={getCategoryColor}
+          formatDate={formatDate}
+          onReadMore={onReadMore}
+        />
+      ))}
+    </section>
   );
 }

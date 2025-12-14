@@ -23,7 +23,10 @@ interface DetailNewsCardPageProps {
   onBack?: () => void;
 }
 
-export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) {
+export function DetailNewsCardPage({
+  berita,
+  onBack,
+}: DetailNewsCardPageProps) {
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
       Banjir: "bg-blue-100 text-blue-800",
@@ -40,15 +43,21 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-white max-w-5xl mx-auto shadow-2xl rounded-lg ">
-      <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
+    <article className="min-h-screen bg-white max-w-5xl mx-auto shadow-2xl rounded-lg flex flex-col">
+      <div className="w-full max-w-4xl mx-auto px-4 py-6 md:py-12 flex-1 flex flex-col">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-xs md:text-sm text-gray-600 mb-4 md:mb-6">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center space-x-2 text-xs md:text-sm text-gray-600 mb-4 md:mb-6"
+        >
           <Link href="/" className="hover:text-blue-600 transition-colors">
             Beranda
           </Link>
           <span>›</span>
-          <Link href="/kategori" className="hover:text-blue-600 transition-colors">
+          <Link
+            href="/kategori"
+            className="hover:text-blue-600 transition-colors"
+          >
             Kategori
           </Link>
           <span>›</span>
@@ -61,13 +70,14 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
             className={`inline-block px-3 md:px-4 py-1 md:py-1.5 rounded-md text-xs md:text-sm font-semibold ${getCategoryColor(
               berita.category
             )}`}
+            aria-label={`Kategori: ${berita.category}`}
           >
             {berita.category}
           </span>
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight break-words">
           {berita.title}
         </h1>
 
@@ -81,6 +91,7 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
                 width={48}
                 height={48}
                 className="w-full h-full object-cover"
+                priority
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-blue-600 text-white font-semibold text-sm md:text-base">
@@ -89,7 +100,9 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
             )}
           </div>
           <div>
-            <p className="font-semibold text-sm md:text-base text-gray-900">{berita.author.name}</p>
+            <p className="font-semibold text-sm md:text-base text-gray-900">
+              {berita.author.name}
+            </p>
             <p className="text-xs md:text-sm text-gray-500">
               {berita.date} • {berita.readTime}
             </p>
@@ -97,13 +110,15 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
         </div>
 
         {/* Featured Image */}
-        <div className="relative w-full h-64 md:h-96 mb-6 md:mb-8 rounded-lg md:rounded-xl overflow-hidden bg-gray-200">
+        <div className="relative w-full aspect-[16/7] md:aspect-[16/6] mb-6 md:mb-10 rounded-lg md:rounded-xl overflow-hidden bg-gray-200">
           {berita.imageUrl ? (
             <Image
               src={berita.imageUrl}
               alt={berita.title}
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 800px"
+              priority
             />
           ) : (
             <div className="w-full h-full">
@@ -113,32 +128,38 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
                 fill
                 className="object-cover"
                 unoptimized
+                sizes="(max-width: 768px) 100vw, 800px"
               />
             </div>
           )}
         </div>
 
         {/* Content */}
-        <article className="prose prose-sm md:prose-lg max-w-none">
+        <section className="prose prose-sm md:prose-lg max-w-none">
           {berita.content.map((paragraph, index) => (
-            <p key={index} className="text-sm md:text-base text-gray-700 leading-relaxed mb-4 md:mb-6 text-justify">
+            <p
+              key={index}
+              className="text-base md:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6 break-words"
+            >
               {paragraph}
             </p>
           ))}
-        </article>
+        </section>
 
         {/* Back Button */}
         {onBack && (
           <div className="mt-8 md:mt-12">
             <button
               onClick={onBack}
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors text-sm md:text-base"
+              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+              tabIndex={0}
             >
               <svg
                 className="w-4 h-4 md:w-5 md:h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -153,15 +174,15 @@ export function DetailNewsCardPage({ berita, onBack }: DetailNewsCardPageProps) 
         )}
 
         <div className="max-w-4xl mx-auto px-4">
-        <LikePage
-          initialLikes={100}
-          initialComments={4}
-          onLike={() => console.log("Liked")}
-          onComment={() => console.log("Comment")}
-          onShare={() => console.log("Share")}
-        />
+          <LikePage
+            initialLikes={100}
+            initialComments={4}
+            onLike={() => console.log("Liked")}
+            onComment={() => console.log("Comment")}
+            onShare={() => console.log("Share")}
+          />
+        </div>
       </div>
-      </div>
-    </div>
+    </article>
   );
 }

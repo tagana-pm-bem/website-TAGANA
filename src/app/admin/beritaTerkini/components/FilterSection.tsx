@@ -118,7 +118,8 @@ export default function FilterSection({
 
         {/* Kategori Umum */}
         <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-600 px-2">Berita Umum</p>
+          <p className="text-xs font-medium text-gray-600 px-2">
+            Berita Umum</p>
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300">
             <button
               onClick={() => onKategoriChange("all")}

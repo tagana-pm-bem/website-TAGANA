@@ -5,7 +5,20 @@ import { beritaBencanaData } from "@/data/beritaBencana";
 import { useRouter } from "next/navigation";
 import { NewsGrid } from "./components/NewsGrid";
 import { NoResults } from "./components/NoResults";
-import  Filterberita from "./components/FIlterBerita";
+import Filterberita from "./components/FIlterBerita";
+
+interface BeritaData {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  image?: string;
+  location: string;
+  status?: string;
+  content?: string;
+  author?: string;
+}
 
 export default function BeritaBencanaPage() {
   const router = useRouter();
@@ -81,22 +94,38 @@ export default function BeritaBencanaPage() {
     });
   };
 
-  const handleReadMore = (id: string) => router.push(`/BeritaBencana/${id}`);
+  const handleReadMore = (id: number) => router.push(`/BeritaBencana/${id}`);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 mb-48">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 mb-32 md:mb-48">
+      {/* Header Title */}
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            Artikel Berita Bencana
+          </h1>
+          <p className="text-sm md:text-base text-gray-500">
+            <span className="font-semibold text-blue-600">
+              {filteredBerita.length}
+            </span>{" "}
+            artikel ditemukan
+          </p>
+        </div>
+      </header>
+
       {/* Search Bar and Filter Button */}
-      <div className="mb-6 flex gap-3">
+      <div className="mb-6 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <input
             type="text"
-            placeholder="Cari berita..."
+            placeholder="Cari berita berdasarkan judul, deskripsi, atau lokasi..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 pl-12 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            aria-label="Cari berita"
           />
           <svg
-            className="absolute left-4 top-3.5 w-5 h-5 text-gray-400"
+            className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -113,21 +142,25 @@ export default function BeritaBencanaPage() {
         {/* Filter Button  */}
         <button
           onClick={() => setShowFilter(!showFilter)}
-          className="inline-flex items-center gap-2
-         px-12 py-2
-         bg-blue-600
+          className="inline-flex items-center justify-center gap-2
+         px-8 sm:px-12 py-3
+         bg-blue-600 hover:bg-blue-700
          border border-gray-300
          rounded-lg
          cursor-pointer
-         text-lg  font-medium text-white   
-         transition"
+         text-base sm:text-lg font-medium text-white   
+         transition-colors
+         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          aria-label="Toggle filter"
+          aria-expanded={showFilter}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
+            className="w-4 h-4 sm:w-5 sm:h-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -147,17 +180,6 @@ export default function BeritaBencanaPage() {
         </div>
       )}
 
-      {/* Results Count */}
-      <div className="mb-6">
-        <p className="text-gray-600">
-          Menampilkan{" "}
-          <span className="font-bold text-[#044BB1]">
-            {filteredBerita.length}
-          </span>{" "}
-          berita
-        </p>
-      </div>
-
       {/* News Grid or No Results */}
       {filteredBerita.length === 0 ? (
         <NoResults />
@@ -170,6 +192,6 @@ export default function BeritaBencanaPage() {
           onReadMore={handleReadMore}
         />
       )}
-    </div>
+    </main>
   );
 }

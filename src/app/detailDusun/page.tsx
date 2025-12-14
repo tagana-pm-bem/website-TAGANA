@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { dusunService, DusunDetailDB } from "@/services/dusunService"; 
+import { dusunService, DusunDetailDB } from "@/services/dusunService";
 
 import Header from "./components/Header";
 import PhotoAndDescription from "./components/PhotoAndDescription";
@@ -17,81 +17,126 @@ function DetailDusunContent() {
   const dusunId = searchParams.get("id");
   const [dusun, setDusun] = useState<DusunDetailDB | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     const fetchDusun = async () => {
-      if (dusunId) {
-        setLoading(true);
-        try {
-          const data = await dusunService.getDetailById(parseInt(dusunId));
+      if (!dusunId) {
+        setError("ID Dusun tidak ditemukan");
+        setLoading(false);
+        return;
+      }
+
+      const parsedId = parseInt(dusunId);
+      if (isNaN(parsedId)) {
+        setError("ID Dusun tidak valid");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await dusunService.getDetailById(parsedId);
+        if (!data) {
+          setError("Data Dusun tidak ditemukan");
+        } else {
           setDusun(data);
-        } catch (error) {
-          console.error("Gagal mengambil data dusun:", error);
-        } finally {
-          setLoading(false);
+          setMapReady(true);
         }
+      } catch (error) {
+        console.error("Gagal mengambil data dusun:", error);
+        setError("Gagal memuat data dusun. Silakan coba lagi.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchDusun();
-    setMapReady(true);
   }, [dusunId]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Memuat Data Dusun...</p>
+          <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-semibold text-sm md:text-base">
+            Memuat Data Dusun...
+          </p>
         </div>
       </div>
     );
   }
 
-  if (!dusun) {
+  if (error || !dusun) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-500 font-semibold">Data Dusun tidak ditemukan.</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="mb-4">
+            <svg
+              className="w-16 h-16 md:w-20 md:h-20 mx-auto text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <p className="text-red-500 font-semibold text-base md:text-lg mb-4">
+            {error || "Data Dusun tidak ditemukan"}
+          </p>
+          <a
+            href="/peta-page"
+            className="inline-block px-6 py-2 bg-[#044BB1] text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
+          >
+            Kembali ke Peta
+          </a>
+        </div>
       </div>
     );
   }
 
   const getPreparednessMessage = (riskLevel: string): string => {
     switch (riskLevel) {
-      case "high": return "Warga diimbau selalu siaga dan mengikuti arahan tim TAGANA. Pastikan jalur evakuasi diketahui.";
-      case "medium": return "Tingkatkan kewaspadaan terutama saat musim hujan. Siapkan tas siaga bencana.";
-      default: return "Tetap waspada dan ikuti informasi dari BPBD. Lakukan simulasi evakuasi secara berkala.";
+      case "high":
+        return "Warga diimbau selalu siaga dan mengikuti arahan tim TAGANA. Pastikan jalur evakuasi diketahui.";
+      case "medium":
+        return "Tingkatkan kewaspadaan terutama saat musim hujan. Siapkan tas siaga bencana.";
+      default:
+        return "Tetap waspada dan ikuti informasi dari BPBD. Lakukan simulasi evakuasi secara berkala.";
     }
   };
 
-  const mappedDisasters = dusun.bencana?.map(b => ({
+  const mappedDisasters = dusun.bencana?.map((b) => ({
     type: b.jenis_bencana,
     severity: b.level_resiko,
     description: b.deskripsi,
-    icon: b.icon
+    icon: b.icon,
   }));
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <main className="w-full min-h-screen bg-white">
       <Header dusunName={dusun.nama} population={dusun.jumlah_penduduk} />
 
-      <PhotoAndDescription 
+      <PhotoAndDescription
         dusunName={dusun.nama}
-        description={dusun.deskripsi} 
-        imageUrl={dusun.gambar_url || "/placeholder-image.jpg"} 
+        description={dusun.deskripsi}
+        imageUrl={dusun.gambar_url || "/placeholder-image.jpg"}
         imageAlt={`Foto Dusun ${dusun.nama}`}
         population={dusun.jumlah_penduduk}
       />
 
-      {/* Main Content Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          
-          {/* Left Column - Info Cards */}
           <div className="lg:col-span-2 space-y-6">
-            
-            <RiskCard 
+            <RiskCard
               riskLevel={dusun.level_resiko}
               dusunName={dusun.nama}
               disasters={mappedDisasters}
@@ -99,7 +144,7 @@ function DetailDusunContent() {
               preparednessMessage={getPreparednessMessage(dusun.level_resiko)}
             />
 
-            <DemographicsCard 
+            <DemographicsCard
               dusunName={dusun.nama}
               demographicData={{
                 jumlahKK: dusun.jumlah_kk,
@@ -108,24 +153,21 @@ function DetailDusunContent() {
                 jumlahBalita: dusun.jumlah_balita,
                 jumlahLansia: dusun.jumlah_lansia,
                 jumlahIbuHamil: dusun.jumlah_ibu_hamil,
-                jumlahPenyandangDisabilitas: dusun.jumlah_disabilitas, 
+                jumlahPenyandangDisabilitas: dusun.jumlah_disabilitas,
                 jumlahPendudukMiskin: dusun.jumlah_miskin,
               }}
             />
           </div>
-
-          {/* Right Column - Map and Location */}
+          
           <div className="space-y-6">
-            {/* Coordinates Card */}
-            <CoordinatesCard 
+            <CoordinatesCard
               latitude={dusun.latitude}
               longitude={dusun.longitude}
             />
 
-            {/* Map Card */}
             {mapReady && (
-              <MapCard 
-                position={[dusun.latitude, dusun.longitude]} // MapCard biasanya butuh array [lat, long]
+              <MapCard
+                position={[dusun.latitude, dusun.longitude]}
                 dusunName={dusun.nama}
                 population={dusun.jumlah_penduduk}
                 mapReady={mapReady}
@@ -134,27 +176,26 @@ function DetailDusunContent() {
           </div>
         </div>
 
-        {/* RT List Card */}
-        {/* Pastikan komponen RTListCard bisa menerima struktur data dari DB atau mapping dulu */}
-        <RTListCard 
-          dusunName={dusun.nama}
-          rtData={dusun.rt} // DB mengembalikan array RT di dalam objek dusun
-        />
+        <RTListCard dusunName={dusun.nama} rtData={dusun.rt} />
       </div>
-    </div>
+    </main>
   );
 }
 
 export default function DetailDusunPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Memuat...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-[#044BB1] mx-auto mb-4"></div>
+            <p className="text-gray-600 font-semibold text-sm md:text-base">
+              Memuat...
+            </p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <DetailDusunContent />
     </Suspense>
   );
