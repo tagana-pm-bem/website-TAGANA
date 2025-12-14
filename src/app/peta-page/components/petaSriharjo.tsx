@@ -174,7 +174,9 @@ export default function PetaSriharjo({
       <MapContainer
         center={mapCenter as [number, number]}
         zoom={14}
-        scrollWheelZoom={true}
+        minZoom={12}
+        maxZoom={18}
+        scrollWheelZoom={true} 
         zoomControl={false}
         className="w-full h-full rounded-xl overflow-hidden shadow-inner"
       >
@@ -201,12 +203,24 @@ export default function PetaSriharjo({
         />
 
         {/*-- batas peta --*/}
-        <Polygon
-          positions={desaBoundary}
+       <Polygon
+          positions={[
+            // Outer boundary (dunia)
+            [
+              [-90, -180],
+              [-90, 180],
+              [90, 180],
+              [90, -180],
+              [-90, -180],
+            ],
+            // Inner boundary (batas desa - akan menjadi "hole")
+            desaBoundary.map(coord => [coord[0], coord[1]] as [number, number]),
+          ]}
           pathOptions={{
             color: "#FFFFFF",
             weight: 3,
-            fillOpacity: 0.05,
+            fillColor: "#000000",
+            fillOpacity: 0.3, // Sesuaikan tingkat kegelapan (0-1)
             dashArray: "5, 5",
           }}
         />
@@ -275,6 +289,7 @@ export default function PetaSriharjo({
               click: () => onDusunSelect(dusun.id),
             }}
           >
+            <Tooltip sticky>{dusun.nama}</Tooltip>
             <Popup className="custom-popup">
               <div className="flex flex-col">
                 {/* Header Popup */}
