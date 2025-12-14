@@ -121,6 +121,14 @@ function DetailDusunContent() {
     icon: b.icon,
   }));
 
+  const mappedRTData = dusun.rt?.map((rtItem) => ({
+    rt: Number(rtItem.nomor_rt) || 0,
+    
+    nama: rtItem.nama_ketua || "Belum ada data",
+
+    lp: (rtItem.jenis_kelamin_ketua as "L" | "P") || undefined
+  })) || [];
+
   return (
     <main className="w-full min-h-screen bg-white">
       <Header dusunName={dusun.nama} population={dusun.jumlah_penduduk} />
@@ -176,7 +184,7 @@ function DetailDusunContent() {
           </div>
         </div>
 
-        <RTListCard dusunName={dusun.nama} rtData={dusun.rt} />
+        <RTListCard dusunName={dusun.nama} rtData={mappedRTData} />
       </div>
     </main>
   );

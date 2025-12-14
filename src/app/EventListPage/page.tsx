@@ -1,35 +1,46 @@
 "use client";
 
+import { useState } from "react";
 import MobileCalendar from "./components/calendar";
-import { EventCard } from "./components/Evencard";
 import { EventList } from "./components/Eventlist";
-import {Header} from "./components/Header";
+import { Header } from "./components/Header";
 import { useRouter } from "next/navigation";
 
 export default function EventListPage() {
   const router = useRouter();
-  const sampleEvent = {
-    bulan: "January",
-    tanggal: 1,
-    judul: "Sample Event",
-    deskripsi: "This is a sample event description",
-    startTime: "09:00",
-    endTime: "17:00",
-    lokasi: "Sample Location",
-    image: "/dusun.jpg",
-  };
+  
+  const [filterDate, setFilterDate] = useState<string | null>(null);
 
   return (
-    <div className="bg-gradient-to-br from-blue-200 via-white to-blue-200 ">
-       <Header onBack={() => router.push("/peta-page")} />
-      <div className="max-w-7xl mx-auto w-full py-6">
-        <MobileCalendar />
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50">
+      <Header 
+         title="Agenda Desa" 
+         subtitle="Jadwal kegiatan dan acara Desa Sriharjo"
+         onBack={() => router.push("/peta-page")} 
+      />
+      
+      <div className="max-w-7xl mx-auto w-full px-4 py-6">
+        <MobileCalendar onSelectDate={setFilterDate} />
 
-        <div className="w-full p-8 rounded-xl shadow-2xl bg-white py-2 mt-10 mb-4 ">
-          <div className="inline-block px-10 mt-4 py-3 rounded-xl shadow-[-1px_0px_19px_5px_rgba(0,_0,_0,_0.15)]  bg-white">
-            <h1 className="text-2xl font-bold">List Event</h1>
+        <div className="w-full p-4 md:p-8 rounded-2xl shadow-xl bg-white mt-8 mb-4 border border-blue-100">
+          <div className="flex justify-between items-center mb-6">
+             <div className="inline-block px-6 py-2 rounded-lg bg-blue-50 border border-blue-100">
+               <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                 {filterDate ? `Agenda Tanggal ${new Date(filterDate).toLocaleDateString('id-ID')}` : "Agenda Mendatang"}
+               </h1>
+             </div>
+             
+             {filterDate && (
+               <button 
+                 onClick={() => setFilterDate(null)}
+                 className="text-sm text-blue-600 hover:underline font-medium"
+               >
+                 Reset Filter
+               </button>
+             )}
           </div>
-          <EventList />
+          
+          <EventList filterDate={filterDate} />
         </div>
       </div>
     </div>
