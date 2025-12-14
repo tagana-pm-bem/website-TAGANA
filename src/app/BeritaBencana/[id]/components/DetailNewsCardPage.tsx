@@ -91,7 +91,21 @@ export function DetailNewsCardPage({
           )}
         </div>
 
-        <article className="prose prose-lg max-w-none prose-blue text-gray-800">
+        {/* --- FIXED: Added Arbitrary Variants for Rich Text Styling --- */}
+        <article className="
+          text-gray-800 leading-relaxed
+          [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8
+          [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-6
+          [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4
+          [&_p]:mb-4
+          [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
+          [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
+          [&_li]:mb-1
+          [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800
+          [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:mb-4
+          [&_strong]:font-bold
+          [&_em]:italic
+        ">
             <div dangerouslySetInnerHTML={{ __html: berita.content }} />
         </article>
 
