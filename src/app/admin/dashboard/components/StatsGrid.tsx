@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { populationStats, dusunData } from "@/data/datadususn";
+import {  dusunData } from "@/data/dataDusun";
 import { useDusun } from "@/hooks/useDusun.hooks";
 
 
@@ -18,7 +18,7 @@ export function StatsGrid() {
     )
   }
   const totalDusun = dusunData.length;
-  const totalPopulation = populationStats.totalPopulation;
+  // const totalPopulation = populationStats.totalPopulation;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
