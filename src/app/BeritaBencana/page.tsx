@@ -3,56 +3,46 @@
 import { useState, useMemo } from "react";
 import { beritaBencanaData } from "@/data/beritaBencana";
 import { useRouter } from "next/navigation";
-import { Header } from "./components/Header";
-import { FilterPanel } from "./components/FilterPanel";
-import { NewsGrid } from "./components/NewsGrid";
+import { Layout } from "./components/layout/layout";
+import { NewsGrid } from "./components/layout/NewsGrid";
 import { NoResults } from "./components/NoResults";
+import  Filterberita from "./components/FIlterBerita";
 
 export default function BeritaBencanaPage() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
-  const [selectedStatus, setSelectedStatus] = useState<string>("Semua");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showFilter, setShowFilter] = useState(true);
-  const [dateFilter, setDateFilter] = useState<{ start: string; end: string }>({
-    start: "",
-    end: "",
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterState, setFilterState] = useState<{
+    disaster: string | null;
+    categories: string[];
+  }>({
+    disaster: null,
+    categories: [],
   });
-
-  const categories = [
-    "Semua",
-    "Banjir",
-    "Longsor",
-    "Gempa",
-    "Angin Puting Beliung",
-    "Kebakaran",
-    "Lainnya",
-  ];
-  const statuses = ["Semua", "Terjadi", "Ditangani", "Selesai"];
 
   // Filter berita
   const filteredBerita = useMemo(() => {
     return beritaBencanaData.filter((berita) => {
-      const matchCategory =
-        selectedCategory === "Semua" || berita.category === selectedCategory;
-      const matchStatus =
-        selectedStatus === "Semua" || berita.status === selectedStatus;
       const matchSearch =
         berita.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         berita.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         berita.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-      let matchDate = true;
-      if (dateFilter.start && dateFilter.end) {
-        const beritaDate = new Date(berita.date);
-        const startDate = new Date(dateFilter.start);
-        const endDate = new Date(dateFilter.end);
-        matchDate = beritaDate >= startDate && beritaDate <= endDate;
-      }
+      const matchDisaster =
+        !filterState.disaster ||
+        berita.category
+          .toLowerCase()
+          .includes(filterState.disaster.toLowerCase());
 
-      return matchCategory && matchStatus && matchSearch && matchDate;
+      const matchCategories =
+        filterState.categories.length === 0 ||
+        filterState.categories.some((cat) =>
+          berita.category.toLowerCase().includes(cat.toLowerCase())
+        );
+
+      return matchSearch && matchDisaster && matchCategories;
     });
-  }, [selectedCategory, selectedStatus, searchQuery, dateFilter]);
+  }, [searchQuery, filterState]);
 
   const getCategoryColor = (category: string) => {
     const colors: any = {
@@ -78,68 +68,112 @@ export default function BeritaBencanaPage() {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("id-ID", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
       day: "numeric",
+      month: "long",
+      year: "numeric",
     });
   };
 
-  const resetFilters = () => {
-    setSelectedCategory("Semua");
-    setSelectedStatus("Semua");
-    setSearchQuery("");
-    setDateFilter({ start: "", end: "" });
+  const handleFilterChange = (filters: any) => {
+    // Map filters dari komponen FilterBerita ke filterState
+    setFilterState({
+      disaster: filters.kategori || null,
+      categories: filters.subKategori ? [filters.subKategori] : [],
+    });
   };
 
   const handleReadMore = (id: string) => router.push(`/BeritaBencana/${id}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-blue-200 ">
-      <Header onBack={() => router.push("/home")} />
-
-      <div className="max-w-7xl container mx-auto px-4 py-8">
-        <FilterPanel
-          show={showFilter}
-          toggleShow={() => setShowFilter((s) => !s)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          categories={categories}
-          statuses={statuses}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          selectedStatus={selectedStatus}
-          setSelectedStatus={setSelectedStatus}
-          dateFilter={dateFilter}
-          setDateFilter={setDateFilter}
-          resetFilters={resetFilters}
-        />
-
-        <div className="mb-6">
-          <p className="text-gray-600">
-            Menampilkan{" "}
-            <span className="font-bold text-[#044BB1]">
-              {filteredBerita.length}
-            </span>{" "}
-            berita
-          </p>
+    <Layout
+      onFilterChange={handleFilterChange}
+      onBack={() => router.push("/home")}
+    >
+      {/* Search Bar and Filter Button */}
+      <div className="mb-6 flex gap-3">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Cari berita..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-3 pl-12 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <svg
+            className="absolute left-4 top-3.5 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
 
-        {filteredBerita.length === 0 ? (
-          <NoResults />
-        ) : (
-          <NewsGrid
-            beritaList={filteredBerita}
-            getCategoryColor={getCategoryColor}
-            getStatusColor={getStatusColor}
-            formatDate={formatDate}
-            onReadMore={handleReadMore}
-          />
-        )}
+        {/* Filter Button  */}
+        <button
+          onClick={() => setShowFilter(!showFilter)}
+          className="inline-flex items-center gap-2
+         px-12 py-2
+         bg-blue-600
+         border border-gray-300
+         rounded-lg
+         cursor-pointer
+         text-lg  font-medium text-white   
+         transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-.447.832l-4 2.667A1 1 0 019 22v-9.586L3.293 6.707A1 1 0 013 6V4z"
+            />
+          </svg>
+          <span>Filter</span>
+        </button>
       </div>
-    </div>
+
+      {/* Filter Panel */}
+      {showFilter && (
+        <div className="mb-6">
+          <Filterberita onFilterChange={handleFilterChange} />
+        </div>
+      )}
+
+      {/* Results Count */}
+      <div className="mb-6">
+        <p className="text-gray-600">
+          Menampilkan{" "}
+          <span className="font-bold text-[#044BB1]">
+            {filteredBerita.length}
+          </span>{" "}
+          berita
+        </p>
+      </div>
+
+      {/* News Grid or No Results */}
+      {filteredBerita.length === 0 ? (
+        <NoResults />
+      ) : (
+        <NewsGrid
+          beritaList={filteredBerita}
+          getCategoryColor={getCategoryColor}
+          getStatusColor={getStatusColor}
+          formatDate={formatDate}
+          onReadMore={handleReadMore}
+        />
+      )}
+    </Layout>
   );
 }
-<label className="block text-sm font-medium text-gray-700 mb-2">
-  Cari Berita
-</label>;

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { NewsCard } from "./NewsCard";
+import { NewsCard } from "../NewsCard";
 
 export function NewsGrid({ beritaList, getCategoryColor, getStatusColor, formatDate, onReadMore }: any) {
   return (

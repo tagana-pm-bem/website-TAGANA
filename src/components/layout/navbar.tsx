@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { InfoModal } from '@/components/ui/modal_desa';
 import Image from "next/image";
 
@@ -10,6 +10,7 @@ export function Navbar() {
   const [lastUpdate, setLastUpdate] = useState<string>("");
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Update the last update time
@@ -90,19 +91,39 @@ export function Navbar() {
             
             <div className="hidden md:flex items-center gap-6 lg:gap-8">
               <button
-                onClick={() => router.push('/EventListPage')}
-                className="text-sm lg:text-base font-semibold text-gray-700 hover:text-[#044BB1] transition-colors duration-200 relative group"
+              onClick={() => router.push('/peta-page')}
+              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group ${
+                pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+              }`}
               >
-                Event
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#044BB1] group-hover:w-full transition-all duration-300"></span>
+              Peta
+              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                pathname === '/peta-page' ? 'w-full' : 'w-0 group-hover:w-full'
+              }`}></span>
+              </button>
+
+              <button
+              onClick={() => router.push('/EventListPage')}
+              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group ${
+                pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+              }`}
+              >
+              Event
+              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                pathname === '/EventListPage' ? 'w-full' : 'w-0 group-hover:w-full'
+              }`}></span>
               </button>
               
               <button
-                onClick={() => router.push('/BeritaBencana')}
-                className="text-sm lg:text-base font-semibold text-gray-700 hover:text-[#044BB1] transition-colors duration-200 relative group"
+              onClick={() => router.push('/BeritaBencana')}
+              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group ${
+                pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+              }`}
               >
-                Berita Bencana
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#044BB1] group-hover:w-full transition-all duration-300"></span>
+              Berita Bencana
+              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
+              }`}></span>
               </button>
             </div>
 
@@ -114,9 +135,9 @@ export function Navbar() {
               {/* Login Button */}
                 <button
                 onClick={() => router.push('/auth/login')}
-                className="flex cursor-pointer items-center space-x-0.5 sm:space-x-1 md:space-x-1.5 px-2 sm:px-2.5 md:px-4 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-md sm:rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 group"
+                className="flex cursor-pointer items-center space-x-0.5 sm:space-x-1 md:space-x-1.5 px-2 sm:px-2.5 md:px-4 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-md sm:rounded-lg hover:shadow-lg  active:scale-95 transition-all duration-300 group"
                 >
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -124,7 +145,7 @@ export function Navbar() {
                 </button>
 
               {/* Info Button */}
-              <button
+              {/* <button
                 onClick={() => setInfoModalOpen(true)}
                 className="flex cursor-pointer items-center space-x-0.5 sm:space-x-1 md:space-x-1.5 px-2 sm:px-2.5 md:px-4 lg:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gradient-to-r from-[#044BB1] to-[#0566d6] text-white rounded-md sm:rounded-lg hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 group"
               >
@@ -132,7 +153,7 @@ export function Navbar() {
                   !
                 </div>
                 <span className="text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold whitespace-nowrap">Tentang Desa</span>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
