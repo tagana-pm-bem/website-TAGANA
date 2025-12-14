@@ -1,54 +1,84 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { beritaBencanaData } from "@/data/beritaBencana";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NewsGrid } from "./components/NewsGrid";
 import { NoResults } from "./components/NoResults";
-import  Filterberita from "./components/FIlterBerita";
+import FilterBerita from "./components/FIlterBerita";
+import { beritaService } from "@/services/beritaService"; 
+import { Loader2 } from "lucide-react";
 
 export default function BeritaBencanaPage() {
   const router = useRouter();
+  
+  const [allBerita, setAllBerita] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [filterState, setFilterState] = useState<{
-    disaster: string | null;
-    categories: string[];
+    kategori: string | null;
+    waktu: string | null;
   }>({
-    disaster: null,
-    categories: [],
+    kategori: null,
+    waktu: null,
   });
 
-  // Filter berita
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await beritaService.getAll();
+        const publishedData = data.filter((item: any) => item.status === 'published');
+        setAllBerita(publishedData);
+      } catch (error) {
+        console.error("Gagal memuat berita:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const cleanHtml = (htmlContent: string | null) => {
+    if (!htmlContent) return "";
+    return htmlContent.replace(/<[^>]+>/g, '');
+  };
+
   const filteredBerita = useMemo(() => {
-    return beritaBencanaData.filter((berita) => {
+    return allBerita.filter((berita) => {
+      const cleanDeskripsi = cleanHtml(berita.isi_berita).toLowerCase();
       const matchSearch =
-        berita.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        berita.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        berita.location.toLowerCase().includes(searchQuery.toLowerCase());
+        berita.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cleanDeskripsi.includes(searchQuery.toLowerCase());
 
-      const matchDisaster =
-        !filterState.disaster ||
-        berita.category
-          .toLowerCase()
-          .includes(filterState.disaster.toLowerCase());
+      const kategoriName = berita.kategori_berita?.nama?.toLowerCase() || "";
+      const matchKategori =
+        !filterState.kategori ||
+        kategoriName.includes(filterState.kategori.toLowerCase());
 
-      const matchCategories =
-        filterState.categories.length === 0 ||
-        filterState.categories.some((cat) =>
-          berita.category.toLowerCase().includes(cat.toLowerCase())
-        );
+      const matchWaktu = true; 
 
-      return matchSearch && matchDisaster && matchCategories;
+      return matchSearch && matchKategori && matchWaktu;
     });
-  }, [searchQuery, filterState]);
+  }, [searchQuery, filterState, allBerita]);
+
+  const mappedBeritaForUI = filteredBerita.map((item) => ({
+    id: item.id,
+    title: item.judul,
+    description: cleanHtml(item.isi_berita), 
+    date: item.created_at || item.tanggal,
+    category: item.kategori_berita?.nama || "Umum",
+    image: item.file_url, 
+    status: item.status
+  }));
 
   const getCategoryColor = (category: string) => {
     const colors: any = {
       Banjir: "bg-blue-100 text-blue-700 border-blue-300",
       Longsor: "bg-amber-100 text-amber-700 border-amber-300",
       Gempa: "bg-red-100 text-red-700 border-red-300",
-      "Angin Puting Beliung": "bg-purple-100 text-purple-700 border-purple-300",
       Kebakaran: "bg-orange-100 text-orange-700 border-orange-300",
       Lainnya: "bg-gray-100 text-gray-700 border-gray-300",
     };
@@ -56,17 +86,12 @@ export default function BeritaBencanaPage() {
   };
 
   const getStatusColor = (status: string) => {
-    const colors: any = {
-      Terjadi: "bg-red-500",
-      Ditangani: "bg-yellow-500",
-      Selesai: "bg-green-500",
-    };
-    return colors[status] || colors.Terjadi;
+    return "bg-green-500"; 
   };
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("id-ID", {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -74,18 +99,16 @@ export default function BeritaBencanaPage() {
   };
 
   const handleFilterChange = (filters: any) => {
-    // Map filters dari komponen FilterBerita ke filterState
     setFilterState({
-      disaster: filters.kategori || null,
-      categories: filters.subKategori ? [filters.subKategori] : [],
+      kategori: filters.kategori || null,
+      waktu: filters.waktu || null,
     });
   };
 
-  const handleReadMore = (id: string) => router.push(`/BeritaBencana/${id}`);
+  const handleReadMore = (id: string) => router.push(`/BeritaBencana/${id}`); // Sesuaikan route detail
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 mb-48">
-      {/* Search Bar and Filter Button */}
       <div className="mb-6 flex gap-3">
         <div className="relative flex-1">
           <input
@@ -110,17 +133,9 @@ export default function BeritaBencanaPage() {
           </svg>
         </div>
 
-        {/* Filter Button  */}
         <button
           onClick={() => setShowFilter(!showFilter)}
-          className="inline-flex items-center gap-2
-         px-12 py-2
-         bg-blue-600
-         border border-gray-300
-         rounded-lg
-         cursor-pointer
-         text-lg  font-medium text-white   
-         transition"
+          className={`inline-flex items-center gap-2 px-8 py-2 border rounded-lg cursor-pointer text-lg font-medium transition ${showFilter ? 'bg-blue-700 text-white border-blue-700' : 'bg-blue-600 text-white border-gray-300 hover:bg-blue-700'}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -140,35 +155,40 @@ export default function BeritaBencanaPage() {
         </button>
       </div>
 
-      {/* Filter Panel */}
       {showFilter && (
         <div className="mb-6">
-          <Filterberita onFilterChange={handleFilterChange} />
+          <FilterBerita onFilterChange={handleFilterChange} />
         </div>
       )}
 
-      {/* Results Count */}
-      <div className="mb-6">
-        <p className="text-gray-600">
-          Menampilkan{" "}
-          <span className="font-bold text-[#044BB1]">
-            {filteredBerita.length}
-          </span>{" "}
-          berita
-        </p>
-      </div>
-
-      {/* News Grid or No Results */}
-      {filteredBerita.length === 0 ? (
-        <NoResults />
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="animate-spin text-blue-600" size={40} />
+        </div>
       ) : (
-        <NewsGrid
-          beritaList={filteredBerita}
-          getCategoryColor={getCategoryColor}
-          getStatusColor={getStatusColor}
-          formatDate={formatDate}
-          onReadMore={handleReadMore}
-        />
+        <>
+          <div className="mb-6">
+            <p className="text-gray-600">
+              Menampilkan{" "}
+              <span className="font-bold text-[#044BB1]">
+                {mappedBeritaForUI.length}
+              </span>{" "}
+              berita
+            </p>
+          </div>
+
+          {mappedBeritaForUI.length === 0 ? (
+            <NoResults message={searchQuery ? "Tidak ditemukan berita dengan kata kunci tersebut." : "Belum ada berita yang diterbitkan."} />
+          ) : (
+            <NewsGrid
+              beritaList={mappedBeritaForUI} 
+              getCategoryColor={getCategoryColor}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+              onReadMore={handleReadMore}
+            />
+          )}
+        </>
       )}
     </div>
   );

@@ -1,160 +1,129 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { interactionService } from "@/services/interactionService";
+import { Loader2 } from "lucide-react";
 
 interface Comment {
   id: string;
-  author: {
-    name: string;
-    avatar?: string;
-  };
-  text: string;
-  time: string;
-  likes: number;
-  replies?: Comment[];
+  nama_pengguna: string;
+  isi_komentar: string;
+  created_at: string;
 }
 
-interface CommentCardProps {
-  comments?: Comment[];
-  totalComments?: number;
-  onAddComment?: (text: string) => void;
-  onLikeComment?: (commentId: string) => void;
-  onReplyComment?: (commentId: string, text: string) => void;
+interface CommentPageProps {
+  beritaId: string;
+  onUpdateTotal?: (num: number) => void;
 }
 
-export function CommentPage({
-  comments = [],
-  totalComments = 24,
-  onAddComment,
-  onLikeComment,
-  onReplyComment,
-}: CommentCardProps) {
+export function CommentPage({ beritaId, onUpdateTotal }: CommentPageProps) {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
-  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
+  const [nama, setNama] = useState(""); // Input nama
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPosting, setIsPosting] = useState(false);
 
-  const handleSubmitComment = () => {
-    if (commentText.trim() && onAddComment) {
-      onAddComment(commentText);
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const data = await interactionService.getComments(beritaId);
+        setComments(data as unknown as Comment[]);
+        if (onUpdateTotal) onUpdateTotal(data.length);
+      } catch (error) {
+        console.error("Gagal ambil komentar", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (beritaId) fetchComments();
+  }, [beritaId]);
+
+  const handleSubmitComment = async () => {
+    if (!commentText.trim()) return;
+
+    const finalName = nama.trim() || "Pengunjung";
+    setIsPosting(true);
+
+    try {
+      const newComment = await interactionService.postComment(beritaId, finalName, commentText);
+      
+      const updatedList = [newComment, ...comments];
+      setComments(updatedList as unknown as Comment[]);
+      if (onUpdateTotal) onUpdateTotal(updatedList.length);
+
       setCommentText("");
+    } catch (error) {
+      alert("Gagal mengirim komentar.");
+    } finally {
+      setIsPosting(false);
     }
   };
 
-  const handleLikeComment = (commentId: string) => {
-    const newLikedComments = new Set(likedComments);
-    if (newLikedComments.has(commentId)) {
-      newLikedComments.delete(commentId);
-    } else {
-      newLikedComments.add(commentId);
-    }
-    setLikedComments(newLikedComments);
-    if (onLikeComment) onLikeComment(commentId);
+  const timeAgo = (dateString: string) => {
+    const diff = new Date().getTime() - new Date(dateString).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} hari lalu`;
+    if (hours > 0) return `${hours} jam lalu`;
+    if (minutes > 0) return `${minutes} menit lalu`;
+    return "Baru saja";
   };
-
-  const defaultComments: Comment[] = [
-    {
-      id: "1",
-      author: { name: "Andi Pratama" },
-      text: "Wah, jadi pengen liburan ke sana lagi. Terakhir ke sana tahun 2019 rasain belum sebagus ini fasilitasnya.",
-      time: "2 jam yang lalu",
-      likes: 0,
-    },
-    {
-      id: "2",
-      author: { name: "Siti Nurhaliza" },
-      text: "Senoga keberhasilannya tetap terjaga ya, jangan cuma bagus di awal saja. Perlu dukuran dari pengunjung juga.",
-      time: "5 jam yang lalu",
-      likes: 12,
-    },
-    {
-      id: "3",
-      author: { name: "Rudi Hartono" },
-      text: "Selalu bangga! Danau Toba itu aset bangga yang luar biasa.",
-      time: "1 hari yang lalu",
-      likes: 5,
-    },
-  ];
-
-  const displayComments = comments.length > 0 ? comments : defaultComments;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 mt-8 shadow-2xl">
-      {/* Header */}
-      <h3 className="text-lg font-bold text-gray-900 mb-6">
-        Komentar ({totalComments})
-      </h3>
+    <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 mt-4 shadow-inner">
+      <h3 className="text-lg font-bold text-gray-900 mb-6">Komentar</h3>
 
-      {/* Comment Input */}
-      <div className="flex items-start space-x-3 mb-8">
-        <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-          <div className="w-full h-full flex items-center justify-center bg-blue-600 text-white font-semibold">
-            A
-          </div>
-        </div>
-        <div className="flex-1 flex gap-3">
-          <input
-            type="text"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Tulis komentar Anda..."
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleSubmitComment();
-              }
-            }}
-          />
-          <button
-            onClick={handleSubmitComment}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-          >
-            Kirim
-          </button>
+      <div className="flex flex-col gap-3 mb-8">
+        <input 
+           type="text"
+           value={nama}
+           onChange={(e) => setNama(e.target.value)}
+           placeholder="Nama Anda (Opsional)"
+           className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div className="flex gap-3">
+            <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Tulis komentar..."
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-h-[50px] resize-none"
+            />
+            <button
+                onClick={handleSubmitComment}
+                disabled={isPosting || !commentText.trim()}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors h-fit self-end flex items-center gap-2"
+            >
+                {isPosting && <Loader2 className="animate-spin" size={16} />}
+                Kirim
+            </button>
         </div>
       </div>
 
-      {/* Comments List */}
       <div className="space-y-6">
-        {displayComments.map((comment) => (
-          <div key={comment.id} className="flex items-start space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-              {comment.author.avatar ? (
-                <img
-                  src={comment.author.avatar}
-                  alt={comment.author.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-400 text-white font-semibold text-sm">
-                  {comment.author.name.charAt(0)}
+        {isLoading ? (
+             <div className="text-center py-4"><Loader2 className="animate-spin mx-auto text-gray-400" /></div>
+        ) : comments.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center italic">Belum ada komentar.</p>
+        ) : (
+            comments.map((comment) => (
+            <div key={comment.id} className="flex items-start space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600 font-bold text-sm uppercase">
+                    {comment.nama_pengguna.charAt(0)}
                 </div>
-              )}
+                <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-gray-900 text-sm">{comment.nama_pengguna}</h4>
+                        <span className="text-xs text-gray-400">{timeAgo(comment.created_at)}</span>
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                        {comment.isi_komentar}
+                    </p>
+                </div>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-semibold text-gray-900 text-sm">{comment.author.name}</h4>
-                <span className="text-xs text-gray-500">{comment.time}</span>
-              </div>
-              <p className="text-gray-700 text-sm mb-3 leading-relaxed">
-                {comment.text}
-              </p>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => handleLikeComment(comment.id)}
-                  className={`text-sm font-medium transition-colors ${
-                    likedComments.has(comment.id)
-                      ? "text-blue-600"
-                      : "text-gray-600 hover:text-blue-600"
-                  }`}
-                >
-                  Suka {comment.likes > 0 && `(${comment.likes})`}
-                </button>
-                <button className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
-                  Balas
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+            ))
+        )}
       </div>
     </div>
   );
