@@ -21,7 +21,6 @@ if (typeof window !== "undefined") {
   });
 }
 
-
 function ChangeView({ coords }: { coords: [number, number] }) {
   const map = useMap();
   useEffect(() => {
@@ -40,7 +39,13 @@ interface Props {
 }
 
 export default function MapCard({ position, dusunName, population, mapReady }: Props) {
-  const boundaryOptions = { color: '#044BB1', weight: 2, fillOpacity: 0.05, dashArray: '5, 5' };
+  const boundaryOptions = { 
+    color: '#FFFFFF', 
+    weight: 3, 
+    fillOpacity: 0.05, 
+    dashArray: '5, 5',
+    opacity: 0.8
+  };
 
   return (
     <>
@@ -58,33 +63,37 @@ export default function MapCard({ position, dusunName, population, mapReady }: P
           <div className="h-64 sm:h-80 lg:h-96 rounded-xl overflow-hidden border-2 border-gray-200 shadow-inner relative z-0">
             <MapContainer
               center={position} 
-              zoom={15}
+              zoom={16}
+              minZoom={12}
+              maxZoom={18}
               className="w-full h-full"
               scrollWheelZoom={false}
             >
-              {/* Logic Pindah Kamera Otomatis */}
               <ChangeView coords={position} />
 
+              {/* Satelit Tile Layer (Esri) */}
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="Tiles &copy; Esri"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                maxZoom={18}
               />
               
-              {/* 1. Marker Dusun (Sesuai Database) */}
+              {/* Marker Dusun */}
               <Marker position={position}>
                 <Popup>
                   <div className="text-center p-1">
                     <h3 className="font-bold text-[#044BB1] text-sm mb-1">{dusunName}</h3>
                     <p className="text-xs text-gray-600">
-                      Populasi: <span className="font-semibold">{population}</span> Jiwa
+                      Populasi: <span className="font-semibold">{population.toLocaleString("id-ID")}</span> Jiwa
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      {position[0].toFixed(4)}, {position[1].toFixed(4)}
+                      {position[0].toFixed(6)}, {position[1].toFixed(6)}
                     </p>
                   </div>
                 </Popup>
               </Marker>
 
+              {/* Batas Desa dengan outline putih untuk kontras di satelit */}
               <Polygon pathOptions={boundaryOptions} positions={desaBoundary} />
 
             </MapContainer>

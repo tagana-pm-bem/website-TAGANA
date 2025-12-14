@@ -61,7 +61,7 @@ export default function PhotoAndDescription({
         </div>
 
         {/* Description Card */}
-        <div className="max-w-5xl mx-auto">
+        <div className="w-full mx-auto ">
           <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-2xl p-6 sm:p-8 shadow-xl border border-blue-100 relative overflow-hidden">
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -mr-16 -mt-16 animate-pulse"></div>

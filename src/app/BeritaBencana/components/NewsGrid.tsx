@@ -27,7 +27,10 @@ export function NewsGrid({
   onReadMore,
 }: NewsGridProps) {
   return beritaList.length === 0 ? null : (
-    <section className="space-y-4" aria-label="Daftar Berita Bencana">
+    <section
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      aria-label="Daftar Berita Bencana"
+    >
       {beritaList.map((b) => (
         <NewsCard
           key={b.id}
