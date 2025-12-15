@@ -199,7 +199,7 @@ export default function PetaSriharjo({
         <MapController
           selectedDusun={selectedDusun}
           allDusun={dusunList}
-          resetTrigger={resetTrigger} // 👈 Pass resetTrigger
+          resetTrigger={resetTrigger} 
         />
 
         {/*-- batas peta --*/}

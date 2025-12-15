@@ -89,41 +89,42 @@ export function Navbar() {
 
             {/* EVENT DAN BERITA*/}
             
-            <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            <div className="flex items-center gap-4 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
               <button
-              onClick={() => router.push('/peta-page')}
-              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
-              }`}
+                onClick={() => router.push('/peta-page')}
+                className={`text-xs sm:text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
+                  pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
               >
-              Peta
-              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                pathname === '/peta-page' ? 'w-full' : 'w-0 group-hover:w-full'
-              }`}></span>
+                Peta
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                  pathname === '/peta-page' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </button>
 
               <button
-              onClick={() => router.push('/EventListPage')}
-              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
-              }`}
+                onClick={() => router.push('/EventListPage')}
+                className={`text-xs sm:text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
+                  pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
               >
-              Event
-              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                pathname === '/EventListPage' ? 'w-full' : 'w-0 group-hover:w-full'
-              }`}></span>
+                Event
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                  pathname === '/EventListPage' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </button>
               
               <button
-              onClick={() => router.push('/BeritaBencana')}
-              className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
-              }`}
+                onClick={() => router.push('/BeritaBencana')}
+                className={`text-xs sm:text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer whitespace-nowrap ${
+                  pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
               >
-              Berita Bencana
-              <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
-              }`}></span>
+                <span className="hidden sm:inline">Berita Bencana</span>
+                <span className="sm:hidden">Berita</span>
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
+                  pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </button>
             </div>
 
