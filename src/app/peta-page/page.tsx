@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <>
-      <style jsx global>{`
+      {/* <style jsx global>{`
         html, body {
           overflow-y: scroll !important;
           -webkit-overflow-scrolling: touch;
@@ -77,11 +77,11 @@ export default function Home() {
             height: 100%;
           }
         }
-      `}</style>
+      `}</style> */}
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-full bg-gray-50">
         <main className="pt-6 pb-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 md:px-14 mx-auto ">
 
             <Controls
               selectedDusunId={selectedDusunId}
@@ -94,7 +94,7 @@ export default function Home() {
 
             {/* <StatsCards /> */}
 
-            <div className=" max-w-7xl mx-auto my-8 ">
+            <div className=" w-full   mx-auto my-8 ">
               <LegendCard />
 
             </div>
