@@ -167,6 +167,10 @@ export default function PetaSriharjo({
           margin: 0;
           width: 280px !important;
         }
+        /* Sembunyikan watermark Leaflet */
+        .leaflet-control-attribution {
+          display: none !important;
+        }
       `}</style>
 
       <InfoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
@@ -176,7 +180,7 @@ export default function PetaSriharjo({
         zoom={14}
         minZoom={12}
         maxZoom={18}
-        scrollWheelZoom={true} 
+        scrollWheelZoom={true}
         zoomControl={false}
         className="w-full h-full rounded-xl overflow-hidden shadow-inner"
       >
@@ -199,11 +203,11 @@ export default function PetaSriharjo({
         <MapController
           selectedDusun={selectedDusun}
           allDusun={dusunList}
-          resetTrigger={resetTrigger} // 👈 Pass resetTrigger
+          resetTrigger={resetTrigger}
         />
 
         {/*-- batas peta --*/}
-       <Polygon
+        <Polygon
           positions={[
             // Outer boundary (dunia)
             [
@@ -214,13 +218,15 @@ export default function PetaSriharjo({
               [-90, -180],
             ],
             // Inner boundary (batas desa - akan menjadi "hole")
-            desaBoundary.map(coord => [coord[0], coord[1]] as [number, number]),
+            desaBoundary.map(
+              (coord) => [coord[0], coord[1]] as [number, number]
+            ),
           ]}
           pathOptions={{
             color: "#FFFFFF",
             weight: 3,
-            fillColor: "#000000",
-            fillOpacity: 0.3, // Sesuaikan tingkat kegelapan (0-1)
+            fillColor: "#1B211A",
+            fillOpacity: 0.5, // Sesuaikan tingkat kegelapan (0-1)
             dashArray: "5, 5",
           }}
         />
@@ -254,10 +260,10 @@ export default function PetaSriharjo({
                   pathOptions={{
                     color: "#ef4444",
                     weight: 2,
-                    opacity: 0.2,
+                    opacity: 0.4,
 
                     fillColor: "#ef4444",
-                    fillOpacity: 0.2,
+                    fillOpacity: 0.4,
                   }}
                 >
                   <Tooltip sticky>{item.name}</Tooltip>
@@ -296,11 +302,6 @@ export default function PetaSriharjo({
                 <div className="bg-[#044BB1] text-white p-3">
                   <h3 className="font-bold text-lg">{dusun.nama}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-bold uppercase bg-white/20`}
-                    >
-                      {dusun.level_resiko || "Medium"} Risk
-                    </span>
                   </div>
                 </div>
 
@@ -326,7 +327,7 @@ export default function PetaSriharjo({
                     <svg
                       className="w-4 h-4"
                       fill="none"
-                      stroke="currentColor"
+                      strokeWidth="currentColor"
                       viewBox="0 0 24 24"
                     >
                       <path
@@ -344,9 +345,7 @@ export default function PetaSriharjo({
         ))}
 
         {/* Kontrol Show/Hide */}
-        <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2">
-          {/* 👇 Tombol Reset View */}
-
+        <div className="absolute bottom-4 left-4 z-[1000] flex flex-col gap-2">
           <button
             onClick={() => setShowFloodZones(!showFloodZones)}
             className={`px-4 py-2 rounded-lg shadow-lg font-medium transition-all text-[15px] ${
@@ -371,32 +370,26 @@ export default function PetaSriharjo({
         </div>
 
         {/* Kontrol Reset View */}
-        <div className="absolute bottom-10 right-4 z-[1000] flex flex-col gap-2">
+        <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-2">
           <button
             onClick={handleResetView}
-            className="px-5 py-3 rounded-2xl shadow-lg font-bold  text-[15px] transition-all bg-white flex items-center gap-2"
+            className="px-3 py-3 rounded-2xl shadow-lg font-bold  text-[15px] transition-all bg-white flex items-center gap-2"
             title="Reset ke tampilan awal"
           >
             <svg
-              className="w-10 h-10"
+              xmlns="http://www.w3.org/2000/svg"
               fill="none"
-              stroke="currentColor "
               viewBox="0 0 24 24"
+              strokeWidth={3}
+              stroke="blue"
+              className="size-6"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"
               />
             </svg>
-            
           </button>
         </div>
       </MapContainer>

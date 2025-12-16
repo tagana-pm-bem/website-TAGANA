@@ -33,31 +33,34 @@ export default function LegendCard() {
       <div className="flex items-center space-x-2 mb-4">
         <Info className="w-5 h-5 text-gray-600" />
         <h3 className="text-sm font-bold text-gray-700 uppercase">
-          Keterangan Tingkat Risiko
+          Keterangan Tingkat Risiko 
         </h3>
       </div>
 
       {/* Legend Items */}
       <div className="space-y-3">
         {legends.map((legend, index) => (
-          <div
-            key={index}
-            className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-          >
-            {/* Color Indicator */}
-            <div className={`w-4 h-4 ${legend.color} rounded-full flex-shrink-0 mt-0.5`} />
-            
-            {/* Text Content */}
-            <div className="flex-1">
-              <p className="text-sm font-bold text-gray-800">{legend.label}</p>
-              <p className="text-xs text-gray-600 mt-1">{legend.description}</p>
-            </div>
+          <div key={index}>
+        <div className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+          {/* Color Indicator */}
+          <div className={`w-4 h-4 ${legend.color} rounded-full flex-shrink-0 mt-0.5`} />
+          
+          {/* Text Content */}
+          <div className="flex-1">
+            <p className="text-sm font-bold text-gray-800">{legend.label}</p>
+            <p className="text-xs text-gray-600 mt-1">{legend.description}</p>
+          </div>
+        </div>
+        {/* Divider - tidak tampil di item terakhir */}
+        {index < legends.length - 1 && (
+          <div className="border-b border-gray-400 my-3" />
+        )}
           </div>
         ))}
       </div>
 
       {/* Footer Note */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="mt-4 pt-4 border-t border-gray-400">
         <p className="text-xs text-gray-500 italic">
           * Tingkat risiko dapat berubah sewaktu-waktu. Selalu ikuti arahan dari petugas berwenang.
         </p>

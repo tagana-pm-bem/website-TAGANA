@@ -29,7 +29,7 @@ export default function Header({ dusunName, population }: Props) {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <BackButton href="/" label="Kembali ke Beranda" />
+        <BackButton href="/peta-page" label="Kembali ke Peta" />
         <div className="flex items-center space-x-4">
           <div className="bg-white bg-opacity-30 rounded-lg p-3 ">
             <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="blue" viewBox="0 0 24 24">

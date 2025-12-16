@@ -86,7 +86,7 @@ export default function MobileCalendar({ onSelectDate, events = [] }: MobileCale
               <span>{day}</span>
               
               {hasEvent && (
-                <span className={`absolute bottom-2 sm:bottom-3 w-1.5 h-1.5 rounded-full ${isSelected ? "bg-white" : "bg-orange-500"}`}></span>
+                <span className={`absolute inset-0 rounded-lg border-2 ${isSelected ? "border-white" : "border-orange-500"}`}></span>
               )}
             </div>
           );

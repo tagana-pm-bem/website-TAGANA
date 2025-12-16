@@ -8,7 +8,6 @@ interface MenuItem {
   icon: React.ReactNode;
   label: string;
   path: string;
-  
 }
 
 export function AdminSidebar() {
@@ -38,15 +37,6 @@ export function AdminSidebar() {
     {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
-      ),
-      label: "Berita Terkini",
-      path: "/admin/beritaTerkini",
-    },
-    {
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
@@ -63,6 +53,7 @@ export function AdminSidebar() {
       label: "Data Dusun",
       path: "/admin/data-dusun",
     },
+
     {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,6 +62,19 @@ export function AdminSidebar() {
       ),
       label: "Kalender Event",
       path: "/admin/kalender",
+    },
+  ];
+
+  const otherPagesItems: MenuItem[] = [
+    
+    {
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+        </svg>
+      ),
+      label: "Berita Terkini",
+      path: "/admin/beritaTerkini",
     },
   ];
 
@@ -87,18 +91,17 @@ export function AdminSidebar() {
     },
     {
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="red" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
       ),
       label: "Keluar",
-      
       path: "/splash",
     },
   ];
 
   useEffect(() => {
-    const currentMenuItem = [...mainMenuItems, ...settingsItems].find(
+    const currentMenuItem = [...mainMenuItems, ...otherPagesItems, ...settingsItems].find(
       item => item.path === pathname
     );
     if (currentMenuItem) {
@@ -114,10 +117,10 @@ export function AdminSidebar() {
   return (
     <aside className="w-64 h-screen bg-gray-50 shadow-lg text-black flex flex-col overflow-y-auto">
       {/* Logo */}
-      <div className="p-4  flex flex-col gap-3 items-center justify-center w-full border-b-2 border-blue-400">
+      <div className="p-4 flex flex-col gap-3 items-center justify-center w-full border-b-2 border-blue-400">
         <div className="flex flex-row gap-3 items-center justify-center">
-          <div className="w-11 h-11 flex items-center justify-center bg-blue-500 rounded-xl" >
-        <LayoutDashboard size={30} color="white" />
+          <div className="w-11 h-11 flex items-center justify-center bg-blue-500 rounded-xl">
+            <LayoutDashboard size={30} color="white" />
           </div>
           <p className="text-2xl font-semibold text-blue-500">Admin Desa</p>
         </div>
@@ -125,31 +128,57 @@ export function AdminSidebar() {
 
       {/* Main Menu */}
       <nav className="flex-1 px-4 py-6 space-y-2">
-        {mainMenuItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => handleMenuClick(item)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-              activeMenu === item.label
-                ? "bg-blue-500 text-white"
-                : "text-blue-500 hover:bg-blue-400 hover:text-white"
-            }`}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2">Main Menu</p>
+          {mainMenuItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleMenuClick(item)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+                activeMenu === item.label
+                  ? "bg-blue-600 text-white"
+                  : "text-blue-500 hover:bg-blue-400 hover:text-white"
+              }`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Other Pages */}
+        <div>
+          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2 mt-6">Other Pages</p>
+          {otherPagesItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleMenuClick(item)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+                activeMenu === item.label
+                  ? "bg-blue-600 text-white"
+                  : "text-blue-500 hover:bg-blue-400 hover:text-white"
+              }`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       {/* Settings Menu */}
-      <nav className="px-4 py-4 space-y-2 ">
+      <nav className="px-4 py-4 space-y-2">
         {settingsItems.map((item) => (
           <button
             key={item.label}
             onClick={() => handleMenuClick(item)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-              activeMenu === item.label
-                ? "bg-blue-500 text-white"
+              item.label === "Keluar"
+                ? activeMenu === item.label
+                  ? "bg-red-600 text-white"
+                  : "text-red-500 hover:bg-red-500 hover:text-white"
+                : activeMenu === item.label
+                ? "bg-blue-600 text-white"
                 : "text-blue-500 hover:bg-blue-400 hover:text-white"
             }`}
           >
@@ -157,7 +186,7 @@ export function AdminSidebar() {
             <span>{item.label}</span>
           </button>
         ))}
-      </nav>
+      </nav>  
     </aside>
   );
 }

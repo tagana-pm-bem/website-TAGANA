@@ -6,6 +6,7 @@ import Card from "@/components/ui/card";
 import RichTextEditor from "./components/RichTextEditor";
 import BeritaTerkini from "./components/beritaTerkini";
 import { KategoriBeritaService } from "@/services/kategoriBeritaService";
+import { beritaService } from "@/services/beritaService";
 import { useBerita } from "./hooks/useBerita.hooks";
 
 interface KategoriItem {
@@ -25,6 +26,10 @@ export default function KelolaBeritaPage() {
   const [isiBerita, setIsiBerita] = useState("");
   const [kategori, setKategori] = useState<KategoriItem[]>([]);
   const [loadingKategori, setLoadingKategori] = useState(true);
+  
+  // 👇 State untuk jumlah berita bulan ini
+  const [jumlahBeritaBulanIni, setJumlahBeritaBulanIni] = useState(0);
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     const fetchKategori = async () => {
@@ -39,6 +44,37 @@ export default function KelolaBeritaPage() {
     };
     fetchKategori();
   }, []);
+
+  // 👇 Fetch jumlah berita bulan ini
+  useEffect(() => {
+    const fetchBeritaStats = async () => {
+      try {
+        setLoadingStats(true);
+        const allBerita = await beritaService.getAll();
+        
+        // Filter berita bulan ini
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        const beritaBulanIni = allBerita.filter((berita) => {
+          const beritaDate = new Date(berita.tanggal);
+          return (
+            beritaDate.getMonth() === currentMonth &&
+            beritaDate.getFullYear() === currentYear
+          );
+        });
+        
+        setJumlahBeritaBulanIni(beritaBulanIni.length);
+      } catch (error) {
+        console.error("Gagal load stats berita:", error);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    
+    fetchBeritaStats();
+  }, [refreshKey]); // 👈 Re-fetch ketika ada berita baru
 
   const handlePublish = async () => {
     if (!judul || !selectedKategori) {
@@ -181,7 +217,13 @@ export default function KelolaBeritaPage() {
       <div className="flex flex-col gap-6 w-1/2 h-full">
         <div className="w-full rounded-2xl flex p-6 justify-between items-center bg-gradient-to-br from-[#044BB1] to-[#0566d6] shadow-sm text-white">
           <div className="flex flex-col gap-1 items-start">
-            <h1 className="font-bold text-5xl">24</h1>
+            <h1 className="font-bold text-5xl">
+              {loadingStats ? (
+                <Loader2 size={40} className="animate-spin" />
+              ) : (
+                jumlahBeritaBulanIni
+              )}
+            </h1>
             <p className="text-sm font-medium text-blue-100">
               Berita diterbitkan bulan ini
             </p>

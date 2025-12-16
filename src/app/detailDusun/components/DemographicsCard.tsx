@@ -31,21 +31,21 @@ export default function DemographicsCard({ dusunName, demographicData }: Props) 
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
-      <h3 className="font-bold text-gray-800 mb-6 flex items-center text-lg">
-        <div className="bg-[#044BB1] rounded-lg p-2 mr-3 text-white"><Users size={24}/></div>
-        Statistik Demografi
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
+      <h3 className="font-bold text-gray-800 mb-4 sm:mb-6 flex items-center text-base sm:text-lg">
+      <div className="bg-[#044BB1] rounded-lg p-1.5 sm:p-2 mr-2 sm:mr-3 text-white"><Users size={20} className="sm:w-6 sm:h-6"/></div>
+      Statistik Demografi
       </h3>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s, i) => (
-          <div key={i} className={`bg-gradient-to-br ${s.color} rounded-xl p-4 border border-white/50 hover:shadow-md transition-all`}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 bg-white/60 rounded-md">{s.icon}</div>
-              <p className="text-xs font-bold text-gray-600 uppercase">{s.label}</p>
-            </div>
-            <p className="text-2xl font-black text-[#044BB1]">{s.val.toLocaleString('id-ID')}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {stats.map((s, i) => (
+        <div key={i} className={`bg-gradient-to-br ${s.color} rounded-xl p-3 sm:p-4 border border-white/50 hover:shadow-md transition-all`}>
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+          <div className="p-1 sm:p-1.5 bg-white/60 rounded-md">{s.icon}</div>
+          <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase leading-tight">{s.label}</p>
+        </div>
+        <p className="text-lg sm:text-2xl font-black text-[#044BB1]">{s.val.toLocaleString('id-ID')}</p>
+        </div>
+      ))}
       </div>
     </div>
   );

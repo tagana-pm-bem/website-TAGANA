@@ -138,43 +138,39 @@ function Homepage() {
         }
       `}</style>
       <div className="hero">
-        <video
-          ref={videoRef}
+        <img
           className="hero-video-bg"
-          src="/video/video homepage.mp4"
-          autoPlay
-          muted
-          loop={false}
-          playsInline
+          src="/assets/bgsplash.png"
+          alt="Background"
         />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1 className="hero-title">SRIHARJO</h1>
           <p className="hero-description">
-            Peta interaktif desa Sriharjo, menyediakan informasi lengkap mengenai potensi, fasilitas, dan demografi desa kami.
+        Peta interaktif desa Sriharjo, menyediakan informasi lengkap mengenai potensi, fasilitas, dan demografi desa kami.
           </p>
           <div className="hero-buttons">
-            <button
-              className="btn"
-              onClick={handlePelajariClick}
-            >
-              Selengkapnya
-            </button>
-            <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>Login</button>
+        <button
+          className="btn"
+          onClick={handlePelajariClick}
+        >
+          Selengkapnya
+        </button>
+        <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>Admin login</button>
           </div>
         </div>
         <div className="hero-stats">
           <div className="stat-item">
-            <h3>{counters.volunteers}+</h3>
-            <p>Total Penduduk</p>
+        <h3>{counters.volunteers}+</h3>
+        <p>Total Penduduk</p>
           </div>
           <div className="stat-item">
-            <h3>{counters.missions}+</h3>
-            <p>Lokasi</p>
+        <h3>{counters.missions}+</h3>
+        <p>Lokasi</p>
           </div>
           <div className="stat-item">
-            <h3>{counters.provinces}</h3>
-            <p>Isi apa ya bingung</p>
+        <h3>{counters.provinces}</h3>
+        <p>Isi apa ya bingung</p>
           </div>
         </div>
       </div>

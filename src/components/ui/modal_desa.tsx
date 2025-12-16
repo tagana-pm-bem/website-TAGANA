@@ -102,7 +102,7 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
                     </div>
                     <div className="bg-white rounded-lg p-3 shadow-sm">
                       <p className="text-sm text-gray-500">Ketinggian</p>
-                      <p className="text-lg font-bold text-[#044BB1]">50-200 mdpl</p>
+                      <p className="text-lg font-bold text-[#044BB1]">58 mdpl</p>
                     </div>
                   </div>
                 </div>
@@ -272,27 +272,7 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
                   </div>
 
                   {/* Penduduk Miskin - Highlight */}
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border-l-4 border-orange-500">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="bg-orange-500 rounded-full p-2">
-                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Penduduk Kategori Miskin</p>
-                          <p className="text-2xl font-bold text-orange-600">{stats.miskin.toLocaleString('id-ID')}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-3xl font-bold text-orange-600">
-                          {((stats.miskin / stats.totalPenduduk) * 100).toFixed(1)}%
-                        </p>
-                        <p className="text-xs text-gray-500">dari total</p>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
 
                 {/* 4. PIE CHART KOMPOSISI USIA */}
