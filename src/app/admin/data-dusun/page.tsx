@@ -7,10 +7,6 @@ export default function DataDusunPage() {
   return (
     <div className="w-full flex flex-col gap-8 mb-[100px]">
       <Card>
-        <PetaWilayah />
-      </Card>
-
-      <Card>
         <ManajemenRisiko />
       </Card>
 
@@ -18,5 +14,5 @@ export default function DataDusunPage() {
         <PotensiBencana />
       </Card>
     </div>
-  )
+  );
 }

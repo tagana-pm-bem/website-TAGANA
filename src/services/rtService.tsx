@@ -10,7 +10,20 @@ export interface RTDB {
 }
 
 export const rtService = {
-    create: async (payload: any) => {
+  // --- TAMBAHAN BARU ---
+  getDusunIdByName: async (namaDusun: string) => {
+    const { data, error } = await supabase
+      .from('dusun') // Asumsi nama tabelnya 'dusun'
+      .select('id')
+      .eq('nama', namaDusun)
+      .single();
+
+    if (error) throw new Error("Gagal mendapatkan ID Dusun");
+    return data?.id;
+  },
+  // ---------------------
+
+  create: async (payload: any) => {
     const { data, error } = await supabase
       .from('rt')
       .insert(payload)

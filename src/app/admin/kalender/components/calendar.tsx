@@ -49,7 +49,7 @@ export default function MobileCalendar({ onSelectDate, events = [] }: MobileCale
   for (let i = 1; i <= daysInMonth; i++) calendar.push(i);
 
   return (
-    <div className="w-full p-4 rounded-xl shadow-md bg-white border border-gray-100">
+    <div className="w-full p-4 rounded-xl shadow-md bg-white border border-gray-200">
       
       <div className="flex justify-between items-center mb-4">
         <button onClick={prevMonth} className="p-2 rounded-md hover:bg-gray-100 cursor-pointer text-gray-600">
@@ -102,7 +102,7 @@ export default function MobileCalendar({ onSelectDate, events = [] }: MobileCale
             >
               <span>{day}</span>
               {hasEvent && (
-                <span className={`absolute bottom-1.5 w-1.5 h-1.5 rounded-full ${isSelected ? "bg-white" : "bg-orange-500"}`}></span>
+                 <span className={`absolute inset-0 rounded-lg bg-orange-200/10 border-3 ${isSelected ? "border-white" : "border-orange-500"}`}></span>
               )}
             </div>
           );

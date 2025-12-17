@@ -13,9 +13,9 @@ function Homepage() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const targets = { volunteers: 1000, missions: 500, provinces: 34 };
+    const targets = { volunteers: 9390, missions: 500, provinces: 34 };
     const duration = 1200;
-    const steps = 60;
+    const steps = 50;
     const stepDuration = duration / steps;
 
     (Object.keys(targets) as Array<keyof typeof targets>).forEach(key => {
@@ -164,14 +164,8 @@ function Homepage() {
         <h3>{counters.volunteers}+</h3>
         <p>Total Penduduk</p>
           </div>
-          <div className="stat-item">
-        <h3>{counters.missions}+</h3>
-        <p>Lokasi</p>
-          </div>
-          <div className="stat-item">
-        <h3>{counters.provinces}</h3>
-        <p>Isi apa ya bingung</p>
-          </div>
+         
+          
         </div>
       </div>
     </main>

@@ -24,6 +24,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",
+    "sweetalert2": "^11.26.10",
+    "sweetalert2-react-content": "^5.1.1",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {

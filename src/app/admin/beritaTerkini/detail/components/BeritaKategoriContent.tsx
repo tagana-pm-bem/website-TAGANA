@@ -7,6 +7,9 @@ import { Loader2 } from "lucide-react";
 import { beritaService } from "@/services/beritaService";
 import { interactionService } from "@/services/interactionService";
 
+// Import fungsi helper yang baru kita buat
+import { confirmDelete, showLoading, showSuccess, showError } from "@/app/admin/ui/SweetAllert2";
+
 interface BeritaKategoriContentProps {
   id: string;
 }
@@ -25,8 +28,8 @@ export default function BeritaKategoriContent({
   
   const [newComment, setNewComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  // State modal manual (isDeleting, showDeleteModal) SUDAHDIHAPUS karena diganti SweetAlert
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -59,6 +62,7 @@ export default function BeritaKategoriContent({
       setLikes(prevLiked ? likes - 1 : likes + 1);
       await interactionService.toggleLike(id);
     } catch (error: any) {
+      // Anda bisa ganti alert biasa ini dengan showError() juga jika mau
       alert(error.message || "Gagal menyukai berita (Login diperlukan)");
       setIsLiked(isLiked); 
     }
@@ -73,36 +77,57 @@ export default function BeritaKategoriContent({
       const newCommentObj = await interactionService.postComment(id, "Admin", newComment);
       setComments([newCommentObj, ...comments]);
       setNewComment("");
+      // Opsional: showSuccess("Komentar Terkirim", "");
     } catch (error) {
       console.error("Error adding comment:", error);
-      alert("Gagal mengirim komentar");
+      showError("Gagal", "Tidak dapat mengirim komentar");
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if(!confirm("Hapus komentar ini?")) return;
-    try {
-      await interactionService.deleteComment(commentId);
-      setComments(comments.filter(c => c.id !== commentId));
-    } catch (error) {
-      console.error("Gagal hapus komentar:", error);
-      alert("Gagal menghapus komentar");
+    // Menggunakan helper SweetAlert untuk komentar juga
+    const result = await confirmDelete("Hapus komentar?", "Komentar akan hilang permanen.");
+    
+    if (result.isConfirmed) {
+      try {
+        await interactionService.deleteComment(commentId);
+        setComments(comments.filter(c => c.id !== commentId));
+        showSuccess("Terhapus!", "Komentar berhasil dihapus.");
+      } catch (error) {
+        console.error("Gagal hapus komentar:", error);
+        showError("Gagal", "Tidak dapat menghapus komentar.");
+      }
     }
   };
 
+  // --- LOGIC BARU MENGGUNAKAN SWEETALERT2 ---
   const handleDeleteBerita = async () => {
-    setIsDeleting(true);
-    try {
-      await beritaService.delete(id);
-      setShowDeleteModal(false);
-      router.push("/admin/beritaTerkini"); 
-    } catch (error) {
-      console.error("Error deleting berita:", error);
-      alert("Gagal menghapus berita");
-    } finally {
-      setIsDeleting(false);
+    // 1. Panggil konfirmasi dari file helper
+    const result = await confirmDelete(
+      "Hapus Berita?", 
+      `Berita "${berita.judul}" akan dihapus permanen.`
+    );
+
+    if (result.isConfirmed) {
+      try {
+        // 2. Tampilkan loading
+        showLoading("Menghapus...", "Sedang menghapus data dari server");
+
+        // 3. Request API
+        await beritaService.delete(id);
+
+        // 4. Tampilkan sukses
+        await showSuccess("Terhapus!", "Berita berhasil dihapus.");
+
+        // 5. Redirect
+        router.push("/admin/beritaTerkini"); 
+
+      } catch (error) {
+        console.error("Error deleting berita:", error);
+        showError("Gagal", "Terjadi kesalahan saat menghapus berita.");
+      }
     }
   };
 
@@ -147,6 +172,7 @@ export default function BeritaKategoriContent({
             <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 capitalize">
               {berita.kategori_berita?.nama || "Umum"}
             </span>
+            {/* Tag <SweetAlert2/> dihapus karena kita pakai fungsi helper langsung */}
           </div>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
@@ -164,7 +190,12 @@ export default function BeritaKategoriContent({
               </div>
             </div>
             
-            <button onClick={() => setShowDeleteModal(true)} className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Hapus Berita">
+            {/* BUTTON DELETE LANGSUNG PANGGIL FUNGSI */}
+            <button 
+              onClick={handleDeleteBerita} 
+              className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg" 
+              title="Hapus Berita"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
             </button>
           </div>
@@ -183,7 +214,6 @@ export default function BeritaKategoriContent({
           </div>
         </section>
 
-        {/* --- PERBAIKAN STYLING DI SINI --- */}
         <article className="
           py-8 text-gray-800 leading-relaxed
           [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-6
@@ -214,7 +244,6 @@ export default function BeritaKategoriContent({
             </button>
           </div>
 
-          {/* Comments Section (Tidak berubah) */}
           <div className="space-y-6">
             <h3 className="text-xl font-bold text-gray-900">Komentar ({comments.length})</h3>
 
@@ -269,22 +298,7 @@ export default function BeritaKategoriContent({
           </div>
         </section>
       </div>
-
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold mb-4">Hapus Berita?</h2>
-            <p className="text-gray-600 mb-6">Tindakan ini permanen. Berita "{berita.judul}" akan dihapus.</p>
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setShowDeleteModal(false)} disabled={isDeleting} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Batal</button>
-              <button onClick={handleDeleteBerita} disabled={isDeleting} className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2">
-                 {isDeleting && <Loader2 className="animate-spin" size={16} />}
-                 Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* MODAL MANUAL YANG DULU ADA DI SINI SUDAH DIHAPUS */}
     </main>
   );
 }

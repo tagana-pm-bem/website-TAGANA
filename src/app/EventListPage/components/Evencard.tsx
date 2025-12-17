@@ -22,7 +22,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-white shadow-[-1px_0px_19px_5px_rgba(0,_0,_0,_0.15)]  rounded-xl p-4 flex flex-row gap-3 items-center border border-gray-100 hover:border-blue-300 "
+      className="bg-white shadow-[0px_2px_6px_0px_rgba(0,_0,_0,_0.35)] rounded-xl p-4 flex flex-row gap-3 items-center border border-gray-100 hover:border-blue-300 "
     >
       {/* Date Badge */}
       <div className="flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-2xs flex-shrink-0 ">

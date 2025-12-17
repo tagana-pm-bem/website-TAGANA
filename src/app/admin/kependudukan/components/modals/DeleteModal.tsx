@@ -1,16 +1,36 @@
 'use client';
 
+// 1. Import Hook
+import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
 
 interface DeleteModalProps {
   title: string;
   message: string;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void; // Support async
   onClose: () => void;
 }
 
 export default function DeleteModal({ title, message, onConfirm, onClose }: DeleteModalProps) {
+  // 2. Panggil fungsi dari Provider
+  const { showCenterSuccess, showCenterFailed, showLoading } = useSweetAlert();
+
+  // 3. Buat Wrapper Function untuk Handle Konfirmasi
+  const handleConfirm = async () => {
+    try {
+      showLoading("Menghapus Data...");
+      
+      await onConfirm();
+      
+      await showCenterSuccess("Berhasil Dihapus");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      showCenterFailed("Gagal Menghapus Data");
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-white/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full">
         <div className="p-6">
           <div className="flex items-center gap-4 mb-4">
@@ -32,7 +52,7 @@ export default function DeleteModal({ title, message, onConfirm, onClose }: Dele
               Batal
             </button>
             <button
-              onClick={onConfirm}
+              onClick={handleConfirm} // Gunakan handleConfirm, bukan onConfirm langsung
               className="cursor-pointer px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
               Hapus

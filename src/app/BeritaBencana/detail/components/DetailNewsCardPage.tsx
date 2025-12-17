@@ -132,7 +132,7 @@ export function DetailNewsCardPage({
         </article>
 
         {onBack && (
-          <div className="mt-12 border-t pt-6">
+          <div className="mt-12 border-t border-gray-700 pt-6">
             <button
               onClick={onBack}
               className="cursor-pointer flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
@@ -142,7 +142,7 @@ export function DetailNewsCardPage({
           </div>
         )}
 
-        <div className="mt-10 border-t pt-8">
+        <div className="mt-10  pt-8">
           <LikePage beritaId={berita.id} />
         </div>
       </div>

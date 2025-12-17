@@ -110,7 +110,7 @@ export default function BeritaBencanaPage() {
 
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 mb-48">
+    <div className="max-w-7xl mx-auto px-4 py-8 mb-48 bg-white">
       <div className="mb-6 flex gap-3">
         <div className="relative flex-1">
           <input

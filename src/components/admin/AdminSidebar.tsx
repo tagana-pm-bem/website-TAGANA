@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { LayoutDashboard } from "lucide-react";
 
+// 1. Import Hook
+import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
+
 interface MenuItem {
   icon: React.ReactNode;
   label: string;
@@ -14,6 +17,9 @@ export function AdminSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const [activeMenu, setActiveMenu] = useState("");
+
+  // 2. Panggil fungsi confirmLogout
+  const { confirmLogout } = useSweetAlert();
 
   const mainMenuItems: MenuItem[] = [
     {
@@ -66,7 +72,6 @@ export function AdminSidebar() {
   ];
 
   const otherPagesItems: MenuItem[] = [
-    
     {
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +101,7 @@ export function AdminSidebar() {
         </svg>
       ),
       label: "Keluar",
-      path: "/splash",
+      path: "/splash", // Path tujuan setelah logout
     },
   ];
 
@@ -109,7 +114,23 @@ export function AdminSidebar() {
     }
   }, [pathname]);
 
-  const handleMenuClick = (item: MenuItem) => {
+  // 3. Update logika Handle Click
+  const handleMenuClick = async (item: MenuItem) => {
+    // KHUSUS TOMBOL KELUAR
+    if (item.label === "Keluar") {
+      const result = await confirmLogout(); // Munculkan SweetAlert
+      
+      if (result.isConfirmed) {
+        // Jika user klik "Ya, Keluar"
+        // Lakukan proses logout di sini (hapus token/session jika ada)
+        // ...
+        
+        router.push(item.path); // Redirect ke /splash
+      }
+      return; // Stop, jangan jalankan kode di bawah
+    }
+
+    // UNTUK MENU LAINNYA
     setActiveMenu(item.label);
     router.push(item.path);
   };
@@ -129,7 +150,7 @@ export function AdminSidebar() {
       {/* Main Menu */}
       <nav className="flex-1 px-4 py-6 space-y-2">
         <div className="mb-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2">Main Menu</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2">Menu Utama</p>
           {mainMenuItems.map((item) => (
             <button
               key={item.label}
@@ -148,7 +169,7 @@ export function AdminSidebar() {
 
         {/* Other Pages */}
         <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2 mt-6">Other Pages</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase px-4 mb-2 mt-6">Page lainnya</p>
           {otherPagesItems.map((item) => (
             <button
               key={item.label}

@@ -38,7 +38,6 @@ export default function EventList({ refreshTrigger = 0, filterDate = null, onDat
   const handleDelete = async (id: string) => {
     await eventService.delete(id);
     fetchEvents();
-    if (onDataChange) onDataChange();
   };
 
   const handleUpdate = async (id: string, data: Partial<EventDB>) => {
@@ -46,8 +45,6 @@ export default function EventList({ refreshTrigger = 0, filterDate = null, onDat
     
     setEvents(events.map(ev => ev.id === id ? { ...ev, ...updatedData } : ev));
     setSelectedEvent(updatedData); 
-    
-    alert("Event berhasil diperbarui!");
   };
 
   const filteredEvents = useMemo(() => {
@@ -82,7 +79,7 @@ export default function EventList({ refreshTrigger = 0, filterDate = null, onDat
             <div
               key={event.id}
               onClick={() => setSelectedEvent(event)}
-              className="shadow-sm rounded-xl p-3 flex flex-row gap-3 items-start border border-gray-100 bg-white hover:shadow-md transition-all cursor-pointer hover:border-blue-200"
+              className="shadow-lg rounded-xl p-3 flex flex-row gap-3 items-start border border-gray-200  mt-3 bg-white transition-all cursor-pointer"
             >
               <div className="flex flex-col items-center justify-center min-w-[55px] h-[55px] bg-blue-50 border border-blue-100 rounded-lg flex-shrink-0">
                 <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">{getMonthName(event.event_date)}</span>

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+// 1. Import Hook
+import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
 
 interface Field {
   name: string;
@@ -14,11 +16,14 @@ interface EditModalProps {
   title: string;
   fields: Field[];
   initialData: any;
-  onSave: (data: any) => void;
+  onSave: (data: any) => Promise<void> | void; // Support async
   onClose: () => void;
 }
 
 export default function EditModal({ title, fields, initialData, onSave, onClose }: EditModalProps) {
+  // 2. Panggil fungsi dari Provider
+  const { showCenterSuccess, showCenterFailed, showLoading } = useSweetAlert();
+  
   const [formData, setFormData] = useState(initialData);
 
   useEffect(() => {
@@ -29,13 +34,31 @@ export default function EditModal({ title, fields, initialData, onSave, onClose 
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 3. Update Handle Submit
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    
+    try {
+      // Tampilkan Loading
+      showLoading("Menyimpan Perubahan...");
+      
+      // Jalankan fungsi simpan dari parent
+      await onSave(formData);
+
+      // Tampilkan Sukses (Center)
+      await showCenterSuccess("Berhasil Disimpan");
+      
+      // Tutup Modal
+      onClose();
+    } catch (error) {
+      console.error(error);
+      // Tampilkan Gagal (Center)
+      showCenterFailed("Gagal Menyimpan Data");
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-white/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">

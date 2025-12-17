@@ -6,11 +6,17 @@ import { CalendarPlus, Save, Loader2 } from "lucide-react";
 import ImageUpload from "./imageUpload";
 import { eventService } from "@/services/eventService";
 
+// 1. Import Hook dari Provider
+import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
+
 interface AddEventProps {
   onSuccess?: () => void;
 }
 
 export default function AddEvent({ onSuccess }: AddEventProps) {
+  // 2. Panggil fungsi SweetAlert
+  const { showDraggableSuccess, showDraggableError } = useSweetAlert();
+
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -21,8 +27,9 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleSubmit = async () => {
+    // 3. Validasi Input dengan SweetAlert
     if (!title || !date || !startTime || !location) {
-      alert("Mohon lengkapi Judul, Tanggal, Waktu Mulai, dan Lokasi!");
+      showDraggableError("Data Belum Lengkap", "Mohon lengkapi Judul, Tanggal, Waktu Mulai, dan Lokasi!");
       return;
     }
 
@@ -45,8 +52,10 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
         status: "scheduled"
       });
 
-      alert("Event berhasil ditambahkan!");
+      // 4. Notifikasi Sukses dengan SweetAlert
+      await showDraggableSuccess("Berhasil Menambahkan Event!");
       
+      // Reset Form
       setTitle("");
       setDate("");
       setStartTime("");
@@ -54,11 +63,13 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
       setLocation("");
       setDescription("");
       setSelectedFile(null); 
+      
       if (onSuccess) onSuccess();
 
     } catch (error) {
       console.error(error);
-      alert("Gagal menyimpan event.");
+      // 5. Notifikasi Error dengan SweetAlert
+      showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan event.");
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +152,7 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
       <button 
         onClick={handleSubmit}
         disabled={isLoading}
-        className="flex flex-row gap-3 items-center justify-center py-3 cursor-pointer rounded-xl bg-blue-400 hover:bg-blue-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex flex-row gap-3 items-center justify-center py-3 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? <Loader2 className="animate-spin text-white" size={16} /> : <Save size={16} color="white" />}
         <p className="text-white font-semibold text-sm">{isLoading ? "Menyimpan..." : "Simpan Event"}</p>

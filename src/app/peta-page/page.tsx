@@ -81,7 +81,7 @@ export default function Home() {
 
       <div className="min-h-full bg-gray-50">
         <main className="pt-6 pb-8">
-          <div className="w-full px-4 md:px-14 mx-auto ">
+          <div className="w-full px-4 md:px-14 mx-auto  ">
 
             <Controls
               selectedDusunId={selectedDusunId}

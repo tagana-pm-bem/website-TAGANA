@@ -9,6 +9,14 @@ import { KategoriBeritaService } from "@/services/kategoriBeritaService";
 import { beritaService } from "@/services/beritaService";
 import { useBerita } from "./hooks/useBerita.hooks";
 
+// Import Helper SweetAlert yang sudah dibuat sebelumnya
+import { 
+  confirmSaveChanges, 
+  showLoading, 
+  showDraggableSuccess, 
+  showDraggableError 
+} from "@/app/admin/ui/SweetAllert2";
+
 interface KategoriItem {
   id: number;
   kategoriBerita: string;
@@ -27,7 +35,6 @@ export default function KelolaBeritaPage() {
   const [kategori, setKategori] = useState<KategoriItem[]>([]);
   const [loadingKategori, setLoadingKategori] = useState(true);
   
-  // 👇 State untuk jumlah berita bulan ini
   const [jumlahBeritaBulanIni, setJumlahBeritaBulanIni] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
 
@@ -45,14 +52,12 @@ export default function KelolaBeritaPage() {
     fetchKategori();
   }, []);
 
-  // 👇 Fetch jumlah berita bulan ini
   useEffect(() => {
     const fetchBeritaStats = async () => {
       try {
         setLoadingStats(true);
         const allBerita = await beritaService.getAll();
         
-        // Filter berita bulan ini
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
@@ -74,15 +79,17 @@ export default function KelolaBeritaPage() {
     };
     
     fetchBeritaStats();
-  }, [refreshKey]); // 👈 Re-fetch ketika ada berita baru
+  }, [refreshKey]);
 
+  // --- MODIFIKASI FUNGSI PUBLISH DI SINI ---
   const handlePublish = async () => {
+    // 1. Validasi Input (Ganti alert biasa dengan Draggable Error)
     if (!judul || !selectedKategori) {
-      alert("Harap lengkapi judul dan kategori!");
+      showDraggableError("Data Belum Lengkap", "Harap lengkapi judul dan kategori!");
       return;
     }
     if (!isiBerita || isiBerita === "<p></p>") {
-      alert("Isi berita tidak boleh kosong!");
+      showDraggableError("Konten Kosong", "Isi berita tidak boleh kosong!");
       return;
     }
 
@@ -94,17 +101,37 @@ export default function KelolaBeritaPage() {
       penulis: "Admin",
       tanggal: new Date().toISOString(),
       file_url: null,
-      lokasi: "Kantor Desa",
     };
 
-    try {
-      await createBerita(payload);
-      setRefreshKey((prev) => prev + 1);
-      setJudul("");
-      setIsiBerita("");
-      setSelectedKategori(null);
-    } catch (error) {
-      console.error("Gagal submit di page:", error);
+    // 2. Konfirmasi User (Apakah yakin ingin publish?)
+    const result = await confirmSaveChanges(
+      "Publikasikan Berita?", 
+      "Ya, Terbitkan", 
+      "Batal"
+    );
+
+    if (result.isConfirmed) {
+      try {
+        // 3. Tampilkan Loading
+        showLoading("Menerbitkan...", "Sedang mengirim data ke server");
+
+        // 4. Eksekusi API (Logika Utama)
+        await createBerita(payload);
+
+        // 5. Tampilkan Sukses (Draggable)
+        showDraggableSuccess("Berita Berhasil Diterbitkan!");
+
+        // 6. Reset State & Refresh Data
+        setRefreshKey((prev) => prev + 1);
+        setJudul("");
+        setIsiBerita("");
+        setSelectedKategori(null);
+
+      } catch (error) {
+        console.error("Gagal submit di page:", error);
+        // 7. Handle Error
+        showDraggableError("Gagal Menerbitkan", "Terjadi kesalahan pada sistem.");
+      }
     }
   };
 

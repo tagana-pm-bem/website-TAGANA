@@ -89,7 +89,7 @@ export function Navbar() {
             </div>
 
             {/* Desktop Navigation - Hidden on mobile */}
-            <div className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
+            <div className="hidden md:flex items-center gap-8 lg:gap-6 xl:gap-8">
               <button
                 onClick={() => router.push('/peta-page')}
                 className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
@@ -120,7 +120,7 @@ export function Navbar() {
                   pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
-                Berita Bencana
+                Berita Terkini
                 <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
                   pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}></span>
@@ -141,14 +141,22 @@ export function Navbar() {
             {/* Mobile Burger Button */}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg  hover:bg-gray-100 transition-colors duration-300"
               aria-label="Toggle menu"
             >
-              <div className="w-6 h-5 flex flex-col justify-between">
-                <span className={`block h-0.5 w-full bg-[#044BB1] rounded transition-all duration-300 ${isSidebarOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-                <span className={`block h-0.5 w-full bg-[#044BB1] rounded transition-all duration-300 ${isSidebarOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`block h-0.5 w-full bg-[#044BB1] rounded transition-all duration-300 ${isSidebarOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-              </div>
+                <svg
+                className="w-6 h-6 text-blue-700 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+                </svg>
             </button>
           </div>
         </div>
@@ -161,7 +169,7 @@ export function Navbar() {
         ></div>
       )}
 
-      <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+      <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50 transform transition-transform duration-500 ease-in-out md:hidden ${
         isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
@@ -200,16 +208,16 @@ export function Navbar() {
               onClick={() => handleNavigation('/BeritaBencana')}
               className={`w-full text-left px-6 py-3 font-semibold transition-colors duration-200 ${
                 pathname === '/BeritaBencana' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
-              }`}
+              }`} 
             >
-              Berita Bencana
+              Berita Terkini
             </button>
 
-            <div className="border-t border-gray-200 my-4"></div>
+            <div className="border-t border-gray-300 my-4"></div>
 
             <button
               onClick={() => handleNavigation('/auth/login')}
-              className="w-full mx-4 flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-gray-500 to-gray-900 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300"
+              className="w-full mx-4 flex items-center space-x-2 px-4 py-3 bg-gradient-to-r shadow-[-1px_3px_9px_-1px_rgba(0,_0,_0,_0.7)] from-gray-700 to-gray-900 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300"
               style={{ width: 'calc(100% - 2rem)' }}
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -5,11 +5,17 @@ import Card from "@/components/ui/card";
 import { UserPlus, Save, Loader2, User, Key, Mail } from "lucide-react";
 import { authService } from "../../../auth/services/authService";
 
+// 1. Import Hook SweetAlert
+import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
+
 interface PengaturanAkunProps {
   onSuccess: () => void; 
 }
 
 export default function PengaturanAkun({ onSuccess }: PengaturanAkunProps) {
+  // 2. Panggil fungsi SweetAlert
+  const { showDraggableSuccess, showDraggableError } = useSweetAlert();
+
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -23,12 +29,13 @@ export default function PengaturanAkun({ onSuccess }: PengaturanAkunProps) {
   };
 
   const handleSubmit = async () => {
+    // 3. Validasi dengan SweetAlert Error
     if (!formData.fullName || !formData.username || !formData.password) {
-      alert("Mohon lengkapi semua data.");
+      showDraggableError("Data Tidak Lengkap", "Mohon lengkapi nama, username, dan password.");
       return;
     }
     if (formData.password.length < 6) {
-      alert("Password minimal 6 karakter.");
+      showDraggableError("Password Lemah", "Password minimal harus 6 karakter.");
       return;
     }
 
@@ -40,19 +47,22 @@ export default function PengaturanAkun({ onSuccess }: PengaturanAkunProps) {
         fullName: formData.fullName,
       });
 
-      alert(`Berhasil! Admin ${formData.username} telah ditambahkan.`);
+      // 4. Notifikasi Sukses dengan SweetAlert
+      await showDraggableSuccess(`Admin ${formData.username} Berhasil Ditambahkan!`);
+      
       setFormData({ fullName: "", username: "", password: "" });
       onSuccess();
     } catch (error: any) {
       console.error(error);
-      alert("Gagal menambahkan admin: " + (error.message || "Terjadi kesalahan"));
+      // 5. Notifikasi Gagal dengan SweetAlert
+      showDraggableError("Gagal Menambahkan", error.message || "Terjadi kesalahan pada server");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="flex flex-col gap-8 w-full">
+    <Card className="flex flex-col gap-8 w-full ">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
           <UserPlus size={20} className="text-blue-500" />

@@ -85,7 +85,7 @@ export default function BeritaList() {
 
   return (
     <div className="h-full w-full flex flex-col gap-4 sm:gap-5 md:gap-6 rounded-lg p-3 sm:p-4 md:p-6">
-      
+      <div>
       <FilterSection 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -94,6 +94,8 @@ export default function BeritaList() {
         resultCount={filteredBerita.length}
         totalCount={beritaList.length}
       />
+
+      </div>
 
       <div className="flex flex-col gap-3 sm:gap-4 mt-2">
         {isLoading ? (

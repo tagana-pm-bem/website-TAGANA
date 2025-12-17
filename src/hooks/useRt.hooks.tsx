@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { rtService, RTDB } from '@/services/rtService';
-import { useAlert } from '@/components/ui/Alert';
 
 export function useRt(selectedDusun: string) {
   const [data, setData] = useState<RTDB[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { showAlert } = useAlert();
 
+  // Fungsi fetch data
   const fetchRt = useCallback(async () => {
     if (!selectedDusun) return;
     
@@ -15,42 +14,48 @@ export function useRt(selectedDusun: string) {
       const result = await rtService.getByDusun(selectedDusun);
       setData(result);
     } catch (error) {
-      console.error(error);
-      showAlert({ type: 'error', title: 'Error', message: 'Gagal mengambil data RT' });
+      console.error("Gagal mengambil data RT:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedDusun, showAlert]);
+  }, [selectedDusun]);
 
+  // Initial load
   useEffect(() => {
     fetchRt();
   }, [fetchRt]);
 
+  // --- UPDATE ---
   const updateRt = async (id: string, payload: any) => {
     try {
       await rtService.update(id, payload);
-      await fetchRt(); 
-      showAlert({ type: 'success', title: 'Sukses', message: 'Data RT berhasil diperbarui' });
+      await fetchRt(); // Refresh data otomatis
       return true;
     } catch (error) {
-      console.error(error);
-      showAlert({ type: 'error', title: 'Gagal', message: 'Gagal update data RT' });
-      return false;
+      console.error("Gagal update RT:", error);
+      // PENTING: Lempar error agar ditangkap oleh SweetAlert di Modal
+      throw error; 
     }
   };
 
+  // --- DELETE ---
   const deleteRt = async (id: string) => {
     try {
       await rtService.delete(id);
-      await fetchRt(); 
-      showAlert({ type: 'success', title: 'Sukses', message: 'Data RT berhasil dihapus' });
+      await fetchRt(); // Refresh data otomatis
       return true;
     } catch (error) {
-      console.error(error);
-      showAlert({ type: 'error', title: 'Gagal', message: 'Gagal menghapus data RT' });
-      return false;
+      console.error("Gagal hapus RT:", error);
+      // PENTING: Lempar error agar ditangkap oleh SweetAlert di Modal
+      throw error;
     }
   };
 
-  return { data, isLoading, updateRt, deleteRt };
+  return { 
+    data, 
+    isLoading, 
+    updateRt, 
+    deleteRt,
+    mutate: fetchRt // Gunakan ini jika butuh refresh manual dari component
+  };
 }

@@ -4,7 +4,8 @@ import { useState } from 'react';
 import EditModal from './modals/EditModal';
 import DeleteModal from './modals/DeleteModal';
 import { useRt } from '@/hooks/useRt.hooks'; 
-import { Pencil, Trash2 } from 'lucide-react';
+import { rtService } from '@/services/rtService'; // Import Service langsung untuk create
+import { Pencil, Trash2, Plus } from 'lucide-react'; // Tambah icon Plus
 
 interface RTDB {
   id: string;
@@ -21,45 +22,81 @@ const DUSUN_LIST = [
 export function RtTable() {
   const [selectedDusun, setSelectedDusun] = useState<string>('Miri');
   
-  const { data: rtData, isLoading, updateRt, deleteRt } = useRt(selectedDusun);
+  // Asumsi hook useRt me-return fungsi refresh/mutate data
+  const { data: rtData, isLoading, updateRt, deleteRt, mutate } = useRt(selectedDusun);
 
   const [editingItem, setEditingItem] = useState<RTDB | null>(null);
   const [deletingItem, setDeletingItem] = useState<RTDB | null>(null);
+  const [isAdding, setIsAdding] = useState(false); // State untuk modal tambah
   const [showAll, setShowAll] = useState(false);
 
   const ITEMS_PER_PAGE = 5;
   const safeData = rtData || [];
   const displayData = showAll ? safeData : safeData.slice(0, ITEMS_PER_PAGE);
 
-  const handleEdit = (item: any) => {
-    setEditingItem(item);
+  // --- LOGIKA CREATE ---
+  const handleSaveAdd = async (newData: any) => {
+    try {
+      // 1. Ambil ID Dusun berdasarkan nama dusun yang dipilih
+      const dusunId = await rtService.getDusunIdByName(selectedDusun);
+      
+      // 2. Siapkan Payload
+      const payload = {
+        dusun_id: dusunId,
+        nomor_rt: newData.rt,
+        nama_ketua: newData.nama,
+        jenis_kelamin_ketua: newData.jenisKelamin
+      };
+
+      // 3. Panggil Service Create
+      await rtService.create(payload);
+      
+      // 4. Refresh Data
+      if (mutate) mutate(); // Jika hook punya mutate
+      else window.location.reload(); // Fallback reload jika hook tidak punya mutate
+      
+      setIsAdding(false);
+    } catch (error) {
+      console.error(error);
+      throw error; // Lempar error agar ditangkap oleh SweetAlert di dalam EditModal
+    }
   };
 
-  const handleDelete = (item: any) => {
-    setDeletingItem(item);
-  };
-
+  // --- LOGIKA UPDATE ---
   const handleSaveEdit = async (updatedData: any) => {
     if (!editingItem) return;
-
-    const payload = {
-      nomor_rt: updatedData.rt,
-      nama_ketua: updatedData.nama,
-      jenis_kelamin_ketua: updatedData.jenisKelamin
-    };
-    
-    const success = await updateRt(editingItem.id, payload);
-    if (success) setEditingItem(null);
+    try {
+      const payload = {
+        nomor_rt: updatedData.rt,
+        nama_ketua: updatedData.nama,
+        jenis_kelamin_ketua: updatedData.jenisKelamin
+      };
+      
+      const success = await updateRt(editingItem.id, payload);
+      if (success) {
+        setEditingItem(null);
+        if (mutate) mutate();
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
+  // --- LOGIKA DELETE ---
   const handleConfirmDelete = async () => {
     if (!deletingItem) return;
-    
-    const success = await deleteRt(deletingItem.id);
-    if (success) setDeletingItem(null);
+    try {
+      const success = await deleteRt(deletingItem.id);
+      if (success) {
+        setDeletingItem(null);
+        if (mutate) mutate();
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const editFields = [
+  const formFields = [
     { name: 'rt', label: 'RT', type: 'text' as const, required: true },
     { name: 'nama', label: 'Nama Kepala RT', type: 'text' as const, required: true },
     { 
@@ -87,18 +124,29 @@ export function RtTable() {
       <div className="flex justify-between items-center">
         <h1 className="font-semibold text-md">Data RT per Dusun</h1>
         
-        <select
-          value={selectedDusun}
-          onChange={(e) => {
-            setSelectedDusun(e.target.value);
-            setShowAll(false);
-          }}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer"
-        >
-          {DUSUN_LIST.map((dusun) => (
-            <option key={dusun} value={dusun}>{dusun}</option>
-          ))}
-        </select>
+        <div className="flex gap-3">
+            <select
+            value={selectedDusun}
+            onChange={(e) => {
+                setSelectedDusun(e.target.value);
+                setShowAll(false);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer"
+            >
+            {DUSUN_LIST.map((dusun) => (
+                <option key={dusun} value={dusun}>{dusun}</option>
+            ))}
+            </select>
+
+            {/* TOMBOL TAMBAH DATA */}
+            <button
+                onClick={() => setIsAdding(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm"
+            >
+                <Plus size={18} />
+                <span className="text-sm font-medium">Tambah</span>
+            </button>
+        </div>
       </div>
 
       <div className="border-b border-gray-300" />
@@ -149,13 +197,13 @@ export function RtTable() {
                     <td className="bg-white shadow-sm rounded-sm py-3">
                       <div className="flex justify-center gap-2">
                         <button
-                          onClick={() => handleEdit(item)}
+                          onClick={() => setEditingItem(item)}
                           className="cursor-pointer p-2 rounded-lg shadow-sm hover:bg-blue-100 transition"
                         >
                           <Pencil size={16} className="text-blue-500" />
                         </button>
                         <button
-                          onClick={() => handleDelete(item)}
+                          onClick={() => setDeletingItem(item)}
                           className="cursor-pointer p-2 rounded-lg shadow-sm hover:bg-red-100 transition"
                         >
                           <Trash2 size={16} className="text-red-500" />
@@ -187,11 +235,26 @@ export function RtTable() {
         {!showAll && safeData.length > 0 && ` | Menampilkan: ${Math.min(ITEMS_PER_PAGE, safeData.length)}`}
       </div>
 
+      {/* MODAL TAMBAH (CREATE) */}
+      {isAdding && (
+        <EditModal
+          title={`Tambah RT di ${selectedDusun}`}
+          fields={formFields}
+          initialData={{
+            rt: '',
+            nama: '',
+            jenisKelamin: ''
+          }}
+          onSave={handleSaveAdd}
+          onClose={() => setIsAdding(false)}
+        />
+      )}
+
+      {/* MODAL EDIT (UPDATE) */}
       {editingItem && (
         <EditModal
           title="Edit Data RT"
-          fields={editFields}
-          // Mapping Data DB -> Form Modal
+          fields={formFields}
           initialData={{
             rt: editingItem.nomor_rt,
             nama: editingItem.nama_ketua || '',
@@ -202,6 +265,7 @@ export function RtTable() {
         />
       )}
 
+      {/* MODAL HAPUS (DELETE) */}
       {deletingItem && (
         <DeleteModal
           title="Hapus Data RT"

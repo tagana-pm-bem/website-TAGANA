@@ -42,7 +42,7 @@ export default function LegendCard() {
       icon: <div className="w-8 h-1 bg-gray-50"></div>,
       title: "Batas RT",
       description: "Garis batas Rukun Tetangga",
-      accentColor: "border-gray-500 bg-gray-400",
+      accentColor: "border-gray-700 bg-gray-400",
     },
     {
       icon: <div className="w-8 h-1 bg-yellow-500"></div>,

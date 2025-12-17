@@ -5,11 +5,14 @@ import { ShieldAlert, Edit3 } from "lucide-react";
 import { useDusun } from "@/hooks/useDusun.hooks"; 
 import { bencanaService } from "@/services/bencanaService";
 import { dusunService } from "@/services/dusunService";
-import { useAlert } from "@/components/ui/Alert";
 import Dropdown from "./dropdown";
 
+// 1. Import Helper SweetAlert2 (sesuai request path Anda)
+import { showDraggableSuccess, showDraggableError } from "@/app/admin/ui/SweetAllert2";
+
+
 export default function ManajemenRisiko() {
-  const { showAlert } = useAlert();
+  // Hapus useAlert() karena sudah diganti SweetAlert
   const { data: dusunList } = useDusun(); 
 
   const [selectedDusunId, setSelectedDusunId] = useState("");
@@ -22,6 +25,13 @@ export default function ManajemenRisiko() {
   const [selectedDusunForEdit, setSelectedDusunForEdit] = useState("");
   const [deskripsiDusun, setDeskripsiDusun] = useState("");
   const [isUpdatingDeskripsi, setIsUpdatingDeskripsi] = useState(false);
+
+  // Dropdown States
+  const [openBencana, setOpenBencana] = useState(false);
+  const [openRisiko, setOpenRisiko] = useState(false);
+
+  //sweet alert
+  
 
   const bencanaOptions = [
     { label: "Banjir", color: "text-blue-500", iconVal: "flood" },
@@ -39,8 +49,9 @@ export default function ManajemenRisiko() {
   ];
 
   const handleSimpan = async () => {
+    // 2. Validasi menggunakan Draggable Error
     if (!selectedDusunId || bencana === "Pilih jenis bencana" || risiko === "Tingkat dampak") {
-      showAlert({ type: 'error', title: 'Gagal', message: 'Mohon lengkapi semua data (Dusun, Bencana, Risiko)' });
+      showDraggableError("Data Tidak Lengkap", "Mohon lengkapi semua data (Dusun, Bencana, Risiko)");
       return;
     }
 
@@ -61,7 +72,9 @@ export default function ManajemenRisiko() {
 
       await bencanaService.create(payload);
 
-      showAlert({ type: 'success', title: 'Berhasil', message: 'Data risiko bencana berhasil ditambahkan' });
+      // 3. Tampilkan Sukses (Await agar user klik OK dulu baru reload)
+      await showDraggableSuccess("Berhasil Menambahkan Data!");
+      
       setBencana("Pilih jenis bencana");
       setRisiko("Tingkat dampak");
       setDeskripsi("");
@@ -71,7 +84,8 @@ export default function ManajemenRisiko() {
 
     } catch (error) {
       console.error(error);
-      showAlert({ type: 'error', title: 'Error', message: 'Gagal menyimpan data' });
+      // 4. Tampilkan Error API
+      showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data ke server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -79,17 +93,19 @@ export default function ManajemenRisiko() {
 
   // Handle Update Deskripsi Dusun
   const handleUpdateDeskripsiDusun = async () => {
+    // 1. Validasi Input (Gunakan Draggable Error)
     if (!selectedDusunForEdit) {
-      showAlert({ type: 'error', title: 'Gagal', message: 'Pilih dusun terlebih dahulu' });
+      showDraggableError("Pilih Dusun", "Silakan pilih dusun terlebih dahulu.");
       return;
     }
 
     if (!deskripsiDusun.trim()) {
-      showAlert({ type: 'error', title: 'Gagal', message: 'Deskripsi tidak boleh kosong' });
+      showDraggableError("Deskripsi Kosong", "Deskripsi tidak boleh kosong.");
       return;
     }
 
     setIsUpdatingDeskripsi(true);
+    
     try {
       const selectedDusun = dusunList?.find(d => d.id === Number(selectedDusunForEdit));
       
@@ -97,11 +113,16 @@ export default function ManajemenRisiko() {
         throw new Error("Dusun tidak ditemukan");
       }
 
+      // 2. Proses API Update
       await dusunService.updateStats(Number(selectedDusunForEdit), {
         deskripsi: deskripsiDusun
       });
 
-      showAlert({ type: 'success', title: 'Berhasil', message: 'Deskripsi dusun berhasil diperbarui' });
+      // 3. Tampilkan Sukses Draggable
+      // Gunakan 'await' agar user melihat alert dulu sebelum reload
+      await showDraggableSuccess("Deskripsi Berhasil Diperbarui!");
+
+      // 4. Reset Form & Reload
       setSelectedDusunForEdit("");
       setDeskripsiDusun("");
       
@@ -109,21 +130,20 @@ export default function ManajemenRisiko() {
 
     } catch (error) {
       console.error(error);
-      showAlert({ type: 'error', title: 'Error', message: 'Gagal memperbarui deskripsi dusun' });
+      // 5. Tampilkan Error Draggable
+      showDraggableError("Gagal Update", "Terjadi kesalahan saat memperbarui deskripsi.");
     } finally {
       setIsUpdatingDeskripsi(false);
     }
   };
 
+  
   // Handle perubahan dusun terpilih untuk edit
   const handleDusunChangeForEdit = (dusunId: string) => {
     setSelectedDusunForEdit(dusunId);
     const selectedDusun = dusunList?.find(d => d.id === Number(dusunId));
     setDeskripsiDusun(selectedDusun?.deskripsi || "");
   };
-
-  const [openBencana, setOpenBencana] = useState(false);
-  const [openRisiko, setOpenRisiko] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
@@ -232,7 +252,7 @@ export default function ManajemenRisiko() {
         <div className="flex justify-end">
           <button 
             onClick={handleUpdateDeskripsiDusun}
-            disabled={isUpdatingDeskripsi || !selectedDusunForEdit}
+            // disabled={isUpdatingDeskripsi || !selectedDusunForEdit}
             className="flex flex-row gap-3 rounded-xl cursor-pointer bg-green-500 hover:bg-green-600 duration-300 transition-all text-white font-semibold py-3 px-6 shadow-md shadow-green-200 disabled:bg-gray-400"
           >
             {isUpdatingDeskripsi ? "Menyimpan..." : "Update Deskripsi"}

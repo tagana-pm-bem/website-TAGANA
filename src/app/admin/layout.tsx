@@ -6,6 +6,7 @@ import { mainMenuItems, settingsItems } from "@/components/admin/adminMenu";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { authService } from "@/app/auth/services/authService";
+import { SweetAlertProvider } from "@/components/ui/SweetAlertProvider";
 
 export default function AdminLayout({
   children,
@@ -75,23 +76,29 @@ export default function AdminLayout({
 
   // Authenticated - show admin layout
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex">
-        <div className="w-64 bg-gray-900 text-white min-h-screen fixed">
-          <AdminSidebar />
-        </div>
+   
+    <SweetAlertProvider>
 
-        <div className="ml-64 flex-1">
-          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <AdminHeader
-              mainMenuItems={mainMenuItems}
-              settingsItems={settingsItems}
-            />
+      <div className="min-h-screen bg-gray-100">
+        <div className="flex">
+          <div className="w-64 bg-gray-900 text-white min-h-screen fixed">
+            <AdminSidebar />
           </div>
 
-          <main className="p-6">{children}</main>
+          <div className="ml-64 flex-1">
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <AdminHeader
+                mainMenuItems={mainMenuItems}
+                settingsItems={settingsItems}
+              />
+            </div>
+
+            <main className="p-6">{children}</main>
+          </div>
         </div>
       </div>
-    </div>
+    </SweetAlertProvider>
+
+    
   );
 }

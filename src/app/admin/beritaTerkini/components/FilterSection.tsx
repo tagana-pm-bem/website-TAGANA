@@ -49,7 +49,7 @@ export default function FilterSection({
       <div className="space-y-3">
         <p className="text-xs font-semibold text-gray-700">Kategori:</p>
 
-        <div className="space-y-2">
+        <div className="bg-white rounded-lg shadow p-3 space-y-2">
           <p className="text-xs font-medium text-gray-600 px-2">
             Berita Bencana
           </p>
@@ -57,17 +57,17 @@ export default function FilterSection({
             {KATEGORI_BENCANA.map((kat) => {
               const kategori = kat as Kategori;
               return (
-                <button
-                  key={kategori}
-                  onClick={() => onKategoriChange(kategori)}
-                  className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition whitespace-nowrap ${
-                    kategoriFilter === kategori
-                      ? KATEGORI_CONFIG[kategori].activeBadge
-                      : KATEGORI_CONFIG[kategori].badge + " hover:opacity-80"
-                  }`}
-                >
-                  {kategori.charAt(0).toUpperCase() + kategori.slice(1)}
-                </button>
+          <button
+            key={kategori}
+            onClick={() => onKategoriChange(kategori)}
+            className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition whitespace-nowrap ${
+              kategoriFilter === kategori
+                ? KATEGORI_CONFIG[kategori].activeBadge
+                : KATEGORI_CONFIG[kategori].badge + " hover:opacity-80"
+            }`}
+          >
+            {kategori.charAt(0).toUpperCase() + kategori.slice(1)}
+          </button>
               );
             })}
           </div>

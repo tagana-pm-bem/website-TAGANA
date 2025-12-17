@@ -13,7 +13,7 @@ export default function PengaturanPage() {
   };
 
   return (
-    <div className="flex flex-col w-full px-4 md:px-8 mb-[100px] max-w-5xl mx-auto gap-8">
+    <div className="flex flex-col w-full  px-4 md:px-8 mb-[100px] max-w-5xl mx-auto gap-8">
       
       <div className="flex flex-col gap-2 pt-6">
         <div className="flex items-center gap-3">
