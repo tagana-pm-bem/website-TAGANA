@@ -84,82 +84,84 @@ export default function BeritaList() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col gap-4 sm:gap-5 md:gap-6 rounded-lg p-3 sm:p-4 md:p-6">
-      <div>
-      <FilterSection 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        kategoriFilter={kategoriFilter}
-        onKategoriChange={setKategoriFilter}
-        resultCount={filteredBerita.length}
-        totalCount={beritaList.length}
-      />
-
+    <div className="w-full flex flex-col gap-6 p-4 md:p-6">
+      
+      {/* 1. BAGIAN FILTER (Full Width, di luar Grid) */}
+      <div className="w-full ">
+        <FilterSection 
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          kategoriFilter={kategoriFilter}
+          onKategoriChange={setKategoriFilter}
+          resultCount={filteredBerita.length}
+          totalCount={beritaList.length}
+        />
       </div>
 
-      <div className="flex flex-col gap-3 sm:gap-4 mt-2">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="animate-spin text-blue-500" size={40} />
-          </div>
-        ) : filteredBerita.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <svg className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-base sm:text-lg md:text-xl font-medium text-gray-700 mb-2">Tidak ada berita ditemukan</p>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">Coba ubah filter atau kata kunci pencarian</p>
-          </div>
-        ) : (
-          filteredBerita.map((berita, index) => (
+      {/* 2. BAGIAN KONTEN (Grid Layout) */}
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="animate-spin text-blue-500" size={40} />
+        </div>
+      ) : filteredBerita.length === 0 ? (
+        <div className="text-center py-16 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-xl font-medium text-gray-700 mb-2">Tidak ada berita ditemukan</p>
+          <p className="text-sm text-gray-500">Coba ubah filter atau kata kunci pencarian</p>
+        </div>
+      ) : (
+        // Di sini Grid diterapkan hanya untuk kartu berita
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBerita.map((berita, index) => (
             <article
               key={berita.id}
               onClick={() => handleBeritaClick(berita.id)}
-              className="bg-white rounded-lg sm:rounded-xl cursor-pointer hover:shadow-xl transition-all duration-200 border border-gray-200 hover:border-gray-300 overflow-hidden"
+              className="bg-white rounded-xl cursor-pointer shadow-2xl  transition-all duration-300 border border-gray-200 flex flex-col h-full group"
             >
-              <div className="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gray-100 overflow-hidden">
+              {/* Image Container */}
+              <div className="relative w-full h-48 bg-gray-100 overflow-hidden rounded-t-xl">
+                 <span className={`absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-sm backdrop-blur-md ${kategoriBadge(berita.kategori)}`}>
+                    {berita.kategori}
+                 </span>
                 <Image
-                  src={berita.image}
+                  src={berita.image || "/images/placeholder-news.jpg"}
                   alt={berita.judul}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1000px"
-                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
                   priority={index < 3} 
                   unoptimized={berita.image.startsWith('http') ? false : true}
                 />
               </div>
 
-              <div className="p-4 sm:p-6 md:p-8 space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold capitalize border ${kategoriBadge(berita.kategori)}`}>
-                    {berita.kategori}
-                  </span>
+              {/* Content Container */}
+              <div className="p-5 flex flex-col flex-1">
+                <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
+                   <span>{berita.tanggal}</span>
+                   <span>•</span>
+                   <span>{berita.penulis}</span>
                 </div>
 
-                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
+                <h2 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2 mb-3">
                   {berita.judul}
                 </h2>
-
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm sm:text-base">
-                      {berita.penulis.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-                      {berita.penulis}
-                    </p>
-                    <time className="text-xs sm:text-sm text-gray-500">
-                      {berita.tanggal}
-                    </time>
-                  </div>
+                
+                {/* Spacer agar tombol/footer selalu di bawah jika card tingginya beda */}
+                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                   <span className={`text-xs font-medium px-2 py-1 rounded ${berita.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {berita.status === 'published' ? 'Published' : 'Draft'}
+                   </span>
+                   <span className="text-xs font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
+                      Baca Detail →
+                   </span>
                 </div>
               </div>
             </article>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

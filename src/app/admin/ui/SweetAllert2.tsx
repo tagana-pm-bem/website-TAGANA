@@ -87,8 +87,8 @@ export const confirmSaveChanges = (
         denyButtonText: denyText,
         icon: "question", // Opsional: icon tanya
         iconColor: "#3085d6",
-        confirmButtonColor: "#28a745", // Ubah warna tombol confirm (hijau)
-        denyButtonColor: "#d33" // Opsional: warna tombol deny (merah)
+        confirmButtonColor: "#28a745", 
+        denyButtonColor: "#d33" 
     });
 };
 
@@ -127,10 +127,11 @@ export const confirmDelete = (
     title: title,
     text: text,
     icon: "warning",
+    iconColor: "#f39c12",
     showCancelButton: true,
     confirmButtonColor: "#d33", 
     cancelButtonColor: "#3085d6", 
-    confirmButtonText: "Ya, Hapus!",
+    confirmButtonText: "Hapus!",
     cancelButtonText: "Batal",
     reverseButtons: true,
   });

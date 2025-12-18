@@ -43,7 +43,7 @@ export function NewsCard({
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <svg
-              className="w-16 h-16 text-gray-400"
+              className="w-16 h-16 text-gray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
