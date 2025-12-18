@@ -204,7 +204,7 @@ export default function BeritaKategoriContent({
         <section className="py-4">
           <div className="relative w-full h-64 sm:h-96 rounded-xl overflow-hidden bg-gray-100 shadow-md">
             <Image
-              src={berita.file_url || "/images/placeholder-news.jpg"}
+              src={berita.file_url || "https://picsum.photos/600/400"}
               alt={berita.judul}
               fill
               className="object-cover"

@@ -70,9 +70,10 @@ export default function BeritaTerkini({ refreshTrigger = 0 }: BeritaTerkiniProps
     return htmlContent.replace(/<[^>]+>/g, ''); 
   };
 
+
   return (
     <div className="h-full w-full flex flex-col gap-4 rounded-lg">
-      <div className="flex justify-between items-center border-b pb-2 border-gray-100">
+      <div className="flex justify-between items-center border-b pb-2 border-gray-3000">
         <h1 className="text-sm font-semibold text-gray-800">Berita Terkini</h1>
         <button 
           onClick={() => router.push("/admin/berita")} 
@@ -92,44 +93,43 @@ export default function BeritaTerkini({ refreshTrigger = 0 }: BeritaTerkiniProps
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3 min-h-[300px]">
+          <div className="flex flex-col gap-6 min-h-[300px]">
             {currentData.map((berita) => (
-              <div
+                <div
                 key={berita.id}
                 onClick={() => router.push(`/admin/beritaTerkini/detail?id=${berita.id}`)}
-                className="flex flex-row gap-3 p-2 bg-white rounded-lg  hover:border-gray-200 hover:bg-gray-50 transition cursor-pointer group items-start"
-              >
-                <div className="relative w-[70px] h-[70px] flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
+                className="flex gap-4 p-3 bg-white rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition cursor-pointer group items-center shadow-sm"
+                >
+                <div className="relative w-20 h-20 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
                   <Image
-                    src={berita.file_url || "https://placehold.co/100x100?text=No+Img"}
-                    alt={berita.judul}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  src={berita.file_url || "https://picsum.photos/600/400"}
+                  alt={berita.judul}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1 w-full min-w-0 max-w-80">
-                  <h1 className="text-sm font-semibold text-gray-800 truncate group-hover:text-blue-600 transition-colors">
+                <div className="flex flex-col justify-between w-full min-w-0">
+                  <div>
+                  <h1 className="text-base font-semibold text-gray-800 truncate group-hover:text-blue-700 transition-colors">
                     {berita.judul}
                   </h1>
-
-                  <p className="text-xs text-gray-500 line-clamp-2 leading-snug break-words">
+                  <p className="text-xs text-gray-600 line-clamp-2 mt-1">
                     {cleanHtml(berita.isi_berita)}
                   </p>
-
-                  <div className="mt-1 flex items-center justify-between w-full">
-                     <span className="text-[10px] text-gray-400">
-                        {formatDate(berita.created_at || berita.tanggal)}
-                     </span>
-
-                     {berita.kategori_berita && (
-                       <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-medium border border-blue-100">
-                         {berita.kategori_berita.nama}
-                       </span>
-                     )}
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                  <span className="text-[11px] text-gray-400">
+                    {formatDate(berita.created_at || berita.tanggal)}
+                  </span>
+                  {berita.kategori_berita && (
+                    <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[11px] font-medium border border-blue-100">
+                    {berita.kategori_berita.nama}
+                    </span>
+                  )}
                   </div>
                 </div>
-              </div>
+                </div>
             ))}
           </div>
 

@@ -82,10 +82,11 @@ export const SweetAlertProvider = ({
       title,
       text,
       icon: "warning",
+      iconColor: "#f39c12",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, Hapus!",
+      confirmButtonText: "Hapus!",
       cancelButtonText: "Batal",
       reverseButtons: true,
     });
