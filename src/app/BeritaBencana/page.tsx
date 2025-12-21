@@ -105,7 +105,7 @@ export default function BeritaBencanaPage() {
     });
   };
 
-  const handleReadMore = (id: number) =>
+  const handleReadMore = (id: string) =>
   router.push(`/BeritaBencana/detail?id=${id}`);
 
 
@@ -186,7 +186,6 @@ export default function BeritaBencanaPage() {
           ) : (
             <NewsGrid
               beritaList={mappedBeritaForUI} 
-              getCategoryColor={getCategoryColor}
               getStatusColor={getStatusColor}
               formatDate={formatDate}
               onReadMore={handleReadMore}

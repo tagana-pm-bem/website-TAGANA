@@ -1,46 +1,80 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Router } from 'next/router';
+import { useDemographics } from "@/hooks/useDemographics";
 
 function Homepage() {
   const router = useRouter();
+  
+  const { totalPenduduk, totalKK, isLoading } = useDemographics();
+
   const [counters, setCounters] = useState({
-    volunteers: 0,
-    missions: 0,
+    volunteers: 0, 
+    missions: 0,   
     provinces: 0
   });
+
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const targets = { volunteers: 9390, missions: 500, provinces: 34 };
+    if (isLoading) return;
+
+    // Gunakan data asli sebagai target, bukan angka hardcoded
+    const targets = { 
+      volunteers: totalPenduduk, 
+      missions: totalKK,         
+      provinces: 0 
+    };
+    
     const duration = 1200;
     const steps = 50;
     const stepDuration = duration / steps;
 
+    const timers: NodeJS.Timeout[] = [];
+
     (Object.keys(targets) as Array<keyof typeof targets>).forEach(key => {
       let current = 0;
-      const increment = targets[key] / steps;
+      const targetValue = targets[key];
+      
+      if (targetValue === 0) {
+        setCounters(prev => ({ ...prev, [key]: 0 }));
+        return;
+      }
+
+      const increment = targetValue / steps;
+      
       const timer = setInterval(() => {
         current += increment;
-        setCounters(prev => ({
-          ...prev,
-          [key]: Math.floor(current)
-        }));
-        if (current >= targets[key]) {
-          setCounters(prev => ({
-            ...prev,
-            [key]: targets[key]
-          }));
+        
+        // Update state
+        setCounters(prev => {
+          const nextVal = Math.floor(current);
+          if (nextVal >= targetValue) {
+            return { ...prev, [key]: targetValue };
+          }
+          return { ...prev, [key]: nextVal };
+        });
+
+      
+        if (current >= targetValue) {
           clearInterval(timer);
         }
       }, stepDuration);
+
+      timers.push(timer);
     });
-  }, []);
+
+    // Cleanup timers saat unmount
+    return () => {
+      timers.forEach(timer => clearInterval(timer));
+    };
+
+  }, [isLoading, totalPenduduk, totalKK]); 
 
   const handlePelajariClick = () => {
     router.push('/peta-page');
   };
+
   return (
     <main>
       <style>{`
@@ -113,7 +147,7 @@ function Homepage() {
         }
         .hero-stats {
           display: flex;
-          gap: 2rem;
+          gap: 3rem; /* Sedikit diperlebar agar rapi */
           justify-content: center;
           margin-bottom: 2rem;
         }
@@ -121,8 +155,13 @@ function Homepage() {
           text-align: center;
         }
         .stat-item h3 {
-          font-size: 1.5rem;
+          font-size: 2rem; /* Diperbesar sedikit */
+          font-weight: bold;
           margin-bottom: 0.3rem;
+        }
+        .stat-item p {
+          font-size: 0.9rem;
+          opacity: 0.9;
         }
        @media (max-width: 600px) {
           .hero-title { font-size: 1.5rem; }
@@ -147,26 +186,35 @@ function Homepage() {
         <div className="hero-content">
           <h1 className="hero-title">SRIHARJO</h1>
           <p className="hero-description">
-        Peta interaktif desa Sriharjo, menyediakan informasi lengkap mengenai potensi, fasilitas, dan demografi desa kami.
+            Peta interaktif desa Sriharjo, menyediakan informasi lengkap mengenai potensi, fasilitas, dan demografi desa kami.
           </p>
           <div className="hero-buttons">
-        <button
-          className="btn"
-          onClick={handlePelajariClick}
-        >
-          Selengkapnya
-        </button>
-        <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>Admin login</button>
+            <button
+              className="btn"
+              onClick={handlePelajariClick}
+            >
+              Selengkapnya
+            </button>
+            {/* <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>
+              Admin login
+            </button> */}
           </div>
         </div>
-        <div className="hero-stats">
-          <div className="stat-item">
-        <h3>{counters.volunteers}+</h3>
-        <p>Total Penduduk</p>
+        
+        {/* Tampilkan statistik hanya jika tidak loading */}
+        {!isLoading && (
+          <div className="hero-stats">
+            <div className="stat-item">
+              <h3>{counters.volunteers.toLocaleString('id-ID')}</h3>
+              <p>Total Penduduk</p>
+            </div>
+            
+            <div className="stat-item">
+              <h3>{counters.missions.toLocaleString('id-ID')}</h3>
+              <p>Kepala Keluarga</p>
+            </div>
           </div>
-         
-          
-        </div>
+        )}
       </div>
     </main>
   );

@@ -1,13 +1,14 @@
 "use client";
 
 import { Kategori } from "../types";
-import { KATEGORI_CONFIG, KATEGORI_BENCANA, KATEGORI_UMUM } from "../constants";
+// Import helper dan list dari constants yang baru
+import { KATEGORI_LIST, getKategoriStyle } from "../constants";
 
 interface FilterSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  kategoriFilter: "all" | Kategori;
-  onKategoriChange: (kategori: "all" | Kategori) => void;
+  kategoriFilter: "all" | string; // Ubah ke string agar fleksibel
+  onKategoriChange: (kategori: "all" | string) => void;
   resultCount: number;
   totalCount: number;
 }
@@ -21,10 +22,20 @@ export default function FilterSection({
   totalCount,
 }: FilterSectionProps) {
 
-  // Fungsi helper untuk merender tombol kategori agar lebih bersih
-  const renderCategoryButton = (kategori: Kategori) => {
+  // 1. Pisahkan kategori secara dinamis berdasarkan group di config
+  const kategoriBencana = KATEGORI_LIST.filter(
+    (k) => getKategoriStyle(k).group === "bencana"
+  );
+  
+  const kategoriUmum = KATEGORI_LIST.filter(
+    (k) => getKategoriStyle(k).group === "umum"
+  );
+
+  // Fungsi helper untuk merender tombol kategori
+  const renderCategoryButton = (kategori: string) => {
     const isActive = kategoriFilter === kategori;
-    const config = KATEGORI_CONFIG[kategori];
+    // Gunakan helper getKategoriStyle agar aman (case-insensitive)
+    const style = getKategoriStyle(kategori);
 
     return (
       <button
@@ -32,17 +43,17 @@ export default function FilterSection({
         onClick={() => onKategoriChange(kategori)}
         className={`flex-shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 border whitespace-nowrap ${
           isActive
-            ? `${config.activeBadge} shadow-sm border-transparent scale-105`
-            : `${config.badge} bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50`
+            ? `${style.activeBadge} shadow-sm border-transparent scale-105`
+            : `${style.badge} bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50`
         }`}
       >
-        {kategori.charAt(0).toUpperCase() + kategori.slice(1)}
+        {style.title}
       </button>
     );
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-xl border  border-gray-100 p-5 mb-6">
+    <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-5 mb-6">
       <div className="flex flex-col gap-5">
         
         {/* Header & Search Bar */}
@@ -79,36 +90,40 @@ export default function FilterSection({
         <div className="space-y-5">
           
           {/* Group 1: Kategori Umum */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-1 h-4 bg-gray-400 rounded-full"></span>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Kategori Umum</p>
+          {kategoriUmum.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-1 h-4 bg-gray-400 rounded-full"></span>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Kategori Umum</p>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mask-image-fade">
+                <button
+                  onClick={() => onKategoriChange("all")}
+                  className={`flex-shrink-0 px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 border whitespace-nowrap ${
+                    kategoriFilter === "all"
+                      ? "bg-gray-800 text-white border-transparent shadow-md transform scale-105"
+                      : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                  }`}
+                >
+                  Semua
+                </button>
+                {kategoriUmum.map((kat) => renderCategoryButton(kat))}
+              </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mask-image-fade">
-              <button
-                onClick={() => onKategoriChange("all")}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 border whitespace-nowrap ${
-                  kategoriFilter === "all"
-                    ? "bg-gray-800 text-white border-transparent shadow-md transform scale-105"
-                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-                }`}
-              >
-                Semua
-              </button>
-              {KATEGORI_UMUM.map((kat) => renderCategoryButton(kat as Kategori))}
-            </div>
-          </div>
+          )}
 
           {/* Group 2: Kategori Bencana */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-1 h-4 bg-red-500 rounded-full"></span>
-              <p className="text-xs font-bold text-red-500 uppercase tracking-wide">Kategori Bencana</p>
+          {kategoriBencana.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-1 h-4 bg-red-500 rounded-full"></span>
+                <p className="text-xs font-bold text-red-500 uppercase tracking-wide">Kategori Bencana</p>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {kategoriBencana.map((kat) => renderCategoryButton(kat))}
+              </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {KATEGORI_BENCANA.map((kat) => renderCategoryButton(kat as Kategori))}
-            </div>
-          </div>
+          )}
 
         </div>
       </div>

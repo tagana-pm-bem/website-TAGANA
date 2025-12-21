@@ -2,28 +2,34 @@
 
 import React from "react";
 import Image from "next/image";
+// 1. Import helper style
+import { getKategoriStyle } from "../constants";
 
 interface NewsCardProps {
   berita: {
-    id: number;
+    id: string; // Sesuaikan dengan tipe ID Anda (string/number)
     title: string;
     description: string;
     category: string;
     date: string;
     image?: string;
     location?: string;
+    status?: string; // Opsional: tambahkan status jika perlu
   };
-  getCategoryColor: (category: string) => string;
+  // 2. Hapus getCategoryColor dari props karena sudah tidak dibutuhkan
   formatDate: (date: string) => string;
-  onReadMore: (id: number) => void;
+  onReadMore: (id: string) => void;
 }
 
 export function NewsCard({
   berita,
-  getCategoryColor,
   formatDate,
   onReadMore,
 }: NewsCardProps) {
+  
+  // 3. Ambil style badge secara dinamis di sini
+  const style = getKategoriStyle(berita.category);
+
   return (
     <article
       className="bg-white border border-gray-200 shadow-md rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col h-full"
@@ -61,18 +67,19 @@ export function NewsCard({
         {/* Category Badge */}
         <div className="absolute top-3 left-3">
           <span
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md ${getCategoryColor(
-              berita.category
-            )}`}
+            // 4. Gunakan style.badge dari helper
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md backdrop-blur-sm ${style.badge}`}
           >
             {berita.category}
           </span>
         </div>
 
-        {/* Status Badge */}
+        {/* Status Badge (Opsional, sesuaikan logika jika perlu) */}
         <div className="absolute top-3 right-3">
-          <span className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-lg shadow-md">
-            Published
+          <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-md ${
+            berita.status === 'published' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+          }`}>
+            {berita.status === 'published' ? 'Published' : 'Draft'}
           </span>
         </div>
       </div>
@@ -128,7 +135,7 @@ export function NewsCard({
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span className="line-clamp-1">{berita.location}</span>
+              <span className="line-clamp-1 max-w-[100px]">{berita.location}</span>
             </div>
           )}
         </div>

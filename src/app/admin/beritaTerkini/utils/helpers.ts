@@ -19,7 +19,7 @@ export const getKategoriBadge = (kategori: Kategori): string => {
  * Get title for kategori
  */
 export const getKategoriTitle = (kategori: Kategori): string => {
-  return KATEGORI_CONFIG[kategori].title;
+  return KATEGORI_CONFIG[kategori].title ?? "";
 };
 
 /**

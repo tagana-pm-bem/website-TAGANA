@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; 
 import Image from "next/image";
 import Link from "next/link";
 import { LikePage } from "./Likepage";
+import { ChevronDown, ChevronUp } from "lucide-react"; 
+// 1. Import helper style
+import { getKategoriStyle } from "@/app/BeritaBencana/constants";
 
 interface DetailNewsCardPageProps {
   berita: {
@@ -27,17 +30,10 @@ export function DetailNewsCardPage({
   berita,
   onBack,
 }: DetailNewsCardPageProps) {
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      Banjir: "bg-blue-100 text-blue-800",
-      Longsor: "bg-amber-100 text-amber-800",
-      Gempa: "bg-red-100 text-red-800",
-      Kebakaran: "bg-orange-100 text-orange-800",
-      Wisata: "bg-green-100 text-green-800",
-      Desa: "bg-yellow-100 text-yellow-800",
-    };
-    return colors[category] || "bg-gray-100 text-gray-800";
-  };
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // 2. Ambil style dinamis berdasarkan kategori
+  const style = getKategoriStyle(berita.category || "Umum");
 
   const authorName = berita.author?.name || "Admin";
 
@@ -47,7 +43,7 @@ export function DetailNewsCardPage({
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
           <Link
-            href="/admin/beritaBencana"
+            href="/BeritaBencana"
             className="hover:text-blue-600 transition-colors"
           >
             Berita Bencana
@@ -58,9 +54,8 @@ export function DetailNewsCardPage({
 
         <div className="mb-4">
           <span
-            className={`inline-block px-4 py-1.5 rounded-md text-sm font-semibold ${getCategoryColor(
-              berita.category || "Umum"
-            )}`}
+            // 3. Terapkan style.badge di sini
+            className={`inline-block px-4 py-1.5 rounded-md text-sm font-semibold shadow-sm border ${style.badge}`}
           >
             {berita.category || "Umum"}
           </span>
@@ -111,39 +106,68 @@ export function DetailNewsCardPage({
           )}
         </div>
 
-        {/* Article content */}
-        <article
-          className="
-          text-gray-800 leading-relaxed
-          [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8
-          [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-6
-          [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4
-          [&_p]:mb-4
-          [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
-          [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
-          [&_li]:mb-1
-          [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800
-          [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:mb-4
-          [&_strong]:font-bold
-          [&_em]:italic
-        "
-        >
-          <div dangerouslySetInnerHTML={{ __html: berita.content || "<p>Tidak ada konten</p>" }} />
-        </article>
+        {/* Article Content Wrapper */}
+        <div className="relative">
+          <article
+            className={`
+              text-gray-800 leading-relaxed transition-all duration-500 ease-in-out
+              ${isExpanded ? "max-h-full" : "max-h-[400px] overflow-hidden"} 
+              
+              [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-8
+              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-6
+              [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4
+              [&_p]:mb-4
+              [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
+              [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
+              [&_li]:mb-1
+              [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800
+              [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:mb-4
+              [&_strong]:font-bold
+              [&_em]:italic
+            `}
+          >
+            <div dangerouslySetInnerHTML={{ __html: berita.content || "<p>Tidak ada konten</p>" }} />
+          </article>
+
+          {/* Gradient Overlay */}
+          {!isExpanded && (
+            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          )}
+        </div>
+
+        {/* Tombol Toggle */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-2 px-6 py-2.5 text-blue-600 font-medium "
+          >
+            {isExpanded ? (
+              <>
+                Tutup <ChevronUp size={15} />
+              </>
+            ) : (
+              <>
+                Baca Selengkapnya <ChevronDown size={15} />
+              </>
+            )}
+          </button>
+        </div>
 
         {onBack && (
           <div className="mt-12 border-t border-gray-700 pt-6">
             <button
               onClick={onBack}
-              className="cursor-pointer flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+              className="cursor-pointer flex items-center space-x-2 mt-4 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
             >
               <span>← Kembali ke Daftar Berita</span>
             </button>
           </div>
         )}
 
-        <div className="mt-10  pt-8">
-          <LikePage beritaId={berita.id} />
+        <div className="mt-2 pt-8">
+          <div className="w-full flex justify-center md:justify-end">
+            <LikePage beritaId={berita.id} />
+          </div>
         </div>
       </div>
     </div>

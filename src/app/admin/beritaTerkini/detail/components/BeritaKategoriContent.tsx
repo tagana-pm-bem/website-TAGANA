@@ -6,8 +6,9 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { beritaService } from "@/services/beritaService";
 import { interactionService } from "@/services/interactionService";
+// 1. Import helper style
+import { getKategoriStyle } from "@/app/admin/beritaTerkini/constants";
 
-// Import fungsi helper yang baru kita buat
 import { confirmDelete, showLoading, showSuccess, showError } from "@/app/admin/ui/SweetAllert2";
 
 interface BeritaKategoriContentProps {
@@ -28,8 +29,6 @@ export default function BeritaKategoriContent({
   
   const [newComment, setNewComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  
-  // State modal manual (isDeleting, showDeleteModal) SUDAHDIHAPUS karena diganti SweetAlert
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -62,7 +61,6 @@ export default function BeritaKategoriContent({
       setLikes(prevLiked ? likes - 1 : likes + 1);
       await interactionService.toggleLike(id);
     } catch (error: any) {
-      // Anda bisa ganti alert biasa ini dengan showError() juga jika mau
       alert(error.message || "Gagal menyukai berita (Login diperlukan)");
       setIsLiked(isLiked); 
     }
@@ -77,7 +75,6 @@ export default function BeritaKategoriContent({
       const newCommentObj = await interactionService.postComment(id, "Admin", newComment);
       setComments([newCommentObj, ...comments]);
       setNewComment("");
-      // Opsional: showSuccess("Komentar Terkirim", "");
     } catch (error) {
       console.error("Error adding comment:", error);
       showError("Gagal", "Tidak dapat mengirim komentar");
@@ -87,7 +84,6 @@ export default function BeritaKategoriContent({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    // Menggunakan helper SweetAlert untuk komentar juga
     const result = await confirmDelete("Hapus komentar?", "Komentar akan hilang permanen.");
     
     if (result.isConfirmed) {
@@ -102,9 +98,7 @@ export default function BeritaKategoriContent({
     }
   };
 
-  // --- LOGIC BARU MENGGUNAKAN SWEETALERT2 ---
   const handleDeleteBerita = async () => {
-    // 1. Panggil konfirmasi dari file helper
     const result = await confirmDelete(
       "Hapus Berita?", 
       `Berita "${berita.judul}" akan dihapus permanen.`
@@ -112,18 +106,10 @@ export default function BeritaKategoriContent({
 
     if (result.isConfirmed) {
       try {
-        // 2. Tampilkan loading
         showLoading("Menghapus...", "Sedang menghapus data dari server");
-
-        // 3. Request API
         await beritaService.delete(id);
-
-        // 4. Tampilkan sukses
         await showSuccess("Terhapus!", "Berita berhasil dihapus.");
-
-        // 5. Redirect
         router.push("/admin/beritaTerkini"); 
-
       } catch (error) {
         console.error("Error deleting berita:", error);
         showError("Gagal", "Terjadi kesalahan saat menghapus berita.");
@@ -156,6 +142,10 @@ export default function BeritaKategoriContent({
     );
   }
 
+  // 2. Ambil style kategori (setelah data berita tersedia)
+  const kategoriName = berita.kategori_berita?.nama || "Umum";
+  const style = getKategoriStyle(kategoriName);
+
   return (
     <main className="w-full min-h-screen bg-white mb-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -169,10 +159,10 @@ export default function BeritaKategoriContent({
         {/* Header */}
         <header className="py-6 sm:py-8">
           <div className="mb-4">
-            <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 capitalize">
-              {berita.kategori_berita?.nama || "Umum"}
+            {/* 3. Gunakan style dinamis pada badge */}
+            <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border shadow-sm ${style.badge}`}>
+              {kategoriName}
             </span>
-            {/* Tag <SweetAlert2/> dihapus karena kita pakai fungsi helper langsung */}
           </div>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
@@ -190,7 +180,6 @@ export default function BeritaKategoriContent({
               </div>
             </div>
             
-            {/* BUTTON DELETE LANGSUNG PANGGIL FUNGSI */}
             <button 
               onClick={handleDeleteBerita} 
               className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg" 
@@ -231,6 +220,7 @@ export default function BeritaKategoriContent({
            <div dangerouslySetInnerHTML={{ __html: berita.isi_berita }} />
         </article>
 
+        {/* ... (Sisa kode komentar sama seperti sebelumnya) ... */}
         <section className="py-8 border-t border-gray-200 mt-8">
           <div className="mb-8">
             <button
@@ -277,17 +267,17 @@ export default function BeritaKategoriContent({
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start">
-                         <div>
+                          <div>
                             <h4 className="font-semibold text-gray-900">{comment.nama_pengguna}</h4>
                             <time className="text-xs text-gray-500">{formatDate(comment.created_at)}</time>
-                         </div>
-                         <button 
+                          </div>
+                          <button 
                             onClick={() => handleDeleteComment(comment.id)}
                             className="cursor-pointer text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
                             title="Hapus Komentar"
-                         >
+                          >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                         </button>
+                          </button>
                       </div>
                       <p className="text-gray-700 mt-2 whitespace-pre-wrap">{comment.isi_komentar}</p>
                     </div>
@@ -298,7 +288,6 @@ export default function BeritaKategoriContent({
           </div>
         </section>
       </div>
-      {/* MODAL MANUAL YANG DULU ADA DI SINI SUDAH DIHAPUS */}
     </main>
   );
 }
