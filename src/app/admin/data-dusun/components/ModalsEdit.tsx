@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Loader2 } from "lucide-react"; // Opsional: tambah icon loader jika mau manual loading
+import { X, Loader2 } from "lucide-react"; 
 import { DisasterDetail } from "@/data/DataBencana";
 
-// 1. Import Hook dari Provider
 import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
 
 type Risiko = "none" | "low" | "medium" | "high";
@@ -13,7 +12,7 @@ interface ModalsEditProps {
   disaster: DisasterDetail;
   dusunName: string;
   onClose: () => void;
-  onSave: (updatedDisaster: DisasterDetail) => void | Promise<void>; // Support async save
+  onSave: (updatedDisaster: DisasterDetail) => void | Promise<void>;
 }
 
 export default function ModalsEdit({
@@ -22,7 +21,6 @@ export default function ModalsEdit({
   onClose,
   onSave,
 }: ModalsEditProps) {
-  // 2. Panggil fungsi dari hook
   const {
     showDraggableSuccess,
     showDraggableError,
@@ -50,20 +48,13 @@ export default function ModalsEdit({
 
     if (result.isConfirmed) {
       try {
-        // Tampilkan loading (opsional)
         showLoading("Menyimpan...", "Sedang memperbarui data");
-
-        // Proses Save (bisa sync atau async)
         await onSave(formData);
-
-        // 5. Tampilkan Sukses Draggable
         await showDraggableSuccess("Data Berhasil Diupdate!");
 
-        // Tutup Modal
         onClose();
       } catch (error) {
         console.error(error);
-        // Handle Error
         showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data.");
       }
     }
