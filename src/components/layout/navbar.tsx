@@ -29,8 +29,6 @@ export function Navbar() {
 
     updateTime();
     const interval = setInterval(updateTime, 1000);
-
-    // Scroll effect
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -57,9 +55,7 @@ export function Navbar() {
       >
         <div className="w-full mx-auto px-4 sm:px-14">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
-            {/* Left side - Logo & Title */}
             <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group flex-shrink-0">
-              {/* Logo with glow effect */}
               <div className="relative">
                 <div className="absolute -inset-1 bg-linear-to-r from-[#044BB1] to-[#0566d6] rounded-full blur opacity-40 group-hover:opacity-60 transition duration-300"></div>
                 <div className="border-2 border-blue-700 sm:border-3 md:border-4 relative w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-linear-to-br from-[#044BB1] via-[#0555c4] to-[#0566d6] rounded-full flex items-center justify-center shadow-xl">
@@ -74,7 +70,6 @@ export function Navbar() {
                 </div>
               </div>
 
-              {/* Title with gradient */}
               <div className="flex flex-col">
                 <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-black bg-linear-to-r from-[#044BB1] to-[#0566d6] bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-sm">
                   TAGANA
@@ -88,7 +83,6 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Desktop Navigation - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-8 lg:gap-6 xl:gap-8">
               <button
                 onClick={() => router.push('/peta-page')}
@@ -126,7 +120,6 @@ export function Navbar() {
                 }`}></span>
               </button>
 
-              {/* Desktop Login Button */}
               <button
                 onClick={() => router.push('/auth/login')}
                 className="flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-gradient-to-r from-gray-500 to-gray-900 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group"
@@ -138,7 +131,6 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* Mobile Burger Button */}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg  hover:bg-gray-100 transition-colors duration-300"

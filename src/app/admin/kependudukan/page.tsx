@@ -18,7 +18,6 @@ interface PopulationData {
 
 export default function AdminKependudukanPage() {
   const handleAdd = () => {
-    // TODO: implement add modal or navigation
     console.log("Tambah penduduk (action)");
   };
 

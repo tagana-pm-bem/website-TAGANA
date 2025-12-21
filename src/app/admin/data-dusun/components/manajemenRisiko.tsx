@@ -6,32 +6,22 @@ import { useDusun } from "@/hooks/useDusun.hooks";
 import { bencanaService } from "@/services/bencanaService";
 import { dusunService } from "@/services/dusunService";
 import Dropdown from "./dropdown";
-
-// 1. Import Helper SweetAlert2 (sesuai request path Anda)
 import { showDraggableSuccess, showDraggableError } from "@/app/admin/ui/SweetAllert2";
 
 
 export default function ManajemenRisiko() {
-  // Hapus useAlert() karena sudah diganti SweetAlert
   const { data: dusunList } = useDusun(); 
-
   const [selectedDusunId, setSelectedDusunId] = useState("");
   const [bencana, setBencana] = useState("Pilih jenis bencana");
   const [risiko, setRisiko] = useState("Tingkat dampak");
   const [deskripsi, setDeskripsi] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // State untuk Edit Deskripsi Dusun
   const [selectedDusunForEdit, setSelectedDusunForEdit] = useState("");
   const [deskripsiDusun, setDeskripsiDusun] = useState("");
   const [isUpdatingDeskripsi, setIsUpdatingDeskripsi] = useState(false);
 
-  // Dropdown States
   const [openBencana, setOpenBencana] = useState(false);
   const [openRisiko, setOpenRisiko] = useState(false);
-
-  //sweet alert
-  
 
   const bencanaOptions = [
     { label: "Banjir", color: "text-blue-500", iconVal: "flood" },
@@ -49,7 +39,6 @@ export default function ManajemenRisiko() {
   ];
 
   const handleSimpan = async () => {
-    // 2. Validasi menggunakan Draggable Error
     if (!selectedDusunId || bencana === "Pilih jenis bencana" || risiko === "Tingkat dampak") {
       showDraggableError("Data Tidak Lengkap", "Mohon lengkapi semua data (Dusun, Bencana, Risiko)");
       return;
@@ -72,7 +61,6 @@ export default function ManajemenRisiko() {
 
       await bencanaService.create(payload);
 
-      // 3. Tampilkan Sukses (Await agar user klik OK dulu baru reload)
       await showDraggableSuccess("Berhasil Menambahkan Data!");
       
       setBencana("Pilih jenis bencana");
@@ -84,16 +72,13 @@ export default function ManajemenRisiko() {
 
     } catch (error) {
       console.error(error);
-      // 4. Tampilkan Error API
       showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data ke server.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle Update Deskripsi Dusun
   const handleUpdateDeskripsiDusun = async () => {
-    // 1. Validasi Input (Gunakan Draggable Error)
     if (!selectedDusunForEdit) {
       showDraggableError("Pilih Dusun", "Silakan pilih dusun terlebih dahulu.");
       return;
@@ -113,16 +98,11 @@ export default function ManajemenRisiko() {
         throw new Error("Dusun tidak ditemukan");
       }
 
-      // 2. Proses API Update
       await dusunService.updateStats(Number(selectedDusunForEdit), {
         deskripsi: deskripsiDusun
       });
 
-      // 3. Tampilkan Sukses Draggable
-      // Gunakan 'await' agar user melihat alert dulu sebelum reload
       await showDraggableSuccess("Deskripsi Berhasil Diperbarui!");
-
-      // 4. Reset Form & Reload
       setSelectedDusunForEdit("");
       setDeskripsiDusun("");
       
@@ -130,7 +110,6 @@ export default function ManajemenRisiko() {
 
     } catch (error) {
       console.error(error);
-      // 5. Tampilkan Error Draggable
       showDraggableError("Gagal Update", "Terjadi kesalahan saat memperbarui deskripsi.");
     } finally {
       setIsUpdatingDeskripsi(false);
@@ -138,7 +117,6 @@ export default function ManajemenRisiko() {
   };
 
   
-  // Handle perubahan dusun terpilih untuk edit
   const handleDusunChangeForEdit = (dusunId: string) => {
     setSelectedDusunForEdit(dusunId);
     const selectedDusun = dusunList?.find(d => d.id === Number(dusunId));
@@ -147,7 +125,6 @@ export default function ManajemenRisiko() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Card 1: Input Manajemen Risiko */}
       <div className="flex flex-col gap-4 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
           <ShieldAlert className="w-5 h-5 text-blue-500" />
@@ -213,8 +190,7 @@ export default function ManajemenRisiko() {
           </button>
         </div>
       </div>
-
-      {/* Card 2: Edit Deskripsi Dusun */}
+{/* 
       <div className="flex flex-col gap-4 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
           <Edit3 className="w-5 h-5 text-green-500" />
@@ -258,7 +234,7 @@ export default function ManajemenRisiko() {
             {isUpdatingDeskripsi ? "Menyimpan..." : "Update Deskripsi"}
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

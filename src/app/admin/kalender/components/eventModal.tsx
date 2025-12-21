@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { X, Edit, Trash2, Save, Loader2, Clock, MapPin } from "lucide-react";
 import Image from "next/image";
 import { EventDB } from "@/services/eventService";
-
-// 1. Import Hook SweetAlert
 import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
 
 interface EventModalProps {
@@ -16,7 +14,6 @@ interface EventModalProps {
 }
 
 export default function EventModal({ event, onClose, onDelete, onUpdate }: EventModalProps) {
-  // 2. Panggil fungsi dari Provider
   const { 
     confirmDelete, 
     showDraggableSuccess, 
@@ -24,8 +21,6 @@ export default function EventModal({ event, onClose, onDelete, onUpdate }: Event
     showLoading,
     showCenterSuccess, 
     showCenterFailed
-    // Jika sudah menambahkan showCenterSuccess di provider, bisa pakai itu. 
-    // Jika belum, pakai showDraggableSuccess saja.
   } = useSweetAlert();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -41,18 +36,11 @@ export default function EventModal({ event, onClose, onDelete, onUpdate }: Event
   const formatTime = (timeStr: string) => timeStr ? timeStr.slice(0, 5) : "";
   const getFullDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  // --- LOGIKA SIMPAN (UPDATE) ---
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Tampilkan Loading
       showLoading("Menyimpan Perubahan...", "Mohon tunggu sebentar");
-      
-      // Proses Update ke Database
       await onUpdate(event.id, formData);
-      
-      // Tampilkan Sukses
-      // (Pastikan tidak ada alert() di file parent/induk yang memanggil onUpdate)
       await showCenterSuccess("Data Event Berhasil Diupdate!");
       
       setIsEditing(false); 
@@ -64,9 +52,7 @@ export default function EventModal({ event, onClose, onDelete, onUpdate }: Event
     }
   };
 
-  // --- LOGIKA HAPUS (DELETE) ---
   const handleDeleteClick = async () => {
-    // 1. Konfirmasi
     const result = await confirmDelete(
       "Hapus Event Ini?",
       `Event "${event.title}" akan dihapus permanen.`
@@ -75,16 +61,9 @@ export default function EventModal({ event, onClose, onDelete, onUpdate }: Event
     if (result.isConfirmed) {
       setIsDeleting(true);
       try {
-        // 2. Loading
         showLoading("Menghapus...", "Sedang menghapus data dari server");
-
-        // 3. Proses Delete
         await onDelete(event.id);
-
-        // 4. Sukses
         await showCenterSuccess("Event Berhasil Dihapus!");
-        
-        // 5. Tutup Modal
         onClose(); 
       } catch (error) {
         console.error(error);

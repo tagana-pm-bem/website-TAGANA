@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// 1. Import Hook
 import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
+import { X } from 'lucide-react'; 
 
 interface Field {
   name: string;
   label: string;
-  type: 'text' | 'number' | 'select';
+  type: 'text' | 'number' | 'select' | 'textarea' | 'image';
   required?: boolean;
   options?: { value: string | number; label: string }[];
 }
@@ -16,14 +16,12 @@ interface EditModalProps {
   title: string;
   fields: Field[];
   initialData: any;
-  onSave: (data: any) => Promise<void> | void; // Support async
+  onSave: (data: any) => Promise<void> | void;
   onClose: () => void;
 }
 
 export default function EditModal({ title, fields, initialData, onSave, onClose }: EditModalProps) {
-  // 2. Panggil fungsi dari Provider
   const { showCenterSuccess, showCenterFailed, showLoading } = useSweetAlert();
-  
   const [formData, setFormData] = useState(initialData);
 
   useEffect(() => {
@@ -34,25 +32,15 @@ export default function EditModal({ title, fields, initialData, onSave, onClose 
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
-  // 3. Update Handle Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-      // Tampilkan Loading
       showLoading("Menyimpan Perubahan...");
-      
-      // Jalankan fungsi simpan dari parent
       await onSave(formData);
-
-      // Tampilkan Sukses (Center)
       await showCenterSuccess("Berhasil Disimpan");
-      
-      // Tutup Modal
       onClose();
     } catch (error) {
       console.error(error);
-      // Tampilkan Gagal (Center)
       showCenterFailed("Gagal Menyimpan Data");
     }
   };
@@ -67,57 +55,79 @@ export default function EditModal({ title, fields, initialData, onSave, onClose 
               onClick={onClose}
               className="cursor-pointer bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={20} className="text-gray-600" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {fields.map((field) => (
-              <div key={field.name}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                </label>
-                
-                {field.type === 'select' ? (
-                  <select
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required={field.required}
-                  >
-                    {field.options?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={field.type}
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required={field.required}
-                  />
-                )}
-              </div>
-            ))}
+            {fields.map((field) => {
+              if (field.type === 'image') return null;
 
-            <div className="flex justify-end gap-3 pt-4">
+              return (
+                <div key={field.name}>
+                  {field.type === 'textarea' ? (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <textarea
+                        value={formData[field.name] || ''}
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={4}
+                        required={field.required}
+                        placeholder={`Masukkan ${field.label}...`}
+                      />
+                    </div>
+                  ) : field.type === 'select' ? (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <select
+                        value={formData[field.name] || ''}
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required={field.required}
+                      >
+                        {field.options?.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <input
+                        type={field.type}
+                        value={formData[field.name] || ''}
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required={field.required}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
               <button
                 type="button"
                 onClick={onClose}
-                className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="cursor-pointer px-6 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="cursor-pointer px-6 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
+                className="cursor-pointer px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
               >
-                Simpan
+                Simpan Perubahan
               </button>
             </div>
           </form>
