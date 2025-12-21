@@ -5,24 +5,24 @@ import { NewsCard } from "./NewsCard";
 
 interface NewsGridProps {
   beritaList: Array<{
-    id: number;
+    id: string; // Updated to string
     title: string;
     description: string;
     category: string;
     date: string;
     image?: string;
     location?: string;
+    status?: string; // Optional: added for consistency
   }>;
-  getCategoryColor: (category: string) => string;
+  // Hapus getCategoryColor karena NewsCard sudah mandiri
   getStatusColor: (status: string) => string;
   formatDate: (date: string) => string;
-  onReadMore: (id: number) => void;
+  onReadMore: (id: string) => void; // Updated to string
 }
 
 export function NewsGrid({
   beritaList,
-  getCategoryColor,
-  getStatusColor,
+  // getStatusColor, // Bisa dihapus jika tidak dipakai di level ini
   formatDate,
   onReadMore,
 }: NewsGridProps) {
@@ -35,7 +35,6 @@ export function NewsGrid({
         <NewsCard
           key={b.id}
           berita={b}
-          getCategoryColor={getCategoryColor}
           formatDate={formatDate}
           onReadMore={onReadMore}
         />

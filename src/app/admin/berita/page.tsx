@@ -8,8 +8,12 @@ import BeritaTerkini from "./components/beritaTerkini";
 import { KategoriBeritaService } from "@/services/kategoriBeritaService";
 import { beritaService } from "@/services/beritaService";
 import { useBerita } from "./hooks/useBerita.hooks";
+import ImageUpload from "./components/imageUpload";
 
-// Import Helper SweetAlert yang sudah dibuat sebelumnya
+// IMPORT TAMBAHAN UNTUK UPLOAD
+import { uploadImageByType } from "@/services/fileService"; // Sesuaikan path jika berbeda
+import { getPublicImageUrl } from "@/lib/storage"; // Sesuaikan path jika berbeda
+
 import { 
   confirmSaveChanges, 
   showLoading, 
@@ -37,6 +41,10 @@ export default function KelolaBeritaPage() {
   
   const [jumlahBeritaBulanIni, setJumlahBeritaBulanIni] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  // State untuk Gambar
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchKategori = async () => {
@@ -81,9 +89,8 @@ export default function KelolaBeritaPage() {
     fetchBeritaStats();
   }, [refreshKey]);
 
-  // --- MODIFIKASI FUNGSI PUBLISH DI SINI ---
   const handlePublish = async () => {
-    // 1. Validasi Input (Ganti alert biasa dengan Draggable Error)
+    // 1. Validasi Input Dasar
     if (!judul || !selectedKategori) {
       showDraggableError("Data Belum Lengkap", "Harap lengkapi judul dan kategori!");
       return;
@@ -93,17 +100,7 @@ export default function KelolaBeritaPage() {
       return;
     }
 
-    const payload = {
-      judul: judul,
-      kategori_berita_id: selectedKategori.id,
-      isi_berita: isiBerita,
-      status: "published" as "published",
-      penulis: "Admin",
-      tanggal: new Date().toISOString(),
-      file_url: null,
-    };
-
-    // 2. Konfirmasi User (Apakah yakin ingin publish?)
+    // 2. Konfirmasi User
     const result = await confirmSaveChanges(
       "Publikasikan Berita?", 
       "Ya, Terbitkan", 
@@ -113,23 +110,53 @@ export default function KelolaBeritaPage() {
     if (result.isConfirmed) {
       try {
         // 3. Tampilkan Loading
-        showLoading("Menerbitkan...", "Sedang mengirim data ke server");
+        showLoading("Menerbitkan...", "Sedang mengupload dan menyimpan data...");
 
-        // 4. Eksekusi API (Logika Utama)
+        let uploadedImageUrl = null;
+
+        // --- LOGIKA UPLOAD GAMBAR BARU ---
+        if (imageFile) {
+          try {
+            // Upload ke folder 'berita' menggunakan helper yang sudah ada
+            const filePath = await uploadImageByType(imageFile, "berita");
+            
+            // Dapatkan URL publik dari path tersebut
+            uploadedImageUrl = getPublicImageUrl(filePath);
+          } catch (uploadError) {
+            console.error("Gagal upload gambar:", uploadError);
+            showDraggableError("Gagal Upload Gambar", "Terjadi kesalahan saat mengupload gambar.");
+            return; // Hentikan proses jika gambar gagal upload
+          }
+        }
+        // ---------------------------------
+
+        // 4. Siapkan Payload (masukkan URL gambar jika ada)
+        const payload = {
+          judul: judul,
+          kategori_berita_id: selectedKategori.id,
+          isi_berita: isiBerita,
+          status: "published" as "published",
+          penulis: "Admin",
+          tanggal: new Date().toISOString(),
+          file_url: uploadedImageUrl, // Sekarang menggunakan URL hasil upload
+        };
+
+        // 5. Simpan ke Database
         await createBerita(payload);
 
-        // 5. Tampilkan Sukses (Draggable)
+        // 6. Tampilkan Sukses
         showDraggableSuccess("Berita Berhasil Diterbitkan!");
 
-        // 6. Reset State & Refresh Data
+        // 7. Reset State
         setRefreshKey((prev) => prev + 1);
         setJudul("");
         setIsiBerita("");
         setSelectedKategori(null);
+        setImageFile(null);    // Reset file
+        setImagePreview(null); // Reset preview
 
       } catch (error) {
         console.error("Gagal submit di page:", error);
-        // 7. Handle Error
         showDraggableError("Gagal Menerbitkan", "Terjadi kesalahan pada sistem.");
       }
     }
@@ -145,6 +172,7 @@ export default function KelolaBeritaPage() {
           </p>
         </div>
 
+        {/* Input Judul */}
         <div className="flex flex-col items-start gap-2">
           <label className="font-semibold text-sm">Judul Berita</label>
           <input
@@ -156,6 +184,7 @@ export default function KelolaBeritaPage() {
           />
         </div>
 
+        {/* Input Kategori */}
         <div className="flex flex-col items-start gap-2 w-full">
           <label className="font-semibold text-sm">Kategori</label>
           <div className="relative w-full">
@@ -208,6 +237,7 @@ export default function KelolaBeritaPage() {
           </div>
         </div>
 
+        {/* Input Isi Berita */}
         <div className="flex flex-col gap-1">
           <h1 className="font-semibold text-sm">Isi Berita</h1>
         </div>
@@ -216,6 +246,17 @@ export default function KelolaBeritaPage() {
           onChange={(html) => setIsiBerita(html)}
         />
 
+        {/* Input Upload Gambar */}
+        <ImageUpload
+          file={imageFile}
+          preview={imagePreview}
+          onChange={(file, preview) => {
+            setImageFile(file);
+            setImagePreview(preview);
+          }}
+        />
+
+        {/* Tombol Aksi */}
         <div className="flex flex-row gap-3 items-center justify-end w-full pt-4">
           <button
             disabled={isLoading}
@@ -241,6 +282,7 @@ export default function KelolaBeritaPage() {
         </div>
       </Card>
 
+      {/* Bagian Statistik (Sidebar Kanan) */}
       <div className="flex flex-col gap-6 w-1/2 h-full">
         <div className="w-full rounded-2xl flex p-6 justify-between items-center bg-gradient-to-br from-[#044BB1] to-[#0566d6] shadow-sm text-white">
           <div className="flex flex-col gap-1 items-start">

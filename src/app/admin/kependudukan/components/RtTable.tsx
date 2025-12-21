@@ -113,8 +113,24 @@ export function RtTable() {
 
   if (isLoading) {
     return (
-      <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-lg shadow-sm">
-        <div className="text-center py-10 text-gray-500">Memuat data RT...</div>
+      <div className="p-6 flex flex-col items-center justify-center gap-2 min-h-[200px]">
+        <svg className="animate-spin h-8 w-8 text-blue-600" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          />
+        </svg>
+        <span className="text-gray-500 mt-2 animate-pulse">Memuat data Rt...</span>
       </div>
     );
   }

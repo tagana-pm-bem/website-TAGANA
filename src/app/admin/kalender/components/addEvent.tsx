@@ -5,8 +5,9 @@ import Card from "@/components/ui/card";
 import { CalendarPlus, Save, Loader2 } from "lucide-react";
 import ImageUpload from "./imageUpload";
 import { eventService } from "@/services/eventService";
+import { uploadImageByType } from "@/services/fileService"; 
+import { getPublicImageUrl } from "@/lib/storage";
 
-// 1. Import Hook dari Provider
 import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
 
 interface AddEventProps {
@@ -14,7 +15,6 @@ interface AddEventProps {
 }
 
 export default function AddEvent({ onSuccess }: AddEventProps) {
-  // 2. Panggil fungsi SweetAlert
   const { showDraggableSuccess, showDraggableError } = useSweetAlert();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -27,18 +27,24 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleSubmit = async () => {
-    // 3. Validasi Input dengan SweetAlert
     if (!title || !date || !startTime || !location) {
       showDraggableError("Data Belum Lengkap", "Mohon lengkapi Judul, Tanggal, Waktu Mulai, dan Lokasi!");
       return;
     }
-
     setIsLoading(true);
     try {
       let imageUrl = null;
       
       if (selectedFile) {
-        imageUrl = await eventService.uploadImage(selectedFile);
+        try {
+          const filePath = await uploadImageByType(selectedFile, "events");
+          imageUrl = getPublicImageUrl(filePath);
+        } catch (uploadError) {
+          console.error("Gagal upload gambar event:", uploadError);
+          showDraggableError("Gagal Upload", "Gagal mengupload gambar event.");
+          setIsLoading(false);
+          return;
+        }
       }
 
       await eventService.create({
@@ -52,10 +58,8 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
         status: "scheduled"
       });
 
-      // 4. Notifikasi Sukses dengan SweetAlert
       await showDraggableSuccess("Berhasil Menambahkan Event!");
       
-      // Reset Form
       setTitle("");
       setDate("");
       setStartTime("");
@@ -68,7 +72,6 @@ export default function AddEvent({ onSuccess }: AddEventProps) {
 
     } catch (error) {
       console.error(error);
-      // 5. Notifikasi Error dengan SweetAlert
       showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan event.");
     } finally {
       setIsLoading(false);
