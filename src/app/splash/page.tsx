@@ -72,7 +72,7 @@ function Homepage() {
   }, [isLoading, totalPenduduk, totalKK]); 
 
   const handlePelajariClick = () => {
-    router.push('/peta-page');
+    router.push('/beranda');
   };
 
   return (

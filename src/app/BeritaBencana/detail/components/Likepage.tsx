@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { CommentPage } from "./CommentCard"; 
 import { interactionService } from "@/services/interactionService"; 
 
@@ -95,7 +95,7 @@ export function LikePage({ beritaId, initialLikes = 0 }: LikePageProps) {
         text-xs sm:text-sm
         ${
           showComments 
-          ? "bg-blue-50 border-blue-200 text-blue-600 ring-2 ring-blue-100 border-transparent" 
+          ? "bg-blue-50 border-blue-200 text-blue-600 ring-2 ring-blue-100" 
           : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
         }
         `}
