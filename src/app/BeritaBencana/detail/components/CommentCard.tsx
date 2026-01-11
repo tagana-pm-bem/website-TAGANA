@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { interactionService } from "@/services/interactionService";
 import { Loader2 } from "lucide-react";
 
@@ -88,7 +88,7 @@ export function CommentPage({ beritaId, onUpdateTotal }: CommentPageProps) {
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Tulis komentar..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-h-[50px] resize-none"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-h-12.5 resize-none"
             />
             <button
                 onClick={handleSubmitComment}
@@ -109,7 +109,7 @@ export function CommentPage({ beritaId, onUpdateTotal }: CommentPageProps) {
         ) : (
             comments.map((comment) => (
             <div key={comment.id} className="flex items-start space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600 font-bold text-sm uppercase">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600 font-bold text-sm uppercase">
                     {comment.nama_pengguna.charAt(0)}
                 </div>
                 <div className="flex-1">

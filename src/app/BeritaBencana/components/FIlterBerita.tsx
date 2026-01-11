@@ -17,22 +17,10 @@ const FilterBerita = ({ onFilterChange }: FilterBeritaProps) => {
   const [selectedKategori, setSelectedKategori] = useState('');
   const [selectedWaktu, setSelectedWaktu] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  
-  // State untuk menyimpan opsi kategori dari database
   const [kategoriOptions, setKategoriOptions] = useState<{ id: number; kategoriBerita: string }[]>([]);
-
-  // Ref untuk klik di luar dropdown agar menutup otomatis (Optional UX improvement)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const waktuOptions = [
-    'Hari Ini',
-    'Minggu Ini',
-    'Bulan Ini',
-    '3 Bulan Terakhir',
-    'Tahun Ini'
-  ];
 
-  // 1. Fetch Data Kategori dari Database
   useEffect(() => {
     const fetchKategori = async () => {
       try {
@@ -46,7 +34,6 @@ const FilterBerita = ({ onFilterChange }: FilterBeritaProps) => {
     fetchKategori();
   }, []);
 
-  // Handle klik luar untuk menutup dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -77,7 +64,7 @@ const FilterBerita = ({ onFilterChange }: FilterBeritaProps) => {
   };
 
   return (
-    <div ref={dropdownRef} className="w-full bg-white rounded-2xl shadow-[-1px_4px_21px_5px_rgba(17,_12,_46,_0.15)] border border-gray-100 p-6">
+    <div ref={dropdownRef} className="w-full bg-white rounded-2xl shadow-[-1px_4px_21px_5px_rgba(17,12,46,0.15)] border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-800">Filter Berita</h3>
         {(selectedKategori || selectedWaktu) && (
@@ -131,9 +118,6 @@ const FilterBerita = ({ onFilterChange }: FilterBeritaProps) => {
             </div>
           )}
         </div>
-
-        {/* DROPDOWN 2: WAKTU */}
-       
       </div>
 
       {/* Tampilan Chip Filter Aktif */}

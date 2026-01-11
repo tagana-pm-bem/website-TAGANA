@@ -2,21 +2,19 @@
 
 import React from "react";
 import Image from "next/image";
-// 1. Import helper style
 import { getKategoriStyle } from "../constants";
 
 interface NewsCardProps {
   berita: {
-    id: string; // Sesuaikan dengan tipe ID Anda (string/number)
+    id: string; 
     title: string;
     description: string;
     category: string;
     date: string;
     image?: string;
     location?: string;
-    status?: string; // Opsional: tambahkan status jika perlu
+    status?: string; 
   };
-  // 2. Hapus getCategoryColor dari props karena sudah tidak dibutuhkan
   formatDate: (date: string) => string;
   onReadMore: (id: string) => void;
 }
@@ -27,7 +25,6 @@ export function NewsCard({
   onReadMore,
 }: NewsCardProps) {
   
-  // 3. Ambil style badge secara dinamis di sini
   const style = getKategoriStyle(berita.category);
 
   return (
@@ -64,17 +61,14 @@ export function NewsCard({
           </div>
         )}
 
-        {/* Category Badge */}
         <div className="absolute top-3 left-3">
           <span
-            // 4. Gunakan style.badge dari helper
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md backdrop-blur-sm ${style.badge}`}
           >
             {berita.category}
           </span>
         </div>
 
-        {/* Status Badge (Opsional, sesuaikan logika jika perlu) */}
         <div className="absolute top-3 right-3">
           <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-md ${
             berita.status === 'published' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
@@ -135,7 +129,7 @@ export function NewsCard({
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span className="line-clamp-1 max-w-[100px]">{berita.location}</span>
+              <span className="line-clamp-1 max-w-25">{berita.location}</span>
             </div>
           )}
         </div>

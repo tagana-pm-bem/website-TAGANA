@@ -6,6 +6,7 @@ import { beritaService, BeritaAcaraDB } from "@/services/beritaService";
 import { DetailNewsCardPage } from "./components/DetailNewsCardPage";
 import { Loader2 } from "lucide-react";
 
+
 export default function DetailClient() {
   const router = useRouter();
   const searchParams = useSearchParams();

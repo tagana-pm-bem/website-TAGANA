@@ -1,7 +1,6 @@
 "use client";
 
 import { BackButton } from "@/components/ui/back-button";
-import React from "react";
 
 interface Props {
   dusunName: string;
@@ -10,8 +9,7 @@ interface Props {
 
 export default function Header({ dusunName, population }: Props) {
   return (
-    <div className="bg-gradient-to-r from-[#044BB1] to-[#0566d6] text-white shadow-lg relative overflow-hidden">
-      {/* Geometric Pattern Background */}
+    <div className="bg-linear-to-r from-[#044BB1] to-[#0566d6] text-white shadow-lg relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute top-1/2 right-0 w-48 h-48 bg-white rounded-full translate-x-1/2 -translate-y-1/2"></div>
@@ -19,7 +17,6 @@ export default function Header({ dusunName, population }: Props) {
         <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-white rounded-full"></div>
       </div>
 
-      {/* Animated Dots Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="grid grid-cols-12 gap-4 h-full">
           {[...Array(48)].map((_, i) => (
