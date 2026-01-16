@@ -58,18 +58,8 @@ export default function PetaSection() {
     if (isMounted) fetchDetail();
   }, [selectedDusunId, isMounted]);
 
-  const getRiskBadge = (level: string) => {
-    const badges = {
-      high: { label: "Siaga Merah", bg: "bg-red-50", text: "text-red-600", border: "border-red-100", dot: "bg-red-500" },
-      medium: { label: "Siaga Kuning", bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", dot: "bg-amber-500" },
-      low: { label: "Siaga Hijau", bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100", dot: "bg-emerald-500" },
-      none: { label: "Kondisi Aman", bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100", dot: "bg-blue-500" }
-    };
-    return badges[level as keyof typeof badges] || badges.none;
-  };
-
+  
   const mainBencana = bencanaList.length > 0 ? bencanaList[0] : null;
-  const riskBadge = getRiskBadge(selectedDusunDetail?.level_resiko || 'none');
 
   if (!isMounted) return null;
 
@@ -127,13 +117,7 @@ export default function PetaSection() {
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
                     className="flex flex-col h-full"
                   >
-                    {/* Status Badge */}
-                    <div className="mb-8">
-                      <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl ${riskBadge.bg} ${riskBadge.text} text-[11px] font-bold uppercase tracking-widest border ${riskBadge.border}`}>
-                        <span className={`w-2 h-2 rounded-full ${riskBadge.dot} animate-pulse`} />
-                        {riskBadge.label}
-                      </span>
-                    </div>
+                 
 
                     <h3 className="text-3xl font-bold text-slate-900 mb-8 tracking-tight leading-tight">
                       Dusun {selectedDusunDetail.nama}
@@ -141,11 +125,11 @@ export default function PetaSection() {
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-10">
-                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Potensi Utama</p>
                         <p className="text-sm font-bold text-slate-800">{mainBencana ? mainBencana.jenis_bencana : "Nihil"}</p>
                       </div>
-                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Total Jiwa</p>
                         <p className="text-sm font-bold text-slate-800 tabular-nums">{selectedDusunDetail.jumlah_penduduk.toLocaleString('id-ID')}</p>
                       </div>
@@ -156,7 +140,7 @@ export default function PetaSection() {
                       <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 mb-8">
                         <div className="flex items-center gap-2 mb-3 text-blue-700 font-bold text-xs uppercase tracking-widest">
                           <ShieldAlert size={16} />
-                          Rekomendasi Ahli
+                          Keterangan Risiko Utama
                         </div>
                         <p className="text-sm text-slate-600 leading-relaxed font-medium italic">
                           "{mainBencana.deskripsi}"

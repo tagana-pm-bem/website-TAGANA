@@ -179,25 +179,11 @@ export function DetailNewsCardPage({
             </div>
           </div>
 
-          {/* Sidebar - 1/3 width */}
-          {/* Sidebar - Tanpa Animasi (Static & Performance First) */}
+          {/* Sidebar */}
           <aside className="lg:col-span-1 w-full lg:h-full">
             <div className="sticky top-30 space-y-6">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <BeritaLainnya />
-              </div>
-
-              <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
-                <h3 className="font-bold text-lg mb-2 text-white">
-                  Butuh Bantuan?
-                </h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  Hubungi posko bencana Sriharjo jika memerlukan bantuan
-                  darurat.
-                </p>
-                <button className="w-full bg-white text-blue-600 py-2 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">
-                  Call Center
-                </button>
               </div>
             </div>
           </aside>

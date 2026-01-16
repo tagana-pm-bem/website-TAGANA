@@ -1,9 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAlert } from '@/components/ui/Alert';
-import { useDusun } from '@/hooks/useDusun.hooks'; 
+// Pastikan komponen-komponen ini sudah di-install via npx shadcn-ui@latest add ...
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { toast } from 'sonner'; // Atau gunakan useToast dari shadcn
+import { useDusun } from '@/hooks/useDusun.hooks';
 import { rtService } from '@/services/rtService';
+import { Loader2, RotateCcw, Save } from 'lucide-react';
 
 const DUSUN_LIST = [
   "Miri", "Jati", "Mojohuro", "Pelemadu", "Sungapan", "Gondosuli",
@@ -15,8 +27,7 @@ interface AddActionRTProps {
 }
 
 export default function AddActionRT({ onClose }: AddActionRTProps) {
-  const { showAlert } = useAlert();
-  const { data: dusunList, isLoading } = useDusun();
+  const { data: dusunList, isLoading: isDusunLoading } = useDusun();
 
   const [rtForm, setRtForm] = useState({
     dusun: '',
@@ -31,15 +42,17 @@ export default function AddActionRT({ onClose }: AddActionRTProps) {
     e.preventDefault();
     
     if (!rtForm.dusun || !rtForm.rt || !rtForm.nama) {
-      showAlert({ type: 'error', title: 'Gagal', message: 'Lengkapi data wajib!' });
+      toast.error('Gagal', {
+        description: 'Lengkapi data wajib (Dusun, RT, dan Nama Ketua)!',
+      });
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const targetDusun = dusunList.find(
-        (d) => d.nama.toLowerCase() === rtForm.dusun.toLowerCase()
+      const targetDusun = dusunList?.find(
+        (d: any) => d.nama.toLowerCase() === rtForm.dusun.toLowerCase()
       );
 
       if (!targetDusun) throw new Error("Dusun tidak ditemukan");
@@ -53,10 +66,8 @@ export default function AddActionRT({ onClose }: AddActionRTProps) {
 
       await rtService.create(payload);
 
-      showAlert({
-        type: 'success',
-        title: 'Berhasil',
-        message: `RT ${rtForm.rt} di ${rtForm.dusun} berhasil ditambahkan`
+      toast.success('Berhasil', {
+        description: `RT ${rtForm.rt} di ${rtForm.dusun} berhasil ditambahkan`,
       });
 
       setRtForm({ dusun: '', rt: '', nama: '', jenisKelamin: '' });
@@ -64,96 +75,118 @@ export default function AddActionRT({ onClose }: AddActionRTProps) {
 
     } catch (error) {
       console.error(error);
-      showAlert({ type: 'error', title: 'Error', message: 'Gagal menyimpan data RT' });
+      toast.error('Error', {
+        description: 'Gagal menyimpan data RT. Silakan coba lagi.',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleReset = () => {
+    setRtForm({ dusun: '', rt: '', nama: '', jenisKelamin: '' });
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-6">Tambah Data RT</h3>
+      <div className="mb-6">
+        <h3 className="text-lg font-bold text-gray-900 tracking-tight">Tambah Data RT</h3>
+        <p className="text-sm text-muted-foreground mt-1">Masukkan informasi ketua RT baru di wilayah dusun.</p>
+      </div>
       
       <form onSubmit={handleRtSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Dusun
-            </label>
-            <select
-              value={rtForm.dusun}
-              onChange={(e) => setRtForm({ ...rtForm, dusun: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-              disabled={isLoading}
+          {/* Dusun Select */}
+          <div className="space-y-2">
+            <Label htmlFor="dusun" className="font-bold">Dusun</Label>
+            <Select 
+              value={rtForm.dusun} 
+              onValueChange={(value) => setRtForm({ ...rtForm, dusun: value })}
+              disabled={isDusunLoading}
             >
-              <option value="">-- Pilih Dusun --</option>
-              {DUSUN_LIST.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
+              <SelectTrigger id="dusun" className="rounded-xl border-slate-200">
+                <SelectValue placeholder="Pilih Dusun" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                {DUSUN_LIST.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Nomor RT */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nomor RT (Contoh: 001)
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="rt" className="font-bold">Nomor RT</Label>
+            <Input
+              id="rt"
               type="text"
               value={rtForm.rt}
               onChange={(e) => setRtForm({ ...rtForm, rt: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="001"
+              placeholder="Contoh: 001"
+              className="rounded-xl border-slate-200 focus:ring-blue-500"
             />
           </div>
         </div>
 
         {/* Nama Ketua RT */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Nama Ketua RT
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="nama" className="font-bold">Nama Ketua RT</Label>
+          <Input
+            id="nama"
             type="text"
             value={rtForm.nama}
             onChange={(e) => setRtForm({ ...rtForm, nama: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="Nama Lengkap"
+            placeholder="Nama Lengkap Tanpa Gelar"
+            className="rounded-xl border-slate-200"
           />
         </div>
 
-        {/* Jenis Kelamin */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Jenis Kelamin Ketua
-          </label>
-          <select
-            value={rtForm.jenisKelamin}
-            onChange={(e) => setRtForm({ ...rtForm, jenisKelamin: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+        {/* Jenis Kelamin Ketua */}
+        <div className="space-y-2">
+          <Label htmlFor="jenisKelamin" className="font-bold">Jenis Kelamin Ketua</Label>
+          <Select 
+            value={rtForm.jenisKelamin} 
+            onValueChange={(value) => setRtForm({ ...rtForm, jenisKelamin: value })}
           >
-            <option value="">-- Pilih --</option>
-            <option value="L">Laki-laki</option>
-            <option value="P">Perempuan</option>
-          </select>
+            <SelectTrigger id="jenisKelamin" className="rounded-xl border-slate-200">
+              <SelectValue placeholder="Pilih Jenis Kelamin" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="L">Laki-laki</SelectItem>
+              <SelectItem value="P">Perempuan</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Tombol Aksi */}
         <div className="flex justify-end gap-3 pt-6 border-t mt-6">
-          <button
+          <Button
             type="button"
-            onClick={() => setRtForm({ dusun: '', rt: '', nama: '', jenisKelamin: '' })}
-            className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            variant="outline"
+            onClick={handleReset}
+            className="rounded-xl border-slate-200 px-6 font-bold text-slate-600 hover:bg-slate-50"
           >
+            <RotateCcw className="mr-2 h-4 w-4" />
             Reset
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="cursor-pointer px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300"
             disabled={isSubmitting}
+            className="rounded-xl bg-[#044BB1] hover:bg-blue-700 px-6 font-bold shadow-lg shadow-blue-900/10"
           >
-            {isSubmitting ? 'Menyimpan...' : 'Simpan Data RT'}
-          </button>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Simpan Data RT
+              </>
+            )}
+          </Button>
         </div>
       </form>
     </div>

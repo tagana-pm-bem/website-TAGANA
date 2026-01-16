@@ -14,6 +14,14 @@ export default function HeroSection() {
     }
   };
 
+  const handlePetaClick = () => {
+    router.push("/peta-page");
+  };
+
+  const handlePanduanClick = () => {
+    router.push("/panduan");
+  };
+
   return (
     <section className="relative overflow-hidden">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24">
@@ -37,14 +45,14 @@ export default function HeroSection() {
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <button
-                onClick={() => router.push("/peta-page")}
+                onClick={handlePetaClick}
                 className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-8 py-3.5 rounded-lg font-bold transition-all shadow-lg shadow-blue-200 active:scale-95"
               >
                 Lihat Peta Bencana
               </button>
 
               <button
-                onClick={handleScrollToPanduan}
+                onClick={handlePanduanClick}
                 className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-8 py-3.5 rounded-lg font-bold transition-all active:scale-95"
               >
                 Panduan Warga

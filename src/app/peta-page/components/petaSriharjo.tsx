@@ -104,7 +104,7 @@ export default function PetaSriharjo({
   const [showFloodZones, setShowFloodZones] = useState(false);
   const [showRTBoundaries, setShowRTBoundaries] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
-  const [showLegend, setShowLegend] = useState(false); // 👈 Tambahkan state untuk legend
+  const [showLegend, setShowLegend] = useState(false); 
 
   // Load Data
   useEffect(() => {
@@ -393,7 +393,7 @@ export default function PetaSriharjo({
             {/* Tombol Legend */}
             <button
               onClick={() => setShowLegend(!showLegend)}
-              className={`px-3 py-3 rounded-2xl shadow-lg font-bold text-[15px] transition-all flex items-center gap-2 ${
+              className={`px-2 py-2 md:px-3 md:py-3 rounded-xl md:rounded-2xl shadow-lg font-medium text-sm md:text-[15px] transition-all flex items-center gap-1 md:gap-2 ${
                 showLegend
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-white text-gray-700 hover:bg-gray-100"
@@ -404,32 +404,30 @@ export default function PetaSriharjo({
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={3}
+                strokeWidth={2}
                 stroke="currentColor"
-                className="size-6"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"
-              />
-            </svg>
-            Legenda
-          </button>
-
-            {/* Tombol Reset View */}
+                />
+              </svg>
+              <span className="hidden sm:inline">Legenda</span>
+            </button>
             <button
               onClick={handleResetView}
-              className="px-3 py-3 rounded-2xl shadow-lg font-bold text-[15px] transition-all bg-white hover:bg-gray-100 flex items-center gap-2"
+              className="px-2 py-2 md:px-3 md:py-3 rounded-xl md:rounded-2xl shadow-lg font-medium text-sm md:text-[15px] transition-all bg-white hover:bg-gray-100 flex items-center gap-1 md:gap-2"
               title="Reset ke tampilan awal"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={3}
-                stroke="blue"
-                className="size-6"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -437,7 +435,7 @@ export default function PetaSriharjo({
                   d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                 />
               </svg>
-              Reset
+              <span className="hidden sm:inline">Reset</span>
             </button>
           </div>
         </div>

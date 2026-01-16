@@ -1,49 +1,46 @@
-import React from 'react';
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-interface BadgeProps {
-  type: 'success' | 'error';
-  message?: string;
-  detail?: string;
-}
+import { cn } from "@/lib/utils"
 
-const Badge: React.FC<BadgeProps> = ({ type, message, detail }) => {
-  const badges = {
-    success: {
-      bgColor: 'bg-green-100',
-      textColor: 'text-green-800',
-      borderColor: 'border-green-300',
-      icon: '✓',
-      defaultMessage: 'Upload Berhasil',
-      defaultDetail: 'File gambar berhasil di unggah'
+const badgeVariants = cva(
+  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        destructive:
+          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+      },
     },
-    error: {
-      bgColor: 'bg-red-100',
-      textColor: 'text-red-800',
-      borderColor: 'border-red-300',
-      icon: '✕',
-      defaultMessage: 'Gagal Menyimpan',
-      defaultDetail: 'Koneksi terputus'
-    }
-  };
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-  const badge = badges[type];
+function Badge({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"span"> &
+  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "span"
 
   return (
-    <div className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${badge.bgColor} ${badge.borderColor}`}>
-      <div className={`flex items-center justify-center w-6 h-6 rounded-full ${badge.textColor} font-bold text-sm`}>
-        {badge.icon}
-      </div>
-      <div className="flex flex-col">
-        <span className={`font-semibold ${badge.textColor} text-sm`}>
-          {message || badge.defaultMessage}
-        </span>
-        <span className={`text-xs ${badge.textColor} opacity-80`}>
-          {detail || badge.defaultDetail}
-        </span>
-      </div>
-    </div>
-  );
-};
+    <Comp
+      data-slot="badge"
+      className={cn(badgeVariants({ variant }), className)}
+      {...props}
+    />
+  )
+}
 
-export default Badge;
-export { Badge };
+export { Badge, badgeVariants }

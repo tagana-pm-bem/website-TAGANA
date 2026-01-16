@@ -7,6 +7,8 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { authService } from "@/app/auth/services/authService";
 import { SweetAlertProvider } from "@/components/ui/SweetAlertProvider";
+// 1. Impor Toaster dari sonner
+import { Toaster } from "sonner"; 
 
 export default function AdminLayout({
   children,
@@ -20,64 +22,44 @@ export default function AdminLayout({
 
   useEffect(() => {
     let isMounted = true;
-
     const checkAuth = async () => {
       try {
-        console.log("[Admin Layout] Checking authentication...");
         const user = await authService.getCurrentUser();
-
         if (!isMounted) return;
-
         if (!user) {
-          console.log(
-            "[Auth Check] User tidak terautentikasi, redirect ke login"
-          );
           router.replace("/auth/login");
           return;
         }
-
-        console.log("[Auth Check] User terautentikasi:", user.email);
         setIsAuthenticated(true);
       } catch (error) {
-        console.error("[Auth Check] Error:", error);
-        if (isMounted) {
-          router.replace("/auth/login");
-        }
+        if (isMounted) router.replace("/auth/login");
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
-
     checkAuth();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [pathname, router]);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
       </div>
     );
   }
 
-  // If not authenticated, show nothing (will redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
+  if (!isAuthenticated) return null;
 
-  // Authenticated - show admin layout
   return (
-   
     <SweetAlertProvider>
+      {/* 2. Tambahkan Toaster di sini agar aktif di seluruh halaman Admin */}
+      <Toaster 
+        position="top-center" 
+        richColors 
+        expand={true}
+        closeButton
+      />
 
       <div className="min-h-screen bg-gray-100">
         <div className="flex">
@@ -98,7 +80,5 @@ export default function AdminLayout({
         </div>
       </div>
     </SweetAlertProvider>
-
-    
   );
 }

@@ -5,23 +5,23 @@ import { motion } from "framer-motion";
 export default function LegendCard() {
   const legends = [
     {
-      icon: <div className="w-5 h-5 rounded-md bg-[#00A3E1] shadow-sm" />, // Ukuran ikon 6->5
+      icon: <div className="w-5 h-5 rounded-md bg-orange-500 shadow-sm" />, // Ukuran ikon 6->5
       title: "Titik Pantau Banjir",
       description: "Lokasi pengamatan banjir",
     },
     {
-      icon: <div className="w-5 h-5 rounded-full bg-[#33C1FF]" />,
+      icon: <div className="w-5 h-5 rounded-full bg-sky-500" />,
       title: "Penanda Lokasi Dusun",
       description: "Titik pusat atau kantor dusun",
     },
     {
-      icon: <div className="w-5 h-5 rounded-md bg-linear-to-b from-[#4A90E2] to-[#2E5BFF] shadow-sm" />,
+      icon: <div className="w-5 h-5 rounded-md bg-red-400 shadow-sm" />,
       title: "Zona Banjir",
       description: "Area rawan banjir",
     },
     {
       icon: <div className="w-5 h-5 rounded border-2 border-slate-500 bg-transparent" />,
-      title: "Batas Dusun",
+      title: "Batas RT",
       description: "Garis batas wilayah dusun",
     },
     {
@@ -31,11 +31,11 @@ export default function LegendCard() {
           <div className="absolute inset-y-1 inset-x-0 bg-white" />
         </div>
       ),
-      title: "Batas RT",
+      title: "Batas Dusun",
       description: "Garis batas Rukun Tetangga",
     },
     {
-      icon: <div className="w-7 h-1 bg-[#FF6B00] rounded-full" />,
+      icon: <div className="w-7 h-1 bg-yellow-400 rounded-full" />,
       title: "Jalan",
       description: "Jalur jalan utama",
     },

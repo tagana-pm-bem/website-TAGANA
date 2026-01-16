@@ -28,7 +28,7 @@ export default function LegendCard() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-[0px_4px_17px_4px_rgba(50,_50,_93,_0.25)] border border-gray-100">
+    <div className="bg-white rounded-lg p-6 shadow-md border border-gray-300">
       {/* Header */}
       <div className="flex items-center space-x-2 mb-4">
         <Info className="w-5 h-5 text-gray-600" />

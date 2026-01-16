@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { NewsGrid } from "./components/NewsGrid";
 import { NoResults } from "./components/NoResults";
 import FilterBerita from "./components/FIlterBerita";
@@ -123,22 +124,41 @@ export default function BeritaBencanaPage() {
           </svg>
         </div>
 
-        <button
+        <motion.button
           onClick={() => setShowFilter(!showFilter)}
           className={`inline-flex items-center gap-2 px-8 py-2 border rounded-lg cursor-pointer text-lg font-medium transition ${showFilter ? 'bg-blue-700 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-.447.832l-4 2.667A1 1 0 019 22v-9.586L3.293 6.707A1 1 0 013 6V4z" />
-          </svg>
+          <motion.svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="w-5 h-5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+            animate={{ rotate: showFilter ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-.447.832l-4 2.667A1 1 0 009 22v-9.586L3.293 6.707A1 1 0 013 6V4z" />
+          </motion.svg>
           <span>Filter</span>
-        </button>
+        </motion.button>
       </div>
 
-      {showFilter && (
-        <div className="mb-6">
-          <FilterBerita onFilterChange={(f: any) => setFilterState({ kategori: f.kategori, waktu: f.waktu })} />
-        </div>
-      )}
+      <AnimatePresence>
+        {showFilter && (
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, height: 0, y: -20 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <FilterBerita onFilterChange={(f: any) => setFilterState({ kategori: f.kategori, waktu: f.waktu })} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isLoading && allBerita.length === 0 ? (
         <div className="flex justify-center items-center py-20">

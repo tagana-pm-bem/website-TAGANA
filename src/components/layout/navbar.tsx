@@ -50,7 +50,7 @@ export function Navbar() {
     <>
       <nav
         className="sticky top-0 z-50 bg-white shadow-md transition-shadow duration-300">
-        <div className="w-full mx-auto px-4 sm:px-14">
+        <div className="w-full mx-auto px-4 sm:px-14 relative">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
             <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group shrink-0">
               <div className="relative">
@@ -79,65 +79,79 @@ export function Navbar() {
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-8 lg:gap-6 xl:gap-8">
+            <div className="hidden md:flex items-center flex-1 justify-center">
+              <div className="flex items-center gap-6 lg:gap-16 relative">
               <button
                 onClick={() => router.push('/beranda')}
-                className={`text-sm lg:text-base font-medium transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/beranda' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/beranda' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Beranda
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/beranda' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/beranda' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/peta-page')}
-                className={`text-sm lg:text-base font-medium transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Peta
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/peta-page' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/peta-page' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/EventListPage')}
-                className={`text-sm lg:text-base font-medium transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Event
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/EventListPage' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/EventListPage' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
               
               <button
                 onClick={() => router.push('/BeritaBencana')}
-                className={`text-sm lg:text-base font-medium transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Berita 
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/BeritaBencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
-                onClick={() => router.push('/auth/login')}
-                className="flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-blue-600  text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group"
+                onClick={() => router.push('/panduan')}
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/panduan/prabencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
               >
-                <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-xs lg:text-base font-medium whitespace-nowrap">Login Admin</span>
+                Panduan
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/panduan/prabencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                }`}></span>
               </button>
+              </div>
             </div>
+
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="hidden md:flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group shrink-0"
+            >
+              <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span className="text-xs lg:text-base font-medium whitespace-nowrap">Login Admin</span>
+            </button>
 
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -219,6 +233,15 @@ export function Navbar() {
               }`} 
             >
               Berita 
+            </button>
+
+            <button
+              onClick={() => handleNavigation('/panduan')}
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
+                pathname === '/panduan' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+              }`} 
+            >
+              Panduan 
             </button>
 
             <div className="border-t border-gray-300 my-4"></div>
