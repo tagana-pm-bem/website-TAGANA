@@ -219,12 +219,12 @@ export function InfoModal({ isOpen, onClose }: ModalProps) {
                         { label: "Ibu Hamil", val: stats.ibuHamil, icon: <HeartPulse size={18}/>, color: "text-rose-600", bg: "bg-rose-50" },
                         { label: "Disabilitas", val: stats.disabilitas, icon: <Accessibility size={18}/>, color: "text-violet-600", bg: "bg-violet-50" },
                       ].map((item, i) => (
-                        <div key={i} className="bg-white border border-slate-100 p-5 rounded-3xl transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-500/5">
+                        <div key={i} className="bg-white border border-slate-300 p-5 rounded-3xl transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-500/5">
                           <div className={`w-9 h-9 ${item.bg} ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                             {item.icon}
                           </div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
-                          <p className="text-xl font-black text-slate-900">{item.val.toLocaleString('id-ID')}</p>
+                          <p className="text-xl font-bold text-slate-900">{item.val.toLocaleString('id-ID')}</p>
                         </div>
                       ))}
                     </div>

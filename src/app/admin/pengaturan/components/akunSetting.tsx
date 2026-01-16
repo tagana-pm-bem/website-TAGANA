@@ -1,45 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import Card from "@/components/ui/card";
-import { UserPlus, Save, Loader2, User, Key, Mail } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { UserPlus, Save, Loader2, User, Key, Mail, Info } from "lucide-react";
 import { authService } from "../../../auth/services/authService";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
-// 1. Import Hook SweetAlert
-import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
-
-interface PengaturanAkunProps {
-  onSuccess: () => void; 
-}
-
-export default function PengaturanAkun({ onSuccess }: PengaturanAkunProps) {
-  // 2. Panggil fungsi SweetAlert
-  const { showDraggableSuccess, showDraggableError } = useSweetAlert();
-
+export default function PengaturanAkun({ onSuccess }: { onSuccess: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    fullName: "",
-    username: "",
-    password: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [formData, setFormData] = useState({ fullName: "", username: "", password: "" });
 
   const handleSubmit = async () => {
-    // 3. Validasi dengan SweetAlert Error
     if (!formData.fullName || !formData.username || !formData.password) {
-      showDraggableError("Data Tidak Lengkap", "Mohon lengkapi nama, username, dan password.");
+      toast.error("Data Tidak Lengkap", { description: "Mohon lengkapi seluruh kolom formulir." });
       return;
     }
     if (formData.password.length < 6) {
-      showDraggableError("Password Lemah", "Password minimal harus 6 karakter.");
+      toast.error("Password Terlalu Pendek", { description: "Password minimal harus 6 karakter." });
       return;
     }
 
     setIsLoading(true);
+    const toastId = toast.loading("Mendaftarkan admin baru...");
     try {
       await authService.registerAdmin({
         username: formData.username,
@@ -47,94 +32,102 @@ export default function PengaturanAkun({ onSuccess }: PengaturanAkunProps) {
         fullName: formData.fullName,
       });
 
-      // 4. Notifikasi Sukses dengan SweetAlert
-      await showDraggableSuccess(`Admin ${formData.username} Berhasil Ditambahkan!`);
+      toast.success("Admin Berhasil Terdaftar", {
+        id: toastId,
+        description: `Akun @${formData.username} kini aktif di sistem.`
+      });
       
       setFormData({ fullName: "", username: "", password: "" });
       onSuccess();
     } catch (error: any) {
-      console.error(error);
-      // 5. Notifikasi Gagal dengan SweetAlert
-      showDraggableError("Gagal Menambahkan", error.message || "Terjadi kesalahan pada server");
+      toast.error("Gagal Mendaftar", {
+        id: toastId,
+        description: error.message || "Kesalahan server saat memproses akun."
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="flex flex-col gap-8 w-full ">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
-          <UserPlus size={20} className="text-blue-500" />
-          <h1 className="text-md font-semibold text-gray-800">Tambah Admin Baru</h1>
+    <Card className="border-slate-100 shadow-xl shadow-slate-200/50 rounded-[1.5rem] overflow-hidden bg-white">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-blue-600">
+            <UserPlus size={24} />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-bold tracking-tight text-slate-900">Tambah Admin Baru</CardTitle>
+            <CardDescription className="font-medium text-slate-500">Berikan akses manajemen sistem kepada personel terpercaya.</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-8 space-y-8">
+        <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-2xl border border-blue-100 group">
+          <Info size={18} className="text-blue-600 shrink-0 mt-0.5" />
+          <p className="text-xs font-medium text-blue-700 leading-relaxed">
+            Sistem akan secara otomatis menyertakan email institusi 
+            <span className="font-bold underline ml-1">@sriharjo.com</span> 
+            untuk kredensial login admin ini.
+          </p>
         </div>
 
-        <p className="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg border border-blue-100">
-          User yang didaftarkan di sini akan memiliki email otomatis: 
-          <span className="font-bold text-blue-600"> [username]@sriharjo.com</span>. 
-          Gunakan username dan password tersebut untuk login.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-blue-500 text-sm font-semibold flex items-center gap-2">
-              <User size={14} /> Nama Lengkap
-            </label>
-            <input
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              placeholder="Contoh: Budi Santoso"
-              className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <User size={14} className="text-[#044BB1]" /> Nama Lengkap
+            </Label>
+            <Input 
+              value={formData.fullName} 
+              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              placeholder="Contoh: Budi Santoso" 
+              className="rounded-xl border-slate-200 h-11 shadow-sm" 
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-blue-500 text-sm font-semibold flex items-center gap-2">
-              <Mail size={14} /> Username
-            </label>
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <Mail size={14} className="text-[#044BB1]" /> Username
+            </Label>
             <div className="relative">
-              <input
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Contoh: budi"
-                className="w-full border border-gray-300 rounded-xl pl-4 pr-32 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+              <Input 
+                value={formData.username} 
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                placeholder="budi" 
+                className="rounded-xl border-slate-200 h-11 shadow-sm pr-28" 
               />
-              <span className="absolute right-4 top-2.5 text-sm text-gray-400 font-medium select-none">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none">
                 @sriharjo.com
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 md:col-span-2">
-            <label className="text-blue-500 text-sm font-semibold flex items-center gap-2">
-              <Key size={14} /> Kata Sandi
-            </label>
-            <input
-              name="password"
-              type="password"
+          <div className="md:col-span-2 space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <Key size={14} className="text-[#044BB1]" /> Kata Sandi
+            </Label>
+            <Input 
+              type="password" 
               value={formData.password}
-              onChange={handleChange}
-              placeholder="Minimal 6 karakter..."
-              className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              placeholder="Minimal 6 karakter kombinasi" 
+              className="rounded-xl border-slate-200 h-11 shadow-sm" 
             />
           </div>
         </div>
-      </div>
 
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-          <span className="text-sm font-semibold">
-            {isLoading ? "Menyimpan..." : "Simpan Admin"}
-          </span>
-        </button>
-      </div>
+        <div className="flex justify-end pt-6 border-t border-slate-50">
+          <Button 
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="bg-[#044BB1] hover:bg-blue-700 px-8 py-6 rounded-2xl font-bold shadow-lg shadow-blue-900/10 gap-2 active:scale-95 transition-all"
+          >
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+            {isLoading ? "Menyimpan..." : "Daftarkan Admin"}
+          </Button>
+        </div>
+      </CardContent>
     </Card>
   );
 }

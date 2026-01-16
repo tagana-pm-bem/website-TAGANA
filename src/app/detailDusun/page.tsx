@@ -181,7 +181,7 @@ function DetailDusunContent() {
           />
 
           {mapReady && (
-            <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-100 bg-white p-2">
+            <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-300 bg-white p-2">
               <MapCard
                 position={[dusun.latitude, dusun.longitude]}
                 dusunName={dusun.nama}

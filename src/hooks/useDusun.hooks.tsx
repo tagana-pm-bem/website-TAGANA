@@ -1,11 +1,12 @@
+'use client';
+
 import { useState, useEffect, useCallback } from "react";
 import { dusunService, DusunDB } from "@/services/dusunService";
-import { useAlert } from "@/components/ui/Alert";
+import { toast } from "sonner"; // Menggunakan Sonner sesuai standar shadcn terbaru
 
 export function useDusun() {
   const [data, setData] = useState<DusunDB[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { showAlert } = useAlert();
 
   const fetchDusun = useCallback(async () => {
     try {
@@ -14,41 +15,43 @@ export function useDusun() {
       setData(result);
     } catch (error) {
       console.error(error);
-      showAlert({
-        type: "error",
-        title: "Error",
-        message: "Gagal mengambil data dusun",
+      toast.error("Gagal Mengambil Data", {
+        description: "Terjadi kesalahan saat menghubungi server desa.",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [showAlert]);
+  }, []); // toast dari sonner tidak perlu masuk dependency array
 
   useEffect(() => {
     fetchDusun();
   }, [fetchDusun]);
 
+  /**
+   * Fungsi untuk memperbarui statistik dusun
+   * @param id ID Dusun
+   * @param newStats Data statistik yang akan diperbarui
+   */
   const updateDusunStats = async (id: number, newStats: Partial<DusunDB>) => {
     try {
       await dusunService.updateStats(id, newStats);
-      await fetchDusun();
-      showAlert({
-        type: "success",
-        title: "Sukses",
-        message: "Data berhasil diperbarui",
+      await fetchDusun(); // Refresh data setelah update
+      
+      toast.success("Data Diperbarui", {
+        description: "Statistik kependudukan berhasil disimpan ke sistem.",
       });
+      
       return true;
     } catch (error) {
       console.error(error);
-      showAlert({
-        type: "error",
-        title: "Gagal",
-        message: "Gagal update data",
+      toast.error("Gagal Update", {
+        description: "Sistem gagal menyimpan perubahan data penduduk.",
       });
       return false;
     }
   };
 
+  // Kalkulasi ringkasan statistik untuk dashboard
   const statsSummary = {
     totalDusun: data.length,
     totalPopulation: data.reduce(

@@ -43,7 +43,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
 
             {/* ===== SIDEBAR DESKTOP ===== */}
-            <aside className="hidden lg:block w-full lg:w-100 shrink-0 sticky top-6">
+            <aside className="hidden lg:block w-full lg:w-100 shrink-0 top-1">
               <Controls
                 selectedDusunId={selectedDusunId}
                 onDusunChange={handleDusunChange}
@@ -73,7 +73,7 @@ export default function Home() {
                 </svg>
               </button>
 
-              <div className="w-full max-h-screen rounded-xl overflow-hidden shadow-2xl shadow-slate-200 border border-white relative bg-white">
+              <div className="w-full h-screen rounded-xl overflow-hidden shadow-2xl shadow-slate-200 border border-white relative bg-white">
                 <MapArea
                   selectedDusunId={selectedDusunId}
                   onDusunSelect={setSelectedDusunId}

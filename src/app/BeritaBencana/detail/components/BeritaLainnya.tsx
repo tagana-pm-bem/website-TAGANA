@@ -5,14 +5,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { beritaService, BeritaAcaraDB } from "@/services/beritaService";
 import { Calendar, Tag } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
 
 const topikPopuler = [
   "Kesehatan",
   "Pembangunan",
   "Bencana Alam",
   "Pendidikan",
-  "UMKM",
-  "Pemuda",
 ];
 
 export default function BeritaLainnya() {
@@ -83,12 +82,12 @@ export default function BeritaLainnya() {
                 </div>
 
                 <div className="flex-1 py-1 min-w-0">
-                  <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="font-medium text-slate-800 text-sm line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors mb-2">
                     {berita.judul}
                   </h3>
                   <div className="flex items-center gap-1.5 text-slate-400">
                     <Calendar size={12} />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="text-[10px] font-medium uppercase tracking-wider">
                       {new Date(berita.tanggal).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "short",
@@ -115,9 +114,13 @@ export default function BeritaLainnya() {
             <Link
               key={topik}
               href={`/BeritaBencana?topik=${topik.toLowerCase().replace(" ", "-")}`}
-              className="px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 border border-slate-100"
             >
-              {topik}
+              <Badge 
+                variant="outline" 
+                className="px-4 py-2 text-md font-medium border-gray-300 hover:bg-blue-600 hover:text-white transition-all duration-300 cursor-pointer"
+              >
+                {topik}
+              </Badge>
             </Link>
           ))}
         </div>

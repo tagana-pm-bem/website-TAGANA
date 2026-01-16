@@ -1,173 +1,123 @@
-import Card from "@/components/ui/card";
+"use client";
+
 import Image from "next/image";
-import { Camera, Save, Trash2, Upload } from "lucide-react";
+import { Camera, Save, Trash2, Upload, Building2, MapPin, Mail, Phone, User } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export default function ProfilDesa() {
+  const handleSave = () => {
+    toast.success("Perubahan Disimpan", {
+      description: "Informasi profil desa telah diperbarui secara global."
+    });
+  };
+
   return (
-    <Card className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-semibold text-md">Profil Desa / Instansi</h1>
-        <div className="border-b border-gray-200" />
-      </div>
-
-      <div className="flex items-center gap-8">
-        <div className="relative group w-24 h-24 shrink-0">
-          <div className="w-full h-full rounded-full overflow-hidden shadow-sm ring-2 ring-gray-100">
-            <Image
-              src="/ketos.png"
-              alt="Logo Desa"
-              fill
-              className="object-cover rounded-full"
-            />
+    <Card className="border-slate-100 shadow-xl shadow-slate-200/50 rounded-[1.5rem] overflow-hidden bg-white">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-[#044BB1]">
+            <Building2 size={24} />
           </div>
-
-          <button
-            className="
-              absolute inset-0
-              rounded-full
-              bg-black/50
-              flex items-center justify-center
-              opacity-0 group-hover:opacity-100
-              transition cursor-pointer
-            "
-          >
-            <div className="flex flex-col cursor-pointer items-center text-white text-xs gap-1">
-              <Camera size={18} />
-              <span>Edit</span>
-            </div>
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-3">
           <div>
-            <p className="text-sm font-semibold">Logo Desa</p>
-            <p className="text-xs text-gray-500">
-              Format JPG / PNG · Maks. 2MB
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              className="
-                flex items-center gap-2
-                px-4 py-2
-                rounded-lg
-                text-sm font-medium
-                text-blue-600
-                bg-blue-50
-                hover:bg-blue-100
-                shadow-sm
-                transition cursor-pointer
-              "
-            >
-              <Upload size={16} />
-              Upload
-            </button>
-
-            <button
-              className="
-                flex items-center gap-2
-                px-4 py-2
-                rounded-lg
-                text-sm font-medium
-                text-gray-600
-                bg-gray-100
-                hover:bg-red-100 hover:text-red-600
-                shadow-sm
-                transition cursor-pointer
-              "
-            >
-              <Trash2 size={16} />
-              Hapus
-            </button>
+            <CardTitle className="text-xl font-bold tracking-tight text-slate-900">Profil Desa / Instansi</CardTitle>
+            <CardDescription className="font-medium text-slate-500">Kelola identitas resmi dan kontak operasional desa.</CardDescription>
           </div>
         </div>
-      </div>
+      </CardHeader>
 
-      <div className="border-b border-gray-200" />
+      <CardContent className="p-8 space-y-10">
+        {/* LOGO SECTION */}
+        <div className="flex flex-col sm:flex-row items-center gap-8 pb-8 border-b border-slate-50">
+          <div className="relative group w-32 h-32 shrink-0">
+            <div className="w-full h-full rounded-[2rem] overflow-hidden shadow-md ring-4 ring-slate-50">
+              <Image src="/ketos.png" alt="Logo Desa" fill className="object-cover" />
+            </div>
+            <button className="absolute inset-0 rounded-[2rem] bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer backdrop-blur-[2px]">
+              <div className="flex flex-col items-center text-white text-xs font-bold gap-1">
+                <Camera size={20} />
+                <span>Ganti Logo</span>
+              </div>
+            </button>
+          </div>
 
-      <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="Nama Desa" placeholder="Masukkan nama desa..." />
-          <Input
-            label="Kode Desa (Kemendagri)"
-            placeholder="Masukkan kode desa..."
-          />
+          <div className="flex flex-col gap-4 text-center sm:text-left">
+            <div>
+              <h4 className="text-sm font-bold text-slate-800">Logo Resmi Desa</h4>
+              <p className="text-xs font-medium text-slate-400 mt-1">Format JPG, PNG atau SVG. Maksimal 2MB.</p>
+            </div>
+            <div className="flex gap-3 justify-center sm:justify-start">
+              <Button variant="outline" className="rounded-xl border-slate-200 font-bold text-slate-600 gap-2 h-10">
+                <Upload size={16} /> Upload
+              </Button>
+              <Button variant="ghost" className="rounded-xl font-bold text-rose-500 hover:bg-rose-50 hover:text-rose-600 h-10">
+                <Trash2 size={16} /> Hapus
+              </Button>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="Kepala Desa" placeholder="Masukkan nama kepala desa..." />
-          <Input label="Kecamatan" placeholder="Masukkan nama kecamatan..." />
+        {/* FORM SECTION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <Building2 size={14} className="text-[#044BB1]" /> Nama Desa
+            </Label>
+            <Input placeholder="Masukkan nama desa..." className="rounded-xl border-slate-200 h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <MapPin size={14} className="text-[#044BB1]" /> Kode Desa (Kemendagri)
+            </Label>
+            <Input placeholder="Masukkan kode desa..." className="rounded-xl border-slate-200 h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <User size={14} className="text-[#044BB1]" /> Kepala Desa
+            </Label>
+            <Input placeholder="Nama Kepala Desa..." className="rounded-xl border-slate-200 h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <MapPin size={14} className="text-[#044BB1]" /> Kecamatan
+            </Label>
+            <Input placeholder="Nama kecamatan..." className="rounded-xl border-slate-200 h-11" />
+          </div>
+          
+          <div className="md:col-span-2 space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <MapPin size={14} className="text-[#044BB1]" /> Alamat Kantor Desa
+            </Label>
+            <Textarea rows={3} placeholder="Alamat lengkap kantor..." className="rounded-xl border-slate-200 resize-none p-4" />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <Mail size={14} className="text-[#044BB1]" /> Email Resmi
+            </Label>
+            <Input type="email" placeholder="contoh@desa.go.id" className="rounded-xl border-slate-200 h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-bold text-slate-700 flex items-center gap-2 mb-1">
+              <Phone size={14} className="text-[#044BB1]" /> Nomor Telepon
+            </Label>
+            <Input placeholder="08xxxxxxxxxx" className="rounded-xl border-slate-200 h-11" />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-blue-500 text-md font-semibold">
-            Alamat Kantor Desa
-          </label>
-          <textarea
-            rows={4}
-            placeholder="Masukkan alamat lengkap..."
-            className="
-              border border-gray-300 rounded-xl
-              px-4 py-3
-              text-sm
-              shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-blue-200
-            "
-          />
-        </div>
-
-        {/* Row 3 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="Email Resmi" placeholder="contoh@desa.go.id" />
-          <Input label="Nomor Telepon" placeholder="08xxxxxxxxxx" />
-        </div>
-
-        {/* Action */}
-        <div className="flex justify-end pt-2">
-          <button
-            className="
-              flex items-center gap-3
-              bg-blue-500
-              hover:bg-blue-600
-              text-white
-              px-6 py-3
-              rounded-xl
-              shadow-md
-              transition
-            "
+        <div className="flex justify-end pt-6 border-t border-slate-50">
+          <Button 
+            onClick={handleSave}
+            className="bg-[#044BB1] hover:bg-blue-700 text-white px-8 py-6 rounded-2xl font-bold shadow-lg shadow-blue-900/10 gap-2 active:scale-95 transition-all"
           >
-            <Save size={20} />
-            <span className="font-semibold text-sm">
-              Simpan Perubahan
-            </span>
-          </button>
+            <Save size={18} /> Simpan Perubahan
+          </Button>
         </div>
-      </div>
+      </CardContent>
     </Card>
-  );
-}
-
-function Input({
-  label,
-  placeholder,
-}: {
-  label: string;
-  placeholder?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-blue-500 text-md font-semibold">{label}</label>
-      <input
-        placeholder={placeholder}
-        className="
-          border border-gray-300 rounded-xl
-          px-4 py-2.5
-          text-sm
-          shadow-sm
-          focus:outline-none focus:ring-2 focus:ring-blue-200
-        "
-      />
-    </div>
   );
 }

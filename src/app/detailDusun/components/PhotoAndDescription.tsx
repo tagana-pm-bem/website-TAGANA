@@ -36,7 +36,7 @@ export default function PhotoAndDescription({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Main Image Hero Section */}
-        <div className="relative w-full h-80 sm:h-100 lg:h-[500px] rounded-[2rem] overflow-hidden shadow-2xl mb-10 group border border-slate-100">
+        <div className="relative w-full h-80 sm:h-100 lg:h-[700px] rounded-xl overflow-hidden shadow-2xl mb-10 group border border-slate-100">
           <Image
             src={finalImageSrc}
             alt={finalAltText}
@@ -51,7 +51,7 @@ export default function PhotoAndDescription({
           />
           
           {/* Overlay Gradient yang lebih estetik */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
 
           {/* Title Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
@@ -76,7 +76,7 @@ export default function PhotoAndDescription({
 
         {/* Description Section */}
         <div className="w-full">
-          <div className="bg-gradient-to-br from-slate-50 to-white rounded-[2.5rem] p-8 sm:p-10 shadow-sm border border-slate-100 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-8 sm:p-10 shadow-sm border border-gray-300 relative overflow-hidden">
             {/* Soft Decorative Glow */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl"></div>
             

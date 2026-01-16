@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAlert } from '@/components/ui/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useDusun } from '@/hooks/useDusun.hooks'; 
 
 const DUSUN_LIST = [
@@ -14,8 +15,8 @@ interface AddActionPendudukProps {
 }
 
 export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
-  const { showAlert } = useAlert();
   const { data: dusunList, updateDusunStats, isLoading } = useDusun();
+  const [alert, setAlert] = useState<{ type: 'error' | 'success'; title: string; message: string } | null>(null);
   const [pendudukForm, setPendudukForm] = useState({
     dusun: '',
     jumlahKK: '',
@@ -34,7 +35,7 @@ export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
     e.preventDefault();
     
     if (!pendudukForm.dusun) {
-      showAlert({
+      setAlert({
         type: 'error',
         title: 'Gagal Menyimpan',
         message: 'Pilih dusun terlebih dahulu'
@@ -43,6 +44,7 @@ export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
     }
 
     setIsSubmitting(true);
+    setAlert(null);
 
     try {
       const targetDusun = dusunList.find(
@@ -67,6 +69,12 @@ export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
       const success = await updateDusunStats(targetDusun.id, payload);
 
       if (success) {
+        setAlert({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data penduduk berhasil disimpan'
+        });
+        
         setPendudukForm({
           dusun: '',
           jumlahKK: '',
@@ -79,12 +87,14 @@ export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
           jumlahPendudukMiskin: ''
         });
         
-        if (onClose) onClose();
+        setTimeout(() => {
+          if (onClose) onClose();
+        }, 1500);
       }
 
     } catch (error) {
       console.error(error);
-      showAlert({
+      setAlert({
         type: 'error',
         title: 'Error',
         message: 'Terjadi kesalahan saat menyimpan data'
@@ -98,6 +108,18 @@ export default function AddActionPenduduk({ onClose }: AddActionPendudukProps) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <h3 className="text-lg font-semibold text-gray-800 mb-6">Input Data Statistik Penduduk</h3>
       
+      {alert && (
+        <Alert variant={alert.type === 'error' ? 'destructive' : 'default'} className="mb-6">
+          {alert.type === 'error' ? (
+            <AlertCircle className="h-4 w-4" />
+          ) : (
+            <CheckCircle2 className="h-4 w-4" />
+          )}
+          <AlertTitle>{alert.title}</AlertTitle>
+          <AlertDescription>{alert.message}</AlertDescription>
+        </Alert>
+      )}
+
       <form onSubmit={handlePendudukSubmit} className="space-y-6">
         {/* Pilih Dusun */}
         <div>

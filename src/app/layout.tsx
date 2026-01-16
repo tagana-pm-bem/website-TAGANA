@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google"; 
 import "../app/globals.css";
-import { AlertProvider } from "@/components/ui/Alert";
 import { LayoutProvider } from "@/components/layout/LayoutProvider";
 
 const inter = Inter({
@@ -23,11 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased overflow-x-hidden font-sans `}>
-        <AlertProvider>
           <LayoutProvider>
             {children}
           </LayoutProvider>
-        </AlertProvider>
       </body>
     </html>
   );

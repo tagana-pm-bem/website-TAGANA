@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   MapPin,
   Users,
@@ -8,16 +8,23 @@ import {
   CloudRain,
   RefreshCw,
   Info,
-  ChevronDown,
   Baby,
   Accessibility,
   User,
-  Check,
-  Search
 } from "lucide-react";
 
 import { dusunService, DusunDetailDB } from "@/services/dusunService";
 import { bencanaService, BencanaDB } from "@/services/bencanaService";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DEFAULT_LAT = -7.942;
 const DEFAULT_LNG = 110.395;
@@ -45,22 +52,9 @@ export default function Controls({
   const [bencanaList, setBencanaList] = useState<BencanaDB[]>([]);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  
-  // State untuk Custom Dropdown
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dusunService.getAllNames().then(setDusunList).catch(console.error);
-    
-    // Close dropdown when clicking outside
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -111,129 +105,122 @@ export default function Controls({
     }
   }, [dusunDetail]);
 
-  const selectedDusunName = dusunList.find(d => d.id === selectedDusunId)?.nama || "Semua Dusun";
-
   return (
-    <div className="flex flex-col gap-6 w-full max-w-sm lg:h-[calc(100vh-4rem)] p-6 bg-white shadow-2xl border-r border-slate-100 overflow-y-auto scrollbar-hide">
+    <div className="flex fixed flex-col gap-4 md:gap-6 w-full max-w-sm max-h-screen rounded-2xl p-4 md:p-6 bg-white shadow-2xl border-r border-slate-100 overflow-y-auto scrollbar-hide">
       
       {/* ================= HEADER ================= */}
       <div className="relative">
         <div className="flex justify-between items-center mb-1">
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Data Wilayah</h2>
-          <button
+          <h2 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight">Data Wilayah</h2>
+          <Button
             onClick={onOpenInfo}
-            className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 md:h-10 md:w-10"
           >
-            <Info size={20} />
-          </button>
+            <Info className="h-8 w-8 md:h-10 md:w-10" />
+          </Button>
         </div>
-        <p className="text-xs font-medium text-slate-400">Profil dusun & risiko bencana</p>
+        <p className="text-[11px] md:text-lg font-light text-slate-400">Profil dusun & risiko bencana</p>
       </div>
 
-      {/* ================= MODERN CUSTOM DROPDOWN ================= */}
-      <div className="space-y-2" ref={dropdownRef}>
+      {/* ================= SHADCN SELECT DROPDOWN ================= */}
+      <div className="space-y-2">
         <div className="flex justify-between items-center px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pilih Lokasi</h3>
+          <Badge variant="outline" className="text-[10px] font-bold border-gray-300 uppercase tracking-widest">
+            Pilih Lokasi
+          </Badge>
           {selectedDusunId && (
-            <button
+            <Button
               onClick={onReset}
-              className="text-[10px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+              variant="ghost"
+              size="sm"
+              className="h-6 text-[10px] font-bold gap-1"
             >
-              <RefreshCw size={10} /> RESET
-            </button>
+              <RefreshCw className="h-3 w-3" /> RESET
+            </Button>
           )}
         </div>
 
-        <div className="relative">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-300 ${
-              isOpen 
-              ? "border-blue-500 bg-white shadow-lg shadow-blue-500/10 ring-4 ring-blue-50" 
-              : "border-slate-100 bg-slate-50 hover:bg-slate-100 text-slate-700"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-1.5 rounded-lg ${selectedDusunId ? "bg-blue-500 text-white" : "bg-slate-200 text-slate-500"}`}>
-                <MapPin size={16} />
+        <Select
+          value={selectedDusunId?.toString() || "all"}
+          onValueChange={(value) => onDusunChange(value === "all" ? null : parseInt(value))}
+        >
+          <SelectTrigger className="w-full h-12 md:h-14 rounded-xl md:rounded-lg ">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className={`p-1 md:p-1.5 rounded-lg ${selectedDusunId ? "bg-blue-500 text-white" : "bg-slate-200 text-slate-500"}`}>
               </div>
-              <span className="text-sm font-semibold">{selectedDusunName}</span>
+              <SelectValue placeholder="Semua Dusun" />
             </div>
-            <ChevronDown size={18} className={`text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
-          </button>
-
-          {/* Dropdown Menu */}
-          {isOpen && (
-            <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 max-h-64 overflow-y-auto animate-in fade-in zoom-in duration-200">
-              <button
-                onClick={() => { onDusunChange(null); setIsOpen(false); }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium hover:bg-slate-50 transition-colors"
-              >
-                <span>Semua Dusun</span>
-                {!selectedDusunId && <Check size={16} className="text-blue-600" />}
-              </button>
-              <div className="h-px bg-slate-100 my-1 mx-2" />
-              {dusunList.map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => { onDusunChange(d.id); setIsOpen(false); }}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    selectedDusunId === d.id ? "bg-blue-50 text-blue-600" : "hover:bg-slate-50 text-slate-600"
-                  }`}
-                >
-                  <span>{d.nama}</span>
-                  {selectedDusunId === d.id && <Check size={16} />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Dusun</SelectItem>
+            {dusunList.map((d) => (
+              <SelectItem key={d.id} value={d.id.toString()}>
+                {d.nama}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* ================= INFO CARDS ================= */}
-      <div className="space-y-4 flex-1">
+      <div className="space-y-3 md:space-y-4 flex-1">
         {loadingDetail ? (
-          <div className="flex items-center gap-2 p-4 text-xs font-semibold text-slate-400 bg-slate-50 rounded-2xl animate-pulse">
-            <RefreshCw size={14} className="animate-spin" /> Mengsinkronkan data...
-          </div>
+          <Card>
+            <CardContent className="flex items-center gap-2 p-4">
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              <span className="text-xs font-semibold text-muted-foreground">Mengsinkronkan data...</span>
+            </CardContent>
+          </Card>
         ) : dusunDetail ? (
-          <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="grid grid-cols-2 gap-2 md:gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Stat Cards */}
             {[
-              { label: "Penduduk", val: `${dusunDetail.jumlah_penduduk} J`, icon: <Users size={14}/>, color: "text-blue-600", bg: "bg-blue-50" },
-              { label: "Keluarga", val: `${dusunDetail.jumlah_kk} KK`, icon: <User size={14}/>, color: "text-indigo-600", bg: "bg-indigo-50" },
-              { label: "Balita", val: `${dusunDetail.jumlah_balita}`, icon: <Baby size={14}/>, color: "text-amber-600", bg: "bg-amber-50" },
-              { label: "Disabilitas", val: `${dusunDetail.jumlah_disabilitas}`, icon: <Accessibility size={14}/>, color: "text-purple-600", bg: "bg-purple-50" },
+              { label: "Penduduk", val: `${dusunDetail.jumlah_penduduk} J`, icon: <Users className="h-3.5 w-3.5"/>, variant: "default" as const },
+              { label: "Keluarga", val: `${dusunDetail.jumlah_kk} KK`, icon: <User className="h-3.5 w-3.5"/>, variant: "secondary" as const },
+              { label: "Balita", val: `${dusunDetail.jumlah_balita}`, icon: <Baby className="h-3.5 w-3.5"/>, variant: "outline" as const },
+              { label: "Disabilitas", val: `${dusunDetail.jumlah_disabilitas}`, icon: <Accessibility className="h-3.5 w-3.5"/>, variant: "outline" as const },
             ].map((stat, i) => (
-              <div key={i} className="p-3 bg-white border border-slate-100 rounded-2xl">
-                <div className={`w-7 h-7 ${stat.bg} ${stat.color} rounded-lg flex items-center justify-center mb-2`}>
-                  {stat.icon}
-                </div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{stat.label}</p>
-                <p className="text-sm font-bold text-slate-900">{stat.val}</p>
-              </div>
+              <Card key={i}>
+                <CardContent className="p-2.5 md:p-3">
+                  <Badge variant={stat.variant} className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center mb-1.5 md:mb-2 p-0">
+                    {stat.icon}
+                  </Badge>
+                  <p className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{stat.label}</p>
+                  <p className="text-xs md:text-sm font-bold">{stat.val}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : null}
 
         {/* ================= BENCANA POTENSI ================= */}
         {bencanaList.length > 0 && (
-          <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1">Potensi Ancaman</h3>
+          <div className="space-y-2 md:space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest">
+              Potensi Ancaman
+            </Badge>
             {bencanaList.map((b) => (
-              <div key={b.id} className="group p-4 rounded-2xl bg-white border border-slate-100 hover:border-amber-200 transition-all">
-                <div className="flex gap-4">
-                  <div className={`mt-1 p-2 rounded-lg shrink-0 ${
-                    b.level_resiko === "high" ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"
-                  }`}>
-                    <AlertTriangle size={16} />
+              <Card key={b.id} className="hover:border-amber-200 transition-all">
+                <CardContent className="p-3 md:p-4">
+                  <div className="flex gap-3 md:gap-4">
+                    <div className={`mt-0.5 md:mt-1 p-2 md:p-2.5 rounded-lg shrink-0 ${
+                      b.level_resiko === "high" 
+                        ? "bg-red-50 text-red-500" 
+                        : b.level_resiko === "medium"
+                        ? "bg-orange-50 text-orange-500"
+                        : "bg-yellow-50 text-yellow-500"
+                    }`}>
+                      <AlertTriangle className="h-5 w-5 md:h-6 md:w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs md:text-sm font-bold mb-0.5 md:mb-1">{b.jenis_bencana}</p>
+                      <p className="text-[11px] md:text-xs text-muted-foreground leading-relaxed italic">"{b.deskripsi}"</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 mb-1">{b.jenis_bencana}</p>
-                    <p className="text-xs font-medium text-slate-500 leading-relaxed italic">"{b.deskripsi}"</p>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
@@ -241,19 +228,22 @@ export default function Controls({
 
       {/* ================= WEATHER WIDGET ================= */}
       {weather && (
-        <div className="mt-auto bg-[#044BB1] p-5 rounded-3xl text-white shadow-xl shadow-blue-900/20 relative overflow-hidden group">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-          <div className="relative z-10">
-            <div className="flex justify-between items-center mb-4">
-              <div className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm">Live Weather</div>
-              <CloudRain size={20} className="text-blue-200" />
+        <Card className="mt-auto bg-linear-to-br from-blue-500 via-blue-600 to-blue-700 border-0 text-white shadow-lg">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border-0">
+          Cuaca Terkini
+              </Badge>
+              <CloudRain className="h-4 w-4 md:h-5 md:w-5 text-blue-100/80" />
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold tracking-tighter">{weather.temperature}°C</span>
-              <span className="text-sm font-semibold opacity-80">{weather.condition}</span>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="flex items-baseline gap-3">
+              <span className="text-4xl md:text-5xl font-bold">{weather.temperature}°</span>
+              <span className="text-sm md:text-base font-medium text-blue-50">{weather.condition}</span>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

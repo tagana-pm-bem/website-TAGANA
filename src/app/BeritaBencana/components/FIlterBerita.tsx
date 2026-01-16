@@ -64,7 +64,7 @@ const FilterBerita = ({ onFilterChange }: FilterBeritaProps) => {
   };
 
   return (
-    <div ref={dropdownRef} className="w-full bg-white rounded-2xl shadow-[-1px_4px_21px_5px_rgba(17,12,46,0.15)] border border-gray-100 p-6">
+    <div ref={dropdownRef} className="w-full bg-white rounded-2xl  border border-gray-300 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-800">Filter Berita</h3>
         {(selectedKategori || selectedWaktu) && (

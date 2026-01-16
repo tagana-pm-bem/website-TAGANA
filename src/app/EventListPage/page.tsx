@@ -30,11 +30,6 @@ export default function EventListPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-100 via-white to-blue-50 w-full px-4 md:px-14 mx-auto">
-      <Header
-      title="Daftar Event Desa Sriharjo"
-      subtitle="Lihat informasi lengkap mengenai event yang akan datang di Desa Sriharjo."
-      onBack={() => router.back()}
-      />
 
       <div className="mx-auto w-full py-6">
       <MobileCalendar onSelectDate={setFilterDate} events={allEvents} />

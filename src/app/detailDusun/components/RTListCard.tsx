@@ -15,7 +15,7 @@ interface Props {
 
 export default function RTListCard({ dusunName, rtData }: Props) {
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-[0px_4px_17px_4px_rgba(50,50,93,0.25)] mt-6 ">
+    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-md mt-6 border border-gray-300">
       <h3 className="font-bold text-gray-800 mb-4 sm:mb-6 flex items-center text-base sm:text-lg lg:text-xl">
       <div className="bg-gradient-to-br from-[#044BB1] to-[#0566d6] rounded-lg p-1.5 sm:p-2 mr-2 sm:mr-3">
         <svg
