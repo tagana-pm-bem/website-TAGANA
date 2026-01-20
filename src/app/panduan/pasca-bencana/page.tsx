@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { Waves, Activity, Mountain, Flame, AlertCircle } from "lucide-react";

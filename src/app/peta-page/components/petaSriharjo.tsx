@@ -97,6 +97,7 @@ export default function PetaSriharjo({
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const markerRefs = useRef<Record<number, L.Marker>>({});
+  const [isMounted, setIsMounted] = useState(false);
 
   // State Data Dusun dari DB
   const [dusunList, setDusunList] = useState<DusunDetailDB[]>([]);
@@ -105,6 +106,11 @@ export default function PetaSriharjo({
   const [showRTBoundaries, setShowRTBoundaries] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [showLegend, setShowLegend] = useState(false); 
+
+  // Ensure component is mounted client-side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Load Data
   useEffect(() => {
@@ -149,7 +155,7 @@ export default function PetaSriharjo({
     setResetTrigger((prev) => prev + 1); // Trigger MapController useEffect
   };
 
-  if (loading) {
+  if (!isMounted || loading) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-gray-100">
         Memuat Peta...

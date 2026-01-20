@@ -7,7 +7,7 @@ export default function PanduanPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/panduan/prabencana");
+    router.replace("/panduan/prabencana");
   }, [router]);
 
   return null;
