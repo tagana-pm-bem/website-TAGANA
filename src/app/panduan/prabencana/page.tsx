@@ -1,4 +1,5 @@
-import PanduanCard from "../components/PanduanCard";
+
+import PanduanCard from "../components/ui/PanduanCard";
 import { Waves, Zap, Mountain, Flame } from "lucide-react";
 
 export default function Prabencana() {

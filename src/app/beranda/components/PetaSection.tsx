@@ -30,10 +30,16 @@ export default function PetaSection() {
   const [bencanaList, setBencanaList] = useState<BencanaDB[]>([]);
   const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [mapKey, setMapKey] = useState(0);
 
   // Mencegah error Hydration & memastikan Client-Side rendering
   useEffect(() => {
-    setIsMounted(true);
+    // Delay mounting to ensure DOM is fully ready
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+      setMapKey(Date.now());
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -71,7 +77,7 @@ export default function PetaSection() {
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Peta Kebencanaan</h2>
-            <p className="text-slate-500 text-lg font-medium leading-relaxed">
+            <p className="text-slate-500 text-lg font-lg leading-relaxed">
               Pantau visualisasi wilayah rawan dan data demografi real-time untuk penguatan mitigasi berbasis komunitas.
             </p>
           </div>
@@ -86,11 +92,13 @@ export default function PetaSection() {
               animate={{ opacity: 1, scale: 1 }}
               className="w-full h-162.5 bg-slate-100 rounded-b-md overflow-hidden shadow-2xl shadow-slate-200 border border-slate-100 relative"
             >
-              <PetaSriharjo 
-                selectedDusunId={selectedDusunId} 
-                onDusunSelect={setSelectedDusunId} 
-              />
-
+              {isMounted && (
+                <PetaSriharjo 
+                  key={mapKey}
+                  selectedDusunId={selectedDusunId} 
+                  onDusunSelect={setSelectedDusunId} 
+                />
+              )}
             </motion.div>
           </div>
 
@@ -165,11 +173,11 @@ export default function PetaSection() {
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="flex flex-col items-center justify-center h-full text-center p-6"
                   >
-                    <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-300 shadow-inner">
+                    <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-400 shadow-inner">
                       <MapPin size={40} />
                     </div>
                     <h3 className="text-xl font-bold text-slate-800 mb-2 tracking-tight">Pilih Titik Wilayah</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                    <p className="text-sm text-slate-400 leading-relaxed font-lg">
                       Silakan pilih salah satu dusun pada peta untuk melihat profil risiko dan data kependudukan.
                     </p>
                   </motion.div>
