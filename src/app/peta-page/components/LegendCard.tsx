@@ -1,103 +1,96 @@
 "use client";
 
-import React from "react";
+import { motion } from "framer-motion";
 
 export default function LegendCard() {
   const legends = [
     {
-      icon: (
-        <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-        </svg>
-      ),
-      title: "Marker Lokasi Dusun",
-      description: "Penanda lokasi di peta",
-      accentColor: "border-blue-600 bg-blue-50",
-    },
-
-      {
-      icon: (
-        <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-        </svg>
-      ),
-      title: "Titik pantau Banjir",
+      icon: <div className="w-5 h-5 rounded-md bg-orange-500 shadow-sm" />, // Ukuran ikon 6->5
+      title: "Titik Pantau Banjir",
       description: "Lokasi pengamatan banjir",
-      accentColor: "border-orange-600 bg-orange-50",
     },
-   
     {
-      icon: <div className="w-6 h-6 bg-red-500 rounded opacity-70"></div>,
+      icon: <div className="w-5 h-5 rounded-full bg-sky-500" />,
+      title: "Penanda Lokasi Dusun",
+      description: "Titik pusat atau kantor dusun",
+    },
+    {
+      icon: <div className="w-5 h-5 rounded-md bg-red-400 shadow-sm" />,
       title: "Zona Banjir",
       description: "Area rawan banjir",
-      accentColor: "border-red-500 bg-red-100",
     },
     {
-      icon: <div className="w-8 h-0 border-t-4 border-dashed border-gray-50"></div>,
-      title: "Batas Dusun",
-      description: "Garis batas wilayah dusun",
-      accentColor: "border-gray-700 bg-gray-400",
-    },
-    {
-      icon: <div className="w-8 h-1 bg-gray-50"></div>,
+      icon: <div className="w-5 h-5 rounded border-2 border-slate-500 bg-transparent" />,
       title: "Batas RT",
-      description: "Garis batas Rukun Tetangga",
-      accentColor: "border-gray-700 bg-gray-400",
+      description: "Garis batas wilayah dusun",
     },
     {
-      icon: <div className="w-8 h-1 bg-yellow-500"></div>,
+      icon: (
+        <div className="relative w-5 h-5">
+          <div className="absolute inset-0 border-x-2 border-y-2 border-dashed border-slate-400 rounded-sm" />
+          <div className="absolute inset-y-1 inset-x-0 bg-white" />
+        </div>
+      ),
+      title: "Batas Dusun",
+      description: "Garis batas Rukun Tetangga",
+    },
+    {
+      icon: <div className="w-7 h-1 bg-yellow-400 rounded-full" />,
       title: "Jalan",
       description: "Jalur jalan utama",
-      accentColor: "border-yellow-500 bg-yellow-50",
     },
-
-   
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 border border-gray-200">
-      {/* Header */}
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-        <svg
-          className="w-6 h-6 text-blue-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-          />
-        </svg>
-        <span>Legenda Peta</span>
-      </h1>
+    <motion.div 
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={containerVariants}
+      className="w-full max-w-[320px] bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-50"
+    >
+      <motion.div variants={itemVariants} className="mb-6">
+        <h2 className="text-xl font-bold text-slate-900 leading-tight mb-3 tracking-tight">
+          Legenda Peta
+        </h2>
+        <p className="text-xs leading-relaxed text-slate-400 font-medium">
+          Simbol untuk menandai area rawan, batas wilayah, dan jalan.
+        </p>
+      </motion.div>
 
-      {/* Legend Items */}
-      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-        {legends.map((legend, index) => (
-          <div
-            key={index}
-            className={`relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border-l-4 ${legend.accentColor} shadow-md hover:shadow-lg transition-all duration-200`}
+      <div className="space-y-5">
+        {legends.map((item, index) => (
+          <motion.div 
+            key={index} 
+            variants={itemVariants}
+            whileHover={{ x: 5 }}
+            className="flex items-start gap-4 group cursor-default"
           >
-            {/* Icon Container */}
-            <div className="flex items-center justify-center w-8 h-8 flex-shrink-0">
-              {legend.icon}
+            <div className="flex items-center justify-center w-6 h-6 shrink-0">
+              {item.icon}
             </div>
 
-            {/* Text Content */}
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm sm:text-base text-gray-800 leading-tight">
-                {legend.title}
+            <div className="flex flex-col">
+              <p className="text-sm font-bold text-[#006341] tracking-tight group-hover:text-blue-600 transition-colors">
+                {item.title}
               </p>
-              <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
-                {legend.description}
+              <p className="text-[11px] font-medium text-slate-400 leading-tight">
+                {item.description}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

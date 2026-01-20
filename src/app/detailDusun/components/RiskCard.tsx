@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Waves,
   Mountain,
@@ -32,8 +31,7 @@ export default function RiskCard({
   riskLevel,
   dusunName,
   disasters,
-  population, // 3. Ambil population di sini
-  preparednessMessage = "Selalu waspada dan ikuti arahan petugas desa jika terjadi keadaan darurat.",
+  population,
 }: Props) {
   const riskColors: Record<string, any> = {
     low: {
@@ -75,7 +73,7 @@ export default function RiskCard({
         : severity === "medium"
         ? "text-yellow-600"
         : "text-blue-600";
-    const className = `w-5 h-5 ${colorClass} flex-shrink-0 mt-0.5`;
+    const className = `w-5 h-5 ${colorClass} shrink-0 mt-0.5`;
 
     switch (iconKey?.toLowerCase()) {
       case "flood":
@@ -110,7 +108,7 @@ export default function RiskCard({
 
   return (
     <div
-      className={`${risk.bg} rounded-2xl p-6 border-l-4 border-amber-600 shadow-xl mb-6`}
+      className={`${risk.bg} rounded-2xl p-6 border border-gray-300 shadow-md mb-6`}
     >
       {/* Header Label */}
       <div className="flex items-center justify-between mb-4">
@@ -122,7 +120,7 @@ export default function RiskCard({
         </div>
 
         {/* 4. Tampilan Total Penduduk (Terdampak) */}
-        <div className="flex items-center space-x-2 bg-white/60 px-3 py-2 rounded-lg border  border-white/50 shadow-[0px_4px_17px_4px_rgba(50,_50,_93,_0.25)]">
+        <div className="flex items-center space-x-2 bg-white/60 px-3 py-2 rounded-lg border  border-gray-300 shadow-md">
           <Users className="w-5 h-5 text-gray-600" />
           <div className="flex flex-col">
             <span className="text-xs text-gray-500 font-medium uppercase">
@@ -135,7 +133,7 @@ export default function RiskCard({
         </div>
       </div>
 
-      <div className="space-y-3 bg-white/60 px-3 py-2 rounded-lg border border-white/50 shadow-[0px_4px_17px_4px_rgba(50,_50,_93,_0.25)]">
+      <div className="space-y-3 bg-white/60 px-3 py-2 rounded-lg border border-gray-300 shadow-md">
         <p className="text-xs font-bold text-gray-500 uppercase">
           Potensi Bencana di {dusunName}
         </p>

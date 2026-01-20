@@ -22,7 +22,7 @@ interface Props {
 
 export default function MapArea({ selectedDusunId, onDusunSelect }: Props) {
   return (
-    <div style={{ height: "600px", width: "100%" }}>
+    <div style={{ height: "100vh", width: "100%" }}>
       <PetaSriharjo selectedDusunId={selectedDusunId} onDusunSelect={onDusunSelect} />
     </div>
   );

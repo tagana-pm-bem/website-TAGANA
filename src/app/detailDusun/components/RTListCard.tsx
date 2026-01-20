@@ -15,7 +15,7 @@ interface Props {
 
 export default function RTListCard({ dusunName, rtData }: Props) {
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl">
+    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-md mt-6 border border-gray-300">
       <h3 className="font-bold text-gray-800 mb-4 sm:mb-6 flex items-center text-base sm:text-lg lg:text-xl">
       <div className="bg-gradient-to-br from-[#044BB1] to-[#0566d6] rounded-lg p-1.5 sm:p-2 mr-2 sm:mr-3">
         <svg
@@ -41,7 +41,7 @@ export default function RTListCard({ dusunName, rtData }: Props) {
       </h3>
 
       {rtData && rtData.length > 0 ? (
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-3 sm:gap-4">
         {rtData.map((rt: RTData, index: number) => (
         <div
           key={index}

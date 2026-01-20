@@ -1,240 +1,188 @@
 'use client';
 
 import { useState } from "react";
-import { ShieldAlert, Edit3 } from "lucide-react";
+import { ShieldAlert, Edit3, Save, Loader2, Info, Map } from "lucide-react";
 import { useDusun } from "@/hooks/useDusun.hooks"; 
 import { bencanaService } from "@/services/bencanaService";
 import { dusunService } from "@/services/dusunService";
-import Dropdown from "./dropdown";
-import { showDraggableSuccess, showDraggableError } from "@/app/admin/ui/SweetAllert2";
 
+// SHADCN UI
+import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { toast } from "sonner";
 
-export default function ManajemenRisiko() {
+interface ManajemenRisikoProps {
+  onSuccess?: () => void;
+}
+
+export default function ManajemenRisiko({ onSuccess }: ManajemenRisikoProps) {
   const { data: dusunList } = useDusun(); 
+  
+  // State Input Risiko
   const [selectedDusunId, setSelectedDusunId] = useState("");
-  const [bencana, setBencana] = useState("Pilih jenis bencana");
-  const [risiko, setRisiko] = useState("Tingkat dampak");
+  const [bencana, setBencana] = useState("");
+  const [risiko, setRisiko] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedDusunForEdit, setSelectedDusunForEdit] = useState("");
-  const [deskripsiDusun, setDeskripsiDusun] = useState("");
-  const [isUpdatingDeskripsi, setIsUpdatingDeskripsi] = useState(false);
 
-  const [openBencana, setOpenBencana] = useState(false);
-  const [openRisiko, setOpenRisiko] = useState(false);
+
 
   const bencanaOptions = [
-    { label: "Banjir", color: "text-blue-500", iconVal: "flood" },
-    { label: "Tanah Longsor", color: "text-amber-700", iconVal: "landslide" },
-    { label: "Gempa Bumi", color: "text-red-500", iconVal: "earthquake" },
-    { label: "Angin Puting Beliung", color: "text-gray-500", iconVal: "wind" },
-    { label: "Kekeringan", color: "text-orange-500", iconVal: "drought" },
-    { label: "Kebakaran", color: "text-red-600", iconVal: "fire" },
-  ];
-
-  const risikoOptions = [
-    { label: "Rendah", color: "text-green-500" }, 
-    { label: "Sedang", color: "text-yellow-500" }, 
-    { label: "Tinggi", color: "text-red-500" }, 
+    { label: "Banjir", iconVal: "flood" },
+    { label: "Tanah Longsor", iconVal: "landslide" },
+    { label: "Kekeringan", iconVal: "drought" },
+    { label: "Kebakaran", iconVal: "fire" },
   ];
 
   const handleSimpan = async () => {
-    if (!selectedDusunId || bencana === "Pilih jenis bencana" || risiko === "Tingkat dampak") {
-      showDraggableError("Data Tidak Lengkap", "Mohon lengkapi semua data (Dusun, Bencana, Risiko)");
+    if (!selectedDusunId || !bencana || !risiko) {
+      toast.error("Data Tidak Lengkap", { description: "Mohon lengkapi seluruh data wajib." });
       return;
     }
 
     setIsSubmitting(true);
+    const toastId = toast.loading("Menyimpan data...");
+    
     try {
       const severityMap: {[key: string]: string} = { "Rendah": "low", "Sedang": "medium", "Tinggi": "high" };
-      
       const selectedBencanaOption = bencanaOptions.find(b => b.label === bencana);
-      const iconOtomatis = selectedBencanaOption?.iconVal || "alert";
 
       const payload = {
         dusun_id: Number(selectedDusunId),
         jenis_bencana: bencana,
         level_resiko: (severityMap[risiko] || "medium") as "low" | "medium" | "high",
         deskripsi: deskripsi || `Potensi ${bencana} di wilayah ini`,
-        icon: iconOtomatis 
+        icon: selectedBencanaOption?.iconVal || "alert"
       };
 
       await bencanaService.create(payload);
-
-      await showDraggableSuccess("Berhasil Menambahkan Data!");
+      toast.success("Data Berhasil Ditambahkan", { id: toastId });
       
-      setBencana("Pilih jenis bencana");
-      setRisiko("Tingkat dampak");
+      setBencana("");
+      setRisiko("");
       setDeskripsi("");
       setSelectedDusunId("");
-      
-      window.location.reload(); 
 
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error(error);
-      showDraggableError("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data ke server.");
+      toast.error("Gagal Menyimpan Data", { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleUpdateDeskripsiDusun = async () => {
-    if (!selectedDusunForEdit) {
-      showDraggableError("Pilih Dusun", "Silakan pilih dusun terlebih dahulu.");
-      return;
-    }
-
-    if (!deskripsiDusun.trim()) {
-      showDraggableError("Deskripsi Kosong", "Deskripsi tidak boleh kosong.");
-      return;
-    }
-
-    setIsUpdatingDeskripsi(true);
-    
-    try {
-      const selectedDusun = dusunList?.find(d => d.id === Number(selectedDusunForEdit));
-      
-      if (!selectedDusun) {
-        throw new Error("Dusun tidak ditemukan");
-      }
-
-      await dusunService.updateStats(Number(selectedDusunForEdit), {
-        deskripsi: deskripsiDusun
-      });
-
-      await showDraggableSuccess("Deskripsi Berhasil Diperbarui!");
-      setSelectedDusunForEdit("");
-      setDeskripsiDusun("");
-      
-      window.location.reload();
-
-    } catch (error) {
-      console.error(error);
-      showDraggableError("Gagal Update", "Terjadi kesalahan saat memperbarui deskripsi.");
-    } finally {
-      setIsUpdatingDeskripsi(false);
-    }
-  };
-
-  
-  const handleDusunChangeForEdit = (dusunId: string) => {
-    setSelectedDusunForEdit(dusunId);
-    const selectedDusun = dusunList?.find(d => d.id === Number(dusunId));
-    setDeskripsiDusun(selectedDusun?.deskripsi || "");
-  };
+ 
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          <ShieldAlert className="w-5 h-5 text-blue-500" />
-          Input Manajemen Risiko
-        </h2>
-        
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-600">Pilih Dusun</label>
-          <select 
-            value={selectedDusunId}
-            onChange={(e) => setSelectedDusunId(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-          >
-            <option value="">-- Pilih Dusun Target --</option>
-            {(dusunList || []).map(d => (
-              <option key={d.id} value={d.id}>{d.nama}</option>
-            ))}
-          </select>
+    <Card className="rounded-[2rem] overflow-hidden bg-white">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-[#044BB1]">
+            <ShieldAlert size={24} />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-medium tracking-tight text-slate-900">Manajemen Risiko & Wilayah</CardTitle>
+            <CardDescription className="font-medium text-slate-500">Pencatatan potensi bencana dan pembaruan informasi profil wilayah desa.</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-8 space-y-12">
+        {/* SECTION 1: INPUT POTENSI BENCANA */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 border-l-4 border-blue-500 pl-4 py-1">
+            <h3 className="text-xs font-medium uppercase tracking-widest text-slate-500">Pencatatan Risiko Baru</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-2.5">
+              <Label className="font-medium text-slate-700 flex items-center gap-2">
+                <Map size={14} className="text-slate-400" /> Dusun Target
+              </Label>
+              <Select value={selectedDusunId} onValueChange={setSelectedDusunId}>
+                <SelectTrigger className="rounded-xl border-slate-200 h-11 focus:ring-blue-100">
+                  <SelectValue placeholder="Pilih Dusun" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {(dusunList || []).map(d => (
+                    <SelectItem key={d.id} value={d.id.toString()} className="font-medium">{d.nama}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2.5">
+              <Label className="font-medium text-slate-700 flex items-center gap-2">
+                <ShieldAlert size={14} className="text-slate-400" /> Jenis Bencana
+              </Label>
+              <Select value={bencana} onValueChange={setBencana}>
+                <SelectTrigger className="rounded-xl border-slate-200 h-11 focus:ring-blue-100">
+                  <SelectValue placeholder="Pilih Bencana" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {bencanaOptions.map(opt => (
+                    <SelectItem key={opt.label} value={opt.label} className="font-medium">{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2.5">
+              <Label className="font-medium text-slate-700 flex items-center gap-2">
+                <Info size={14} className="text-slate-400" /> Tingkat Risiko
+              </Label>
+              <Select value={risiko} onValueChange={setRisiko}>
+                <SelectTrigger className="rounded-xl border-slate-200 h-11 focus:ring-blue-100">
+                  <SelectValue placeholder="Tingkat Dampak" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="Rendah" className="font-medium text-emerald-600">Rendah</SelectItem>
+                  <SelectItem value="Sedang" className="font-medium text-amber-600">Sedang</SelectItem>
+                  <SelectItem value="Tinggi" className="font-medium text-rose-600">Tinggi</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
+            <Label className="font-medium text-slate-700">Keterangan Tambahan</Label>
+            <Textarea 
+              value={deskripsi}
+              onChange={(e) => setDeskripsi(e.target.value)}
+              placeholder="Jelaskan detail potensi ancaman di wilayah ini secara singkat..." 
+              className="rounded-xl border-slate-200 resize-none p-4 focus:ring-blue-100 min-h-[100px]"
+            />
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button 
+              onClick={handleSimpan}
+              disabled={isSubmitting}
+              className="bg-[#044BB1] hover:bg-blue-700 text-white px-8 py-6 rounded-2xl font-medium shadow-lg shadow-blue-900/10 gap-2 active:scale-95 transition-all"
+            >
+              {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              Simpan Data Risiko
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Dropdown
-            label="Jenis Bencana"
-            value={bencana}
-            open={openBencana}
-            setOpen={setOpenBencana}
-            setValue={setBencana}
-            options={bencanaOptions}
-            icon={ShieldAlert}
-          />
-
-          <Dropdown
-            label="Tingkat Risiko"
-            value={risiko}
-            open={openRisiko}
-            setOpen={setOpenRisiko}
-            setValue={setRisiko}
-            options={risikoOptions}
-            icon={ShieldAlert}
-          />
+        <div className="relative py-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-100"></span>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2 w-full">
-          <label className="text-sm font-medium text-gray-600">Keterangan Tambahan</label>
-          <textarea
-            value={deskripsi}
-            onChange={(e) => setDeskripsi(e.target.value)}
-            placeholder="Masukkan keterangan detail potensi bencana..."
-            className="w-full px-4 py-3 rounded-xl shadow-sm border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-            rows={3}
-          />
-        </div>
-
-        <div className="border-b w-full mt-2 border-gray-200" />
-
-        <div className="flex justify-end">
-          <button 
-            onClick={handleSimpan}
-            disabled={isSubmitting}
-            className="flex flex-row gap-3 rounded-xl cursor-pointer bg-blue-500 hover:bg-blue-600 duration-300 transition-all text-white font-semibold py-3 px-6 shadow-md shadow-blue-200 disabled:bg-gray-400"
-          >
-            {isSubmitting ? "Menyimpan..." : "Simpan Data Risiko"}
-          </button>
-        </div>
-      </div>
-{/* 
-      <div className="flex flex-col gap-4 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          <Edit3 className="w-5 h-5 text-green-500" />
-          Edit Deskripsi Dusun
-        </h2>
-        
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-600">Pilih Dusun</label>
-          <select 
-            value={selectedDusunForEdit}
-            onChange={(e) => handleDusunChangeForEdit(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
-          >
-            <option value="">-- Pilih Dusun untuk Edit --</option>
-            {(dusunList || []).map(d => (
-              <option key={d.id} value={d.id}>{d.nama}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-2 w-full">
-          <label className="text-sm font-medium text-gray-600">Deskripsi Dusun</label>
-          <textarea
-            value={deskripsiDusun}
-            onChange={(e) => setDeskripsiDusun(e.target.value)}
-            placeholder="Masukkan deskripsi dusun..."
-            className="w-full px-4 py-3 rounded-xl shadow-sm border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-green-400"
-            rows={4}
-            disabled={!selectedDusunForEdit}
-          />
-        </div>
-
-        <div className="border-b w-full mt-2 border-gray-200" />
-
-        <div className="flex justify-end">
-          <button 
-            onClick={handleUpdateDeskripsiDusun}
-            // disabled={isUpdatingDeskripsi || !selectedDusunForEdit}
-            className="flex flex-row gap-3 rounded-xl cursor-pointer bg-green-500 hover:bg-green-600 duration-300 transition-all text-white font-semibold py-3 px-6 shadow-md shadow-green-200 disabled:bg-gray-400"
-          >
-            {isUpdatingDeskripsi ? "Menyimpan..." : "Update Deskripsi"}
-          </button>
-        </div>
-      </div> */}
-    </div>
+      
+      </CardContent>
+    </Card>
   );
 }

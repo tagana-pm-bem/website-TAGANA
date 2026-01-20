@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { beritaService, BeritaAcaraDB } from "@/services/beritaService";
-import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Calendar, ArrowRight } from "lucide-react";
+
+// SHADCN UI
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface BeritaWithCategory extends BeritaAcaraDB {
   kategori_berita?: {
@@ -32,7 +37,6 @@ export default function BeritaTerkini({ refreshTrigger = 0 }: BeritaTerkiniProps
       try {
         const data = await beritaService.getAll();
         setListBerita(data as unknown as BeritaWithCategory[]);
-        
         setCurrentPage(1); 
       } catch (error) {
         console.error("Gagal load berita terkini:", error);
@@ -70,93 +74,108 @@ export default function BeritaTerkini({ refreshTrigger = 0 }: BeritaTerkiniProps
     return htmlContent.replace(/<[^>]+>/g, ''); 
   };
 
-
   return (
-    <div className="h-full w-full flex flex-col gap-4 rounded-lg">
-      <div className="flex justify-between items-center border-b pb-2 border-gray-3000">
-        <h1 className="text-sm font-semibold text-gray-800">Berita Terkini</h1>
-        <button 
+    <div className="w-full flex flex-col gap-5">
+      {/* HEADER SECTION */}
+      <div className="flex justify-between items-center px-6 pt-2">
+        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Berita Terkini</h2>
+        <Button 
+          variant="ghost" 
+          size="sm" 
           onClick={() => router.push("/admin/berita")} 
-          className="text-blue-600 text-xs font-medium cursor-pointer hover:underline"
+          className="text-[#044BB1] text-xs font-medium hover:bg-blue-50 transition-colors gap-1"
         >
-          Lihat Semua
-        </button>
+          Lihat Semua <ArrowRight size={12} />
+        </Button>
       </div>
 
-      {isLoading ? (
-        <div className="flex w-full justify-center py-6">
-          <Loader2 className="animate-spin text-gray-400" size={20} />
-        </div>
-      ) : listBerita.length === 0 ? (
-        <div className="text-center py-4 text-xs text-gray-400 italic">
-          Belum ada berita.
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-col gap-6 min-h-[300px]">
+      <div className="px-4 pb-4">
+        {isLoading ? (
+          <div className="flex w-full items-center justify-center py-20 flex-col gap-3">
+            <Loader2 className="animate-spin text-[#044BB1]" size={24} />
+            <span className="text-xs font-medium text-slate-400">Menyinkronkan histori...</span>
+          </div>
+        ) : listBerita.length === 0 ? (
+          <div className="text-center py-12 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+            <p className="text-xs font-medium text-slate-400 italic">Belum ada berita yang diterbitkan.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
             {currentData.map((berita) => (
-                <div
+              <Card 
                 key={berita.id}
                 onClick={() => router.push(`/admin/beritaTerkini/detail?id=${berita.id}`)}
-                className="flex gap-4 p-3 bg-white rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition cursor-pointer group items-center shadow-sm"
-                >
-                <div className="relative w-20 h-20 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
-                  <Image
-                  src={berita.file_url || "https://picsum.photos/600/400"}
-                  alt={berita.judul}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
+                className="group border-slate-100 shadow-none hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer overflow-hidden rounded-2xl"
+              >
+                <CardContent className="p-3">
+                  <div className="flex gap-4 items-center">
+                    {/* Image Container */}
+                    <div className="relative w-16 h-16 flex-shrink-0 bg-slate-100 rounded-xl overflow-hidden border border-slate-50">
+                      <Image
+                        src={berita.file_url || "https://picsum.photos/200/200"}
+                        alt={berita.judul}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
 
-                <div className="flex flex-col justify-between w-full min-w-0">
-                  <div>
-                  <h1 className="text-base font-semibold text-gray-800 truncate group-hover:text-blue-700 transition-colors">
-                    {berita.judul}
-                  </h1>
-                  <p className="text-xs text-gray-600 line-clamp-2 mt-1">
-                    {cleanHtml(berita.isi_berita)}
-                  </p>
+                    {/* Content Container */}
+                    <div className="flex flex-col min-w-0 flex-1 gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        {berita.kategori_berita && (
+                          <Badge variant="secondary" className="bg-blue-50 text-[#044BB1] text-[10px] font-medium border-none px-2 py-0">
+                            {berita.kategori_berita.nama}
+                          </Badge>
+                        )}
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
+                          <Calendar size={10} />
+                          {formatDate(berita.created_at || berita.tanggal)}
+                        </div>
+                      </div>
+
+                      <h3 className="text-sm font-medium text-slate-800 truncate group-hover:text-[#044BB1] transition-colors leading-snug">
+                        {berita.judul}
+                      </h3>
+                      
+                      <p className="text-[11px] text-slate-500 line-clamp-1 font-normal opacity-80">
+                        {cleanHtml(berita.isi_berita)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between mt-2">
-                  <span className="text-[11px] text-gray-400">
-                    {formatDate(berita.created_at || berita.tanggal)}
-                  </span>
-                  {berita.kategori_berita && (
-                    <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[11px] font-medium border border-blue-100">
-                    {berita.kategori_berita.nama}
-                    </span>
-                  )}
-                  </div>
-                </div>
-                </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
+        )}
+      </div>
 
-          {listBerita.length > ITEMS_PER_PAGE && (
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <span className="text-xs text-gray-400">
-                Hal {currentPage} dari {totalPages}
-              </span>
-              <div className="flex gap-1">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentPage === 1}
-                  className="cursor-pointer p-1 rounded-md hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-gray-600"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={currentPage === totalPages}
-                  className="cursor-pointer p-1 rounded-md hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-gray-600"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          )}
-        </>
+      {/* PAGINATION SECTION */}
+      {!isLoading && listBerita.length > ITEMS_PER_PAGE && (
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-50/50 border-t border-slate-100 rounded-b-[1.5rem]">
+          <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">
+            Halaman {currentPage} dari {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePrev}
+              disabled={currentPage === 1}
+              className="h-8 w-8 rounded-lg border-slate-200 disabled:opacity-30 transition-all active:scale-90"
+            >
+              <ChevronLeft size={14} className="text-slate-600" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 rounded-lg border-slate-200 disabled:opacity-30 transition-all active:scale-90"
+            >
+              <ChevronRight size={14} className="text-slate-600" />
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

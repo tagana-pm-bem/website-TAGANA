@@ -93,7 +93,7 @@ export function EventList({ filterDate }: EventListProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-4 mt-4 mb-6 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-4 mt-4 mb-6  mx-auto">
         {filteredEvents.map((event) => (
           <EventCard
             key={event.id}

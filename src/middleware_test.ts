@@ -8,7 +8,6 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Skip middleware if Supabase credentials are not configured
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY

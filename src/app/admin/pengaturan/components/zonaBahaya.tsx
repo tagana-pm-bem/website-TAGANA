@@ -1,37 +1,50 @@
-import Card from "@/components/ui/card";
-import { AlertTriangle } from "lucide-react";
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { AlertTriangle, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ZonaBahaya() {
-  return (
-    <Card className="border border-red-300 bg-red-300">
-      <div className="flex items-center justify-between gap-6">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="text-red-600 mt-0.5" size={20} />
-          <div className="flex flex-col gap-1">
-            <h1 className="text-sm font-semibold text-red-700">
-              Zona Berbahaya
-            </h1>
-            <p className="text-xs text-red-600">
-              Tindakan ini tidak dapat dibatalkan. Harap berhati-hati.
-            </p>
-          </div>
-        </div>
+  const handleReset = () => {
+    toast.error("Tindakan Dibatalkan", {
+      description: "Anda memerlukan otorisasi super-admin untuk mereset sistem."
+    });
+  };
 
-        <button
-          className="
-            px-4 py-2
-            rounded-lg
-            text-sm font-semibold
-            text-red-700
-            border border-red-400
-            bg-white
-            hover:bg-red-600 hover:text-white
-            transition cursor-pointer
-          "
-        >
-          Reset Sistem ke Awal
-        </button>
-      </div>
+  return (
+    <Card className="border-rose-100 bg-rose-50/30 rounded-[1.5rem] overflow-hidden">
+      <CardContent className="p-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-rose-100 rounded-2xl text-rose-600 shadow-sm border border-rose-200">
+              <AlertTriangle size={24} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-lg font-bold text-rose-900 tracking-tight">
+                  Zona Berbahaya
+                </h1>
+                <Badge className="bg-rose-500 text-white border-none text-[10px] font-bold px-2 py-0">KRITIS</Badge>
+              </div>
+              <p className="text-sm font-medium text-rose-700/70 max-w-lg leading-relaxed">
+                Tindakan di bawah ini bersifat destruktif dan tidak dapat dibatalkan. 
+                Data yang telah dihapus atau sistem yang direset akan hilang selamanya.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="px-8 py-6 rounded-2xl font-bold text-rose-700 border-rose-200 bg-white hover:bg-rose-600 hover:text-white hover:border-rose-600 shadow-sm transition-all active:scale-95 gap-2"
+          >
+            <RotateCcw size={18} />
+            Reset Sistem ke Awal
+          </Button>
+        </div>
+      </CardContent>
     </Card>
   );
 }

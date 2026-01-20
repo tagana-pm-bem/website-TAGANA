@@ -71,7 +71,7 @@ function DetailDusunContent() {
 
   if (error || !dusun) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="mb-4">
             <svg
@@ -130,63 +130,77 @@ function DetailDusunContent() {
   })) || [];
 
   return (
-    <main className="w-full min-h-screen bg-white">
-      <Header dusunName={dusun.nama} population={dusun.jumlah_penduduk} />
+   <main className="w-full min-h-screen bg-gray-50 pb-20">
+  {/* Bagian Atas: Full Width Content */}
+  <Header dusunName={dusun.nama} population={dusun.jumlah_penduduk} />
 
-      <PhotoAndDescription
-        dusunName={dusun.nama}
-        description={dusun.deskripsi}
-        imageUrl={dusun.gambar_url || "/placeholder-image.jpg"}
-        imageAlt={`Foto Dusun ${dusun.nama}`}
-        population={dusun.jumlah_penduduk}
-      />
+  <PhotoAndDescription
+    dusunName={dusun.nama}
+    description={dusun.deskripsi}
+    imageUrl={dusun.gambar_url || "/placeholder-image.jpg"}
+    imageAlt={`Foto Dusun ${dusun.nama}`}
+    population={dusun.jumlah_penduduk}
+  />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <RiskCard
-              riskLevel={dusun.level_resiko}
-              dusunName={dusun.nama}
-              disasters={mappedDisasters}
-              population={dusun.jumlah_penduduk}
-              preparednessMessage={getPreparednessMessage(dusun.level_resiko)}
-            />
+  {/* Bagian Utama: Grid System */}
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-9 relative z-20">
+    {/* Menggunakan grid 12 kolom untuk kontrol yang lebih presisi (8 untuk main, 4 untuk sidebar) */}
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start ">
+      
+      {/* KOLOM KIRI (Main Content - 8/12) */}
+      <section className="lg:col-span-8 space-y-8 ">
+        <RiskCard
+          riskLevel={dusun.level_resiko}
+          dusunName={dusun.nama}
+          disasters={mappedDisasters}
+          population={dusun.jumlah_penduduk}
+          preparednessMessage={getPreparednessMessage(dusun.level_resiko)}
+        />
 
-            <DemographicsCard
-              dusunName={dusun.nama}
-              demographicData={{
-                jumlahKK: dusun.jumlah_kk,
-                jumlahLakiLaki: dusun.jumlah_laki_laki,
-                jumlahPerempuan: dusun.jumlah_perempuan,
-                jumlahBalita: dusun.jumlah_balita,
-                jumlahLansia: dusun.jumlah_lansia,
-                jumlahIbuHamil: dusun.jumlah_ibu_hamil,
-                jumlahPenyandangDisabilitas: dusun.jumlah_disabilitas,
-                jumlahPendudukMiskin: dusun.jumlah_miskin,
-              }}
-            />
-          </div>
-          
-          <div className="space-y-6">
-            <CoordinatesCard
-              latitude={dusun.latitude}
-              longitude={dusun.longitude}
-            />
+        <DemographicsCard
+          dusunName={dusun.nama}
+          demographicData={{
+            jumlahKK: dusun.jumlah_kk,
+            jumlahLakiLaki: dusun.jumlah_laki_laki,
+            jumlahPerempuan: dusun.jumlah_perempuan,
+            jumlahBalita: dusun.jumlah_balita,
+            jumlahLansia: dusun.jumlah_lansia,
+            jumlahIbuHamil: dusun.jumlah_ibu_hamil,
+            jumlahPenyandangDisabilitas: dusun.jumlah_disabilitas,
+          }}
+        />
+      </section>
 
-            {mapReady && (
+      {/* KOLOM KANAN (Sidebar - 4/12) */}
+      <aside className="lg:col-span-4 space-y-8">
+        {/* Card Koordinat & Peta biasanya lebih bagus jika digabung atau diletakkan berdekatan */}
+        <div className="space-y-6">
+          <CoordinatesCard
+            latitude={dusun.latitude}
+            longitude={dusun.longitude}
+          />
+
+          {mapReady && (
+            <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-300 bg-white p-2">
               <MapCard
                 position={[dusun.latitude, dusun.longitude]}
                 dusunName={dusun.nama}
                 population={dusun.jumlah_penduduk}
                 mapReady={mapReady}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <RTListCard dusunName={dusun.nama} rtData={mappedRTData} />
-      </div>
-    </main>
+        <RTListCard 
+          dusunName={dusun.nama} 
+          rtData={mappedRTData} 
+        />
+      </aside>
+
+    </div>
+  </div>
+</main>
   );
 }
 

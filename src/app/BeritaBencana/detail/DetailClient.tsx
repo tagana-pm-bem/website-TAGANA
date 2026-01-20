@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { beritaService, BeritaAcaraDB } from "@/services/beritaService";
 import { DetailNewsCardPage } from "./components/DetailNewsCardPage";
 import { Loader2 } from "lucide-react";
+import { NoResults } from "../components/NoResults";
+
 
 export default function DetailClient() {
   const router = useRouter();
@@ -61,7 +63,11 @@ export default function DetailClient() {
   }
 
   if (error || !berita) {
-    return <div>Berita tidak ditemukan</div>;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <NoResults message="Berita yang Anda cari tidak ditemukan atau mungkin telah dihapus. Silakan kembali ke halaman berita untuk melihat artikel lainnya." />
+      </div>
+    );
   }
 
   return (

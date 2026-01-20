@@ -1,18 +1,24 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { NewsGrid } from "./components/NewsGrid";
 import { NoResults } from "./components/NoResults";
 import FilterBerita from "./components/FIlterBerita";
 import { beritaService } from "@/services/beritaService"; 
-import { Loader2 } from "lucide-react";
+import { Loader2, Search, Filter as FilterIcon } from "lucide-react";
+import { supabase } from "@/lib/supabase"; // Diperlukan untuk logika Realtime
+import { useBeritaStore } from "../../hooks/useBeritaStore"; 
 
 export default function BeritaBencanaPage() {
   const router = useRouter();
   
-  const [allBerita, setAllBerita] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Ambil state dari Zustand Store
+  const { allBerita, setAllBerita } = useBeritaStore();
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -24,43 +30,71 @@ export default function BeritaBencanaPage() {
     waktu: null,
   });
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const data = await beritaService.getAll();
-        const publishedData = data.filter((item: any) => item.status === 'published');
-        setAllBerita(publishedData);
-      } catch (error) {
-        console.error("Gagal memuat berita:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fungsi sinkronisasi data terbaru
+  const loadData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
+    try {
+      const data = await beritaService.getAll();
+      // Hanya menampilkan yang sudah diterbitkan
+      const publishedData = data.filter((item: any) => item.status === 'published');
+      setAllBerita(publishedData); 
+    } catch (error) {
+      console.error("Gagal sinkronisasi warta:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setAllBerita]);
 
-    loadData();
+  // Handle Hydration
+  useEffect(() => {
+    setHasHydrated(true);
   }, []);
+
+  // Logika Realtime & Refresh Otomatis
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    // Ambil data awal (silent jika sudah ada cache di store)
+    loadData(allBerita.length > 0);
+
+    // Subscribe ke perubahan tabel berita_acara secara realtime
+    const channel = supabase
+      .channel('realtime-berita')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'berita_acara' },
+        () => {
+          // Jika ada update/insert dari admin, langsung tarik data terbaru tanpa reload
+          loadData(true); 
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [hasHydrated, loadData, allBerita.length]);
 
   const cleanHtml = (htmlContent: string | null) => {
     if (!htmlContent) return "";
     return htmlContent.replace(/<[^>]+>/g, '');
   };
 
+  // Filter Logic
   const filteredBerita = useMemo(() => {
     return allBerita.filter((berita) => {
       const cleanDeskripsi = cleanHtml(berita.isi_berita).toLowerCase();
       const matchSearch =
         berita.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cleanDeskripsi.includes(searchQuery.toLowerCase());
+        cleanDeskripsi.includes(searchQuery.toLowerCase()) ||
+        (berita.lokasi?.toLowerCase() || "").includes(searchQuery.toLowerCase());
 
       const kategoriName = berita.kategori_berita?.nama?.toLowerCase() || "";
       const matchKategori =
         !filterState.kategori ||
         kategoriName.includes(filterState.kategori.toLowerCase());
 
-      const matchWaktu = true; 
-
-      return matchSearch && matchKategori && matchWaktu;
+      return matchSearch && matchKategori;
     });
   }, [searchQuery, filterState, allBerita]);
 
@@ -68,130 +102,88 @@ export default function BeritaBencanaPage() {
     id: item.id,
     title: item.judul,
     description: cleanHtml(item.isi_berita), 
-    date: item.created_at || item.tanggal,
+    date: item.created_at || item.tanggal, // Otomatis terurut dari backend
     category: item.kategori_berita?.nama || "Umum",
     image: item.file_url, 
-    status: item.status
+    status: item.status,
+    location: item.lokasi 
   }));
-
-  const getCategoryColor = (category: string) => {
-    const colors: any = {
-      Banjir: "bg-blue-100 text-blue-700 border-blue-300",
-      Longsor: "bg-amber-100 text-amber-700 border-amber-300",
-      Gempa: "bg-red-100 text-red-700 border-red-300",
-      Kebakaran: "bg-orange-100 text-orange-700 border-orange-300",
-      Lainnya: "bg-gray-100 text-gray-700 border-gray-300",
-    };
-    return colors[category] || colors.Lainnya;
-  };
-
-  const getStatusColor = (status: string) => {
-    return "bg-green-500"; 
-  };
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-";
     return new Date(dateStr).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+      day: "numeric", month: "long", year: "numeric",
     });
   };
 
-  const handleFilterChange = (filters: any) => {
-    setFilterState({
-      kategori: filters.kategori || null,
-      waktu: filters.waktu || null,
-    });
-  };
+  const handleReadMore = (id: string) => router.push(`/BeritaBencana/detail?id=${id}`);
 
-  const handleReadMore = (id: string) =>
-  router.push(`/BeritaBencana/detail?id=${id}`);
-
+  if (!hasHydrated) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 mb-48 bg-white">
-      <div className="mb-6 flex gap-3">
-        <div className="relative flex-1">
+    <div className="w-full px-4 md:px-14 mx-auto py-8 mb-48 animate-in fade-in duration-500">
+      {/* Search & Filter Bar */}
+      <div className="mb-8 flex gap-4">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#044BB1] transition-colors" />
           <input
             type="text"
-            placeholder="Cari berita berdasarkan judul, deskripsi, atau lokasi..."
+            placeholder="Cari berita berdasarkan judul, isi, atau lokasi..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            aria-label="Cari berita"
+            className="w-full px-5 py-3.5 pl-12 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/5 transition-all font-medium shadow-sm"
           />
-          <svg
-            className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
         </div>
 
-        <button
+        <motion.button
           onClick={() => setShowFilter(!showFilter)}
-          className={`inline-flex items-center gap-2 px-8 py-2 border rounded-lg cursor-pointer text-lg font-medium transition ${showFilter ? 'bg-blue-700 text-white border-blue-700' : 'bg-blue-600 text-white border-gray-300 hover:bg-blue-700'}`}
+          className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl cursor-pointer text-sm font-medium transition-all shadow-md ${
+            showFilter ? 'bg-[#044BB1] text-white shadow-blue-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4 sm:w-5 sm:h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-.447.832l-4 2.667A1 1 0 019 22v-9.586L3.293 6.707A1 1 0 013 6V4z"
-            />
-          </svg>
+          <FilterIcon size={18} className={showFilter ? "animate-pulse" : ""} />
           <span>Filter</span>
-        </button>
+        </motion.button>
       </div>
 
-      {showFilter && (
-        <div className="mb-6">
-          <FilterBerita onFilterChange={handleFilterChange} />
-        </div>
-      )}
+      <AnimatePresence>
+        {showFilter && (
+          <motion.div 
+            className="mb-8 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 shadow-inner"
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <FilterBerita onFilterChange={(f: any) => setFilterState({ kategori: f.kategori, waktu: f.waktu })} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {isLoading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="animate-spin text-blue-600" size={40} />
-        </div>
-      ) : (
-        <>
-          <div className="mb-6">
-            <p className="text-gray-600">
-              Menampilkan{" "}
-              <span className="font-bold text-[#044BB1]">
-                {mappedBeritaForUI.length}
-              </span>{" "}
-              berita
-            </p>
-          </div>
-
-          {mappedBeritaForUI.length === 0 ? (
-            <NoResults message={searchQuery ? "Tidak ditemukan berita dengan kata kunci tersebut." : "Belum ada berita yang diterbitkan."} />
+      {/* Status Loading & Stats */}
+      <div className="mb-8 flex justify-between items-center px-2">
+        <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+          {isLoading ? (
+            <span className="flex items-center gap-2 text-[#044BB1]">
+              <Loader2 className="w-4 h-4 animate-spin" /> Sinkronisasi Warta Terbaru...
+            </span>
           ) : (
-            <NewsGrid
-              beritaList={mappedBeritaForUI} 
-              getStatusColor={getStatusColor}
-              formatDate={formatDate}
-              onReadMore={handleReadMore}
-            />
+            <>Terdapat <span className="text-[#044BB1] font-bold">{mappedBeritaForUI.length}</span> Berita Terpublikasi</>
           )}
-        </>
+        </p>
+      </div>
+
+      {/* Main Grid */}
+      {mappedBeritaForUI.length === 0 && !isLoading ? (
+        <NoResults message={searchQuery ? "Tidak ditemukan berita dengan kriteria tersebut." : "Belum ada berita yang diterbitkan."} />
+      ) : (
+        <NewsGrid
+          beritaList={mappedBeritaForUI} 
+          formatDate={formatDate}
+          onReadMore={handleReadMore}
+        />
       )}
     </div>
   );

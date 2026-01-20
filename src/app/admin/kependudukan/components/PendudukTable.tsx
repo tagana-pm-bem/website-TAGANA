@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import EditModal from './modals/EditModal';
-import { useAlert } from '@/components/ui/Alert';
+import { toast } from 'sonner'; // Menggunakan sonner (shadcn default recomendation)
 import { useDusun } from '@/hooks/useDusun.hooks';
-import { Pencil } from 'lucide-react';
-import Image from 'next/image';
+import { Pencil, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { uploadImageByType } from "@/services/fileService";
 import { getPublicImageUrl } from "@/lib/storage";
+import { Button } from "@/components/ui/Button";
 
 interface DusunDB {
   id: number;
@@ -26,7 +26,6 @@ interface DusunDB {
 
 export function PendudukTable() {
   const { data: pendudukData, isLoading, updateDusunStats } = useDusun();
-  const { showAlert } = useAlert();
   const [editingItem, setEditingItem] = useState<DusunDB | null>(null);
   const [showAll, setShowAll] = useState(false);
 
@@ -40,40 +39,54 @@ export function PendudukTable() {
 
   const handleSaveEdit = async (updatedData: any) => {
     if (!editingItem) return;
-    let finalImageUrl = updatedData.gambar_url;
+    
+    // Gunakan id toast untuk loading state jika ingin lebih advanced
+    const toastId = toast.loading("Menyimpan perubahan...");
 
-    if (updatedData._imageFile) {
-        try {
-            const filePath = await uploadImageByType(updatedData._imageFile, "dusun");
-            finalImageUrl = getPublicImageUrl(filePath);
-        } catch (error) {
-            console.error("Gagal upload gambar dusun:", error);
-            throw new Error("Gagal mengupload gambar");
-        }
-    }
+    try {
+      let finalImageUrl = updatedData.gambar_url;
 
-    const payload = {
-      deskripsi: updatedData.deskripsi,
-      gambar_url: finalImageUrl,
+      if (updatedData._imageFile) {
+        const filePath = await uploadImageByType(updatedData._imageFile, "dusun");
+        finalImageUrl = getPublicImageUrl(filePath);
+      }
+
+      const payload = {
+        deskripsi: updatedData.deskripsi,
+        gambar_url: finalImageUrl,
+        jumlah_kk: Number(updatedData.jumlahKK),
+        jumlah_laki_laki: Number(updatedData.jumlahLakiLaki),
+        jumlah_perempuan: Number(updatedData.jumlahPerempuan),
+        jumlah_balita: Number(updatedData.jumlahBalita),
+        jumlah_lansia: Number(updatedData.jumlahLansia),
+        jumlah_ibu_hamil: Number(updatedData.jumlahIbuHamil),
+        jumlah_disabilitas: Number(updatedData.jumlahPenyandangDisabilitas),
+        jumlah_miskin: Number(updatedData.jumlahPendudukMiskin)
+      };
+
+      const success = await updateDusunStats(editingItem.id, payload);
       
-      jumlah_kk: Number(updatedData.jumlahKK),
-      jumlah_laki_laki: Number(updatedData.jumlahLakiLaki),
-      jumlah_perempuan: Number(updatedData.jumlahPerempuan),
-      jumlah_balita: Number(updatedData.jumlahBalita),
-      jumlah_lansia: Number(updatedData.jumlahLansia),
-      jumlah_ibu_hamil: Number(updatedData.jumlahIbuHamil),
-      jumlah_disabilitas: Number(updatedData.jumlahPenyandangDisabilitas),
-      jumlah_miskin: Number(updatedData.jumlahPendudukMiskin)
-    };
-
-    const success = await updateDusunStats(editingItem.id, payload);
-    if (success) setEditingItem(null);
+      if (success) {
+        toast.success("Berhasil!", {
+          description: `Data penduduk Dusun ${editingItem.nama} telah diperbarui.`,
+          id: toastId,
+        });
+        setEditingItem(null);
+      } else {
+        throw new Error("Gagal mengupdate database");
+      }
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast.error("Gagal menyimpan", {
+        description: "Terjadi kesalahan saat memperbarui data.",
+        id: toastId,
+      });
+    }
   };
 
   const editFields = [
     { name: 'gambar_url', label: 'Foto Dusun', type: 'image' as const, required: false },
     { name: 'deskripsi', label: 'Deskripsi Dusun', type: 'textarea' as const, required: false },
-    
     { name: 'jumlahKK', label: 'Jumlah KK', type: 'number' as const, required: true },
     { name: 'jumlahLakiLaki', label: 'Jumlah Laki-Laki', type: 'number' as const, required: true },
     { name: 'jumlahPerempuan', label: 'Jumlah Perempuan', type: 'number' as const, required: true },
@@ -85,62 +98,80 @@ export function PendudukTable() {
   ];
 
   if (isLoading) {
-    return 
-        <div className="p-6 flex flex-col items-center justify-center gap-2 min-h-[200px]">
-            <span className="text-gray-500 mt-2 animate-pulse">Memuat data...</span>
-        </div>
+    return (
+      <div className="p-12 flex flex-col items-center justify-center gap-3 min-h-[300px] bg-white rounded-xl">
+        <Loader2 className="h-8 w-8 animate-spin text-[#044BB1]" />
+        <span className="text-slate-500 font-medium animate-pulse">Sinkronisasi data penduduk...</span>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-lg shadow-sm">
-      <h1 className="font-semibold text-md">Data Penduduk per Dusun</h1>
-      <div className="border-b border-gray-300" />
-
-      <div className="overflow-x-auto">
-        <div className="rounded-xl shadow-sm p-4">
-          <table className="w-full border-separate border-spacing-1">
-            <thead>
-              <tr>
-                {["No", "Dusun", "KK", "L", "P", "Balita", "Lansia", "Bumil", "Disabilitas", "Miskin", "Aksi"].map((h) => (
-                  <th key={h} className="bg-blue-200 shadow-sm rounded-sm px-4 py-3 text-sm font-semibold text-center whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {displayData.map((item, index) => (
-                <tr key={item.id}>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{index + 1}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm font-medium whitespace-nowrap px-2">{item.nama}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_kk}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_laki_laki}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_perempuan}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_balita}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_lansia}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_ibu_hamil}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_disabilitas}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3 text-center text-sm">{item.jumlah_miskin}</td>
-                  <td className="bg-white shadow-sm rounded-sm py-3">
-                    <div className="flex justify-center gap-2 px-2">
-                      <button 
-                        onClick={() => handleEdit(item)}
-                        className="cursor-pointer p-2 rounded-lg shadow-sm hover:bg-blue-100 transition"
-                      >
-                        <Pencil size={16} className="text-blue-500" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-xl text-slate-900 tracking-tight">Data Penduduk per Dusun</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola data demografi dan statistik wilayah.</p>
         </div>
       </div>
       
+      <div className="border-b border-slate-100" />
+
+      <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-slate-50/50">
+              {["No", "Dusun", "KK", "L", "P", "Balita", "Lansia", "Bumil", "Disabilitas", "Miskin", "Aksi"].map((h) => (
+                <th key={h} className="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center border-b border-slate-100">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {displayData.map((item, index) => (
+              <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                <td className="py-4 text-center text-sm text-slate-600">{index + 1}</td>
+                <td className="py-4 text-center text-sm font-bold text-slate-900 whitespace-nowrap px-2">{item.nama}</td>
+                <td className="py-4 text-center text-sm font-medium text-slate-700">{item.jumlah_kk}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_laki_laki}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_perempuan}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_balita}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_lansia}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_ibu_hamil}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_disabilitas}</td>
+                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_miskin}</td>
+                <td className="py-4">
+                  <div className="flex justify-center">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleEdit(item)}
+                      className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-[#044BB1] transition-all"
+                    >
+                      <Pencil size={14} />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
       {safeData.length > ITEMS_PER_PAGE && (
-        <div className="flex justify-center">
-            <button onClick={() => setShowAll(!showAll)} className="px-6 py-3 cursor-pointer bg-blue-400 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                {showAll ? 'Lihat Lebih Sedikit' : `Lihat Selengkapnya (${safeData.length - ITEMS_PER_PAGE} lainnya)`}
-            </button>
+        <div className="flex justify-center mt-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowAll(!showAll)} 
+              className="rounded-xl px-8 font-bold border-slate-200 text-slate-700 hover:bg-slate-50"
+            >
+                {showAll ? (
+                  <> <ChevronUp className="mr-2 h-4 w-4" /> Lihat Lebih Sedikit </>
+                ) : (
+                  <> <ChevronDown className="mr-2 h-4 w-4" /> Lihat Selengkapnya ({safeData.length - ITEMS_PER_PAGE}) </>
+                )}
+            </Button>
         </div>
       )}
 

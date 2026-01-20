@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase"; // Sesuaikan path import ini
+import { supabase } from "@/lib/supabase"; 
 
 export interface DemographicStats {
   totalPenduduk: number;

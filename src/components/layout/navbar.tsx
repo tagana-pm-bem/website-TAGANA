@@ -49,16 +49,12 @@ export function Navbar() {
   return (
     <>
       <nav
-        className={`sticky top-0 z-50 bg-white transition-all duration-300 ${
-          isScrolled ? "shadow-2xl border-b-2" : "shadow-lg border-b-4"
-        } border-[#2e68b8ab]`}
-      >
-        <div className="w-full mx-auto px-4 sm:px-14">
+        className="sticky top-0 z-50 bg-white shadow-md transition-shadow duration-300">
+        <div className="w-full mx-auto px-4 sm:px-14 relative">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
-            <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group flex-shrink-0">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group shrink-0">
               <div className="relative">
-                <div className="absolute -inset-1 bg-linear-to-r from-[#044BB1] to-[#0566d6] rounded-full blur opacity-40 group-hover:opacity-60 transition duration-300"></div>
-                <div className="border-2 border-blue-700 sm:border-3 md:border-4 relative w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-linear-to-br from-[#044BB1] via-[#0555c4] to-[#0566d6] rounded-full flex items-center justify-center shadow-xl">
+                <div className="border-2 border-blue-500 sm:border-3 md:border-4 relative w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-linear-to-br from-[#044BB1] via-[#0555c4] to-[#0566d6] rounded-full flex items-center justify-center shadow-xl">
                   <Image
                     src="/tagana_logo.png"
                     alt="Tagana Logo"
@@ -71,7 +67,7 @@ export function Navbar() {
               </div>
 
               <div className="flex flex-col">
-                <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-black bg-linear-to-r from-[#044BB1] to-[#0566d6] bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-sm">
+                <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold bg-linear-to-r from-[#044BB1] to-[#0566d6] bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-sm">
                   TAGANA
                 </h1>
                 <div className="flex items-center space-x-1 -mt-0.5 sm:-mt-1">
@@ -83,53 +79,79 @@ export function Navbar() {
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-8 lg:gap-6 xl:gap-8">
+            <div className="hidden md:flex items-center flex-1 justify-center">
+              <div className="flex items-center gap-6 lg:gap-16 relative">
+              <button
+                onClick={() => router.push('/beranda')}
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/beranda' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
+              >
+                Beranda
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/beranda' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                }`}></span>
+              </button>
+
               <button
                 onClick={() => router.push('/peta-page')}
-                className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Peta
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/peta-page' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/peta-page' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/EventListPage')}
-                className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Event
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/EventListPage' ? 'w-full' : 'w-0 group-hover:w-full'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/EventListPage' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
               
               <button
                 onClick={() => router.push('/BeritaBencana')}
-                className={`text-sm lg:text-base font-semibold transition-colors duration-200 relative group cursor-pointer ${
-                  pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
-                Berita Terkini
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#044BB1] transition-all duration-300 ${
-                  pathname === '/BeritaBencana' ? 'w-full' : 'w-0 group-hover:w-full'
+                Berita 
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/BeritaBencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
-                onClick={() => router.push('/auth/login')}
-                className="flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-gradient-to-r from-gray-500 to-gray-900 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group"
+                onClick={() => router.push('/panduan')}
+                className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
+                pathname === '/panduan/prabencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                }`}
               >
-                <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-xs lg:text-base font-semibold whitespace-nowrap">Admin</span>
+                Panduan
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                pathname === '/panduan/prabencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                }`}></span>
               </button>
+              </div>
             </div>
+
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="hidden md:flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group shrink-0"
+            >
+              <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span className="text-xs lg:text-base font-medium whitespace-nowrap">Login Admin</span>
+            </button>
 
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -179,8 +201,16 @@ export function Navbar() {
 
           <div className="flex-1 overflow-y-auto py-4">
             <button
+              onClick={() => handleNavigation('/beranda')}
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
+                pathname === '/beranda' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Beranda
+            </button>
+            <button
               onClick={() => handleNavigation('/peta-page')}
-              className={`w-full text-left px-6 py-3 font-semibold transition-colors duration-200 ${
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
                 pathname === '/peta-page' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -189,7 +219,7 @@ export function Navbar() {
 
             <button
               onClick={() => handleNavigation('/EventListPage')}
-              className={`w-full text-left px-6 py-3 font-semibold transition-colors duration-200 ${
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
                 pathname === '/EventListPage' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
@@ -198,24 +228,33 @@ export function Navbar() {
 
             <button
               onClick={() => handleNavigation('/BeritaBencana')}
-              className={`w-full text-left px-6 py-3 font-semibold transition-colors duration-200 ${
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
                 pathname === '/BeritaBencana' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`} 
             >
-              Berita Terkini
+              Berita 
+            </button>
+
+            <button
+              onClick={() => handleNavigation('/panduan')}
+              className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
+                pathname === '/panduan' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+              }`} 
+            >
+              Panduan 
             </button>
 
             <div className="border-t border-gray-300 my-4"></div>
 
             <button
               onClick={() => handleNavigation('/auth/login')}
-              className="w-full mx-4 flex items-center space-x-2 px-4 py-3 bg-gradient-to-r shadow-[-1px_3px_9px_-1px_rgba(0,_0,_0,_0.7)] from-gray-700 to-gray-900 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300"
+              className="w-full mx-4 flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300"
               style={{ width: 'calc(100% - 2rem)' }}
             >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <span className="font-semibold">Login Admin</span>
+              <span className="font-medium">Login Admin</span>
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import BeritaList from "./components/beritaList";
-import Card from "@/components/ui/card";
+import {Card} from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Berita Terkini - Admin TAGANA",

@@ -50,7 +50,7 @@ export default function MapCard({ position, dusunName, population, mapReady }: P
   return (
     <>
       {mapReady && (
-        <div className="bg-white rounded-2xl p-4 shadow-xl">
+        <div className="bg-white rounded-2xl p-4  ">
           <h3 className="font-bold text-gray-800 mb-5 flex items-center text-base sm:text-lg">
             <div className="bg-gradient-to-br from-[#044BB1] to-[#0566d6] rounded-lg p-2 mr-3">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
