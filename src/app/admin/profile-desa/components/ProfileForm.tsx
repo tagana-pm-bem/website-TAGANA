@@ -42,6 +42,7 @@ export default function DusunProfilePage() {
   const [deskripsi, setDeskripsi] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // 1. Logika Sync URL ke State (Hanya sekali saat mount)
   useEffect(() => {
@@ -82,9 +83,11 @@ export default function DusunProfilePage() {
   }
 
   // --- LOGIKA HANDLER ---
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file); // Simpan file untuk diupload nanti
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -104,17 +107,30 @@ export default function DusunProfilePage() {
     const toastId = toast.loading("Menyimpan perubahan profil...");
 
     try {
-      // Memanggil fungsi updateStats dari dusunService
+      let uploadedImageUrl = undefined;
+
+      // 1. Upload Foto TAPI HANYA JIKA ADA FILE BARU DIPILIH
+      if (selectedFile) {
+        toast.loading("Mengunggah foto...", { id: toastId });
+        uploadedImageUrl = await dusunService.uploadProfilePhoto(selectedFile);
+      }
+
+      // 2. update ke database
       await dusunService.updateStats(Number(selectedDusunId), {
         deskripsi: deskripsi,
+        ...(uploadedImageUrl && { gambar_url: uploadedImageUrl }), // Update URL jika ada upload baru
       });
 
       toast.success("Profil Diperbarui", {
         id: toastId,
-        description: "Deskripsi wilayah berhasil disimpan ke sistem."
+        description: "Deskripsi dan foto wilayah berhasil disimpan."
       });
+      
+      // Reset file selection
+      setSelectedFile(null);
     } catch (error) {
-      toast.error("Gagal Memperbarui", { id: toastId });
+      console.error("Error updating profile:", error);
+      toast.error("Gagal Memperbarui", { id: toastId, description: "Terjadi kesalahan saat menyimpan data." });
     } finally {
       setIsUpdating(false);
     }
