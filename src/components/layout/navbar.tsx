@@ -46,6 +46,12 @@ export function Navbar() {
     setIsSidebarOpen(false);
   };
 
+  const isActive = (path: string) => {
+    if (pathname === path) return true;
+    if (pathname?.startsWith(`${path}/`)) return true;
+    return false;
+  };
+
   return (
     <>
       <nav
@@ -84,60 +90,60 @@ export function Navbar() {
               <button
                 onClick={() => router.push('/beranda')}
                 className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/beranda' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                isActive('/beranda') ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Beranda
-                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
-                pathname === '/beranda' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] -left-2 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                isActive('/beranda') ? 'min-w-[90px]  opacity-100' : 'w-0 opacity-0 group-hover:min-w-[90px]  group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/peta-page')}
                 className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/peta-page' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                isActive('/peta-page') ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Peta
-                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
-                pathname === '/peta-page' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] -left-5  h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                isActive('/peta-page') ? 'min-w-[90px]  opacity-100' : 'w-0 opacity-0 group-hover:min-w-[90px]  group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/EventListPage')}
                 className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/EventListPage' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                isActive('/EventListPage') ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Event
-                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
-                pathname === '/EventListPage' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] -left-4  h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                isActive('/EventListPage') ? 'min-w-[90px]  opacity-100' : 'w-0 opacity-0 group-hover:min-w-[90px]  group-hover:opacity-100'
                 }`}></span>
               </button>
               
               <button
                 onClick={() => router.push('/BeritaBencana')}
                 className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/BeritaBencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                isActive('/BeritaBencana') ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Berita 
-                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
-                pathname === '/BeritaBencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] -left-3.5  h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
+                isActive('/BeritaBencana') ? 'min-w-[90px]  opacity-100' : 'w-0 opacity-0 group-hover:min-w-[90px]  group-hover:opacity-100'
                 }`}></span>
               </button>
 
               <button
                 onClick={() => router.push('/panduan')}
                 className={`text-sm lg:text-xl font-light  transition-colors duration-200 relative group cursor-pointer ${
-                pathname === '/panduan/prabencana' ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
+                isActive('/panduan') ? 'text-[#044BB1]' : 'text-gray-700 hover:text-[#044BB1]'
                 }`}
               >
                 Panduan
                 <span className={`absolute -bottom-[20px] sm:-bottom-[24px] md:-bottom-[32px] left-0 h-1 bg-[#044BB1] transition-all duration-500 ease-out ${
-                pathname === '/panduan/prabencana' ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
+                isActive('/panduan') ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                 }`}></span>
               </button>
               </div>
@@ -147,8 +153,8 @@ export function Navbar() {
               onClick={() => router.push('/auth/login')}
               className="hidden md:flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group shrink-0"
             >
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
 </svg>
 
               <span className="text-xs lg:text-base font-medium whitespace-nowrap">Login Admin</span>
@@ -204,7 +210,7 @@ export function Navbar() {
             <button
               onClick={() => handleNavigation('/beranda')}
               className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
-                pathname === '/beranda' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+                isActive('/beranda') ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
               Beranda
@@ -212,7 +218,7 @@ export function Navbar() {
             <button
               onClick={() => handleNavigation('/peta-page')}
               className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
-                pathname === '/peta-page' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+                isActive('/peta-page') ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
               Peta
@@ -221,7 +227,7 @@ export function Navbar() {
             <button
               onClick={() => handleNavigation('/EventListPage')}
               className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
-                pathname === '/EventListPage' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+                isActive('/EventListPage') ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
               Event
@@ -230,7 +236,7 @@ export function Navbar() {
             <button
               onClick={() => handleNavigation('/BeritaBencana')}
               className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
-                pathname === '/BeritaBencana' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+                isActive('/BeritaBencana') ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`} 
             >
               Berita 
@@ -239,7 +245,7 @@ export function Navbar() {
             <button
               onClick={() => handleNavigation('/panduan')}
               className={`w-full text-left px-6 py-3 font-medium transition-colors duration-200 ${
-                pathname === '/panduan' ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
+                isActive('/panduan') ? 'bg-blue-50 text-[#044BB1] border-l-4 border-[#044BB1]' : 'text-gray-700 hover:bg-gray-50'
               }`} 
             >
               Panduan 

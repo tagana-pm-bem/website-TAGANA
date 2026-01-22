@@ -1,18 +1,17 @@
 import { supabase } from '@/lib/supabase';
+import { uploadImageByType } from '@/services/fileService';
+import { getPublicImageUrl } from '@/lib/storage';
 
-// 1. Interface Sesuai Kolom Tabel 'dusun' (Database)
 export interface DusunDB {
   id: number;
   nama: string;
   
-  // Data Spasial & Profil (Penting untuk Peta)
   latitude: number;
   longitude: number;
   deskripsi: string;
-  level_resiko: string; // 'low', 'medium', 'high', 'none'
+  level_resiko: string; 
   gambar_url: string;
 
-  // Data Statistik
   jumlah_penduduk: number;
   jumlah_kk: number;
   jumlah_laki_laki: number;
@@ -24,7 +23,6 @@ export interface DusunDB {
   jumlah_miskin: number;
 }
 
-// 2. Interface untuk Relasi Bencana (Tabel Bencana)
 export interface BencanaItem {
   id: string;
   jenis_bencana: string;
@@ -33,7 +31,6 @@ export interface BencanaItem {
   icon: string;
 }
 
-// 3. Interface untuk Relasi RT (Tabel RT)
 export interface RTItem {
   id: string;
   nomor_rt: string;
@@ -41,14 +38,12 @@ export interface RTItem {
   jenis_kelamin_ketua: string | null;
 }
 
-// 4. Interface Dusun + List Bencana (Untuk Tabel Potensi Bencana)
 export interface DusunWithBencana {
   id: number;
   nama: string;
   bencana: BencanaItem[];
 }
 
-// 5. Interface LENGKAP (Detail Page: Dusun + RT + Bencana)
 export interface DusunDetailDB extends DusunDB {
   rt: RTItem[];
   bencana: BencanaItem[];
@@ -65,7 +60,6 @@ export const dusunService = {
     return data as DusunDB[];
   },
 
-  // Ambil Hanya Nama & ID (Untuk Dropdown Form biar ringan)
   getAllNames: async () => {
     const { data, error } = await supabase
       .from('dusun')
@@ -76,7 +70,6 @@ export const dusunService = {
     return data as { id: number; nama: string }[];
   },
 
-  // Ambil Dusun + List Bencana (Untuk Halaman Tabel Risiko)
   getAllWithBencana: async () => {
     const { data, error } = await supabase
       .from('dusun')
@@ -127,5 +120,16 @@ export const dusunService = {
 
     if (error) throw error;
     return data;
+  },
+
+  uploadProfilePhoto: async (file: File) => {
+    try {
+      const filePath = await uploadImageByType(file, 'dusun');
+      const publicUrl = getPublicImageUrl(filePath);
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading profile photo:', error);
+      throw error;
+    }
   }
 };

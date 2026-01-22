@@ -4,8 +4,8 @@ export interface EventDB {
   id: string;
   title: string;
   description: string;
-  event_date: string; // YYYY-MM-DD
-  start_time: string; // HH:MM
+  event_date: string; 
+  start_time: string; 
   end_time?: string;
   location: string;
   image_url?: string;
@@ -13,7 +13,6 @@ export interface EventDB {
 }
 
 export const eventService = {
-  // Ambil semua event (diurutkan tanggal terdekat)
   getAll: async () => {
     const { data, error } = await supabase
       .from("events")
@@ -25,7 +24,6 @@ export const eventService = {
     return data as EventDB[];
   },
 
-  // Tambah Event Baru
   create: async (payload: Omit<EventDB, "id">) => {
     const { data, error } = await supabase
       .from("events")
@@ -55,16 +53,14 @@ export const eventService = {
     return true;
   },
 
-  // Upload Gambar ke Bucket 'events'
   uploadImage: async (file: File) => {
     const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
     const { data, error } = await supabase.storage
-      .from("events") // Pastikan nama bucket sesuai
+      .from("events") 
       .upload(fileName, file);
 
     if (error) throw error;
 
-    // Ambil Public URL
     const { data: publicUrl } = supabase.storage
       .from("events")
       .getPublicUrl(fileName);
