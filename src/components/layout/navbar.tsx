@@ -147,9 +147,10 @@ export function Navbar() {
               onClick={() => router.push('/auth/login')}
               className="hidden md:flex cursor-pointer items-center space-x-1.5 px-4 lg:px-6 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:shadow-lg active:scale-95 transition-all duration-300 group shrink-0"
             >
-              <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+</svg>
+
               <span className="text-xs lg:text-base font-medium whitespace-nowrap">Login Admin</span>
             </button>
 

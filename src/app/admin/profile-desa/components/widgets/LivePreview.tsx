@@ -13,8 +13,8 @@ interface LivePreviewProps {
 
 export function LivePreview({ data, previewImage }: LivePreviewProps) {
   return (
-    <Card className="border-slate-100 shadow-2xl shadow-slate-200/60 rounded-[2rem] overflow-hidden bg-white max-w-sm mx-auto sticky top-6">
-      <CardHeader className="p-0 relative aspect-[4/3] bg-slate-100">
+    <Card className="border-slate-100 shadow-2xl shadow-slate-200/60 rounded-[2rem] overflow-hidden bg-white max-w-2xl mx-auto sticky top-6">
+      <CardHeader className="p-0 relative aspect-[16/9] bg-slate-100">
         {/* Gambar Utama Profil */}
         {previewImage || data.gambar_url ? (
           <Image 
@@ -25,56 +25,59 @@ export function LivePreview({ data, previewImage }: LivePreviewProps) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-            <Globe size={48} strokeWidth={1} />
+            <Globe size={64} strokeWidth={1} />
           </div>
         )}
         
         {/* Floating Badge Risiko */}
-        <div className="absolute top-4 left-4">
-          <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none shadow-sm font-medium text-[10px] px-3 py-1 rounded-full">
+        <div className="absolute top-6 left-6">
+          <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none shadow-lg font-semibold text-sm px-5 py-2 rounded-full">
             Dusun {data.nama || "..."}
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-5">
-        <div className="space-y-2">
+      <CardContent className="p-8 space-y-6">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-slate-900">Tentang Wilayah</h3>
-            <ExternalLink size={14} className="text-slate-400" />
+            <h3 className="text-2xl font-semibold text-slate-900">Tentang Wilayah</h3>
+            <ExternalLink size={18} className="text-slate-400" />
           </div>
-          <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-4">
-            {data.deskripsi || "Admin belum memasukkan deskripsi untuk wilayah ini. Deskripsi yang informatif membantu masyarakat mengenali potensi desa."}
+          <p className="text-sm font-medium text-slate-600 leading-relaxed line-clamp-6">
+            {data.deskripsi || "Admin belum memasukkan deskripsi untuk wilayah ini. Deskripsi yang informatif membantu masyarakat mengenali potensi desa dengan lebih baik dan memberikan gambaran umum tentang karakteristik wilayah."}
           </p>
         </div>
 
-        <div className="h-px bg-slate-50 w-full" />
+        <div className="h-px bg-slate-100 w-full" />
 
         {/* Ringkasan Publik */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
-              <Users size={14} />
+        <div className="grid grid-cols-2 gap-6">
+          <div className="flex items-center gap-4 bg-slate-50 rounded-xl p-5">
+            <div className="p-3 bg-blue-500 text-white rounded-xl shadow-md">
+              <Users size={24} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-medium text-slate-400 leading-none">Penduduk</span>
-              <span className="text-xs font-medium text-slate-800">{(data.jumlah_penduduk || 0).toLocaleString()} Jiwa</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Penduduk</span>
+              <span className="text-2xl font-bold text-slate-900">{(data.jumlah_penduduk || 0).toLocaleString()}</span>
+              <span className="text-xs text-slate-500 mt-0.5">Jiwa</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-slate-50 text-slate-600 rounded-lg">
-              <MapPin size={14} />
+          <div className="flex items-center gap-4 bg-slate-50 rounded-xl p-5">
+            <div className="p-3 bg-emerald-500 text-white rounded-xl shadow-md">
+              <MapPin size={24} />
             </div>
-            <div className="flex flex-col text-right">
-              <span className="text-[10px] font-medium text-slate-400 leading-none">Lokasi</span>
-              <span className="text-[10px] font-medium text-slate-800">Koordinat Aktif</span>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Lokasi</span>
+              <span className="text-sm font-bold text-slate-900">Koordinat Aktif</span>
+              <span className="text-xs text-slate-500 mt-0.5">Peta Tersedia</span>
             </div>
           </div>
         </div>
         
-        <div className="pt-2">
-          <Badge variant="secondary" className="w-full justify-center bg-slate-50 text-slate-400 border-none py-1.5 text-[9px] font-medium uppercase tracking-widest">
+        <div className="pt-4">
+          <Badge variant="secondary" className="w-full justify-center bg-slate-50 text-slate-400 border-none py-3 text-xs font-bold uppercase tracking-widest">
+            <Globe size={14} className="mr-2" />
             Simulasi Tampilan Publik
           </Badge>
         </div>

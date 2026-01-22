@@ -41,6 +41,8 @@ export default function ManajemenRisiko({ onSuccess }: ManajemenRisikoProps) {
     { label: "Tanah Longsor", iconVal: "landslide" },
     { label: "Kekeringan", iconVal: "drought" },
     { label: "Kebakaran", iconVal: "fire" },
+    { label: "Gempa Bumi", iconVal: "earthquake" },
+    { label: "Angin Topan", iconVal: "typhoon" },
   ];
 
   const handleSimpan = async () => {
@@ -90,7 +92,7 @@ export default function ManajemenRisiko({ onSuccess }: ManajemenRisikoProps) {
             <ShieldAlert size={24} />
           </div>
           <div>
-            <CardTitle className="text-xl font-medium tracking-tight text-slate-900">Manajemen Risiko & Wilayah</CardTitle>
+            <CardTitle className="text-xl font-medium tracking-tight text-slate-900">Manajemen Risiko Wilayah</CardTitle>
             <CardDescription className="font-medium text-slate-500">Pencatatan potensi bencana dan pembaruan informasi profil wilayah desa.</CardDescription>
           </div>
         </div>

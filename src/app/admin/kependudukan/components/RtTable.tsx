@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import EditModal from './modals/EditModal';
 import DeleteModal from './modals/DeleteModal';
 import { useRt } from '@/hooks/useRt.hooks'; 
@@ -21,8 +21,8 @@ const DUSUN_LIST = [
 
 export function RtTable() {
   const [selectedDusun, setSelectedDusun] = useState<string>('Miri');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
-  // Asumsi hook useRt me-return fungsi refresh/mutate data
   const { data: rtData, isLoading, updateRt, deleteRt, mutate } = useRt(selectedDusun);
 
   const [editingItem, setEditingItem] = useState<RTDB | null>(null);
@@ -33,6 +33,19 @@ export function RtTable() {
   const ITEMS_PER_PAGE = 5;
   const safeData = rtData || [];
   const displayData = showAll ? safeData : safeData.slice(0, ITEMS_PER_PAGE);
+
+  // FETCH DATA FUNCTION
+  const fetchData = useCallback((silent = false) => {
+    if (mutate) {
+      mutate();
+    }
+  }, [mutate]);
+
+  // EFFECT UNTUK RELOAD OTOMATIS
+  useEffect(() => {
+    // Selalu fetch saat mount (silent update jika sudah ada cache)
+    fetchData(!!rtData);
+  }, [fetchData, refreshTrigger, selectedDusun]);
 
   // --- LOGIKA CREATE ---
   const handleSaveAdd = async (newData: any) => {
@@ -52,8 +65,8 @@ export function RtTable() {
       await rtService.create(payload);
       
       // 4. Refresh Data
-      if (mutate) mutate(); // Jika hook punya mutate
-      else window.location.reload(); // Fallback reload jika hook tidak punya mutate
+      if (mutate) mutate();
+      setRefreshTrigger(prev => prev + 1); // Trigger refresh
       
       setIsAdding(false);
     } catch (error) {
@@ -76,6 +89,7 @@ export function RtTable() {
       if (success) {
         setEditingItem(null);
         if (mutate) mutate();
+        setRefreshTrigger(prev => prev + 1); // Trigger refresh
       }
     } catch (error) {
       throw error;
@@ -90,6 +104,7 @@ export function RtTable() {
       if (success) {
         setDeletingItem(null);
         if (mutate) mutate();
+        setRefreshTrigger(prev => prev + 1); // Trigger refresh
       }
     } catch (error) {
       throw error;
