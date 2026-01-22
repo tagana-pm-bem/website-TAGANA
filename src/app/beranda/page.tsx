@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function Beranda() {
   return (
-    <main className="w-full min-h-screen bg-white p-4 flex flex-col overflow-x-hidden">     
+    <main className="px-4 sm:px-13 min-h-screen bg-white p-4 flex flex-col overflow-x-hidden">     
       <HeroSection />
 
       <div className="w-full">

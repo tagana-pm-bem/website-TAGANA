@@ -8,7 +8,7 @@ import { NoResults } from "./components/NoResults";
 import FilterBerita from "./components/FIlterBerita";
 import { beritaService } from "@/services/beritaService"; 
 import { Loader2, Search, Filter as FilterIcon } from "lucide-react";
-import { supabase } from "@/lib/supabase"; // Diperlukan untuk logika Realtime
+import { supabase } from "@/lib/supabase"; 
 import { useBeritaStore } from "../../hooks/useBeritaStore"; 
 
 export default function BeritaBencanaPage() {
@@ -30,12 +30,10 @@ export default function BeritaBencanaPage() {
     waktu: null,
   });
 
-  // Fungsi sinkronisasi data terbaru
   const loadData = useCallback(async (isSilent = false) => {
     if (!isSilent) setIsLoading(true);
     try {
       const data = await beritaService.getAll();
-      // Hanya menampilkan yang sudah diterbitkan
       const publishedData = data.filter((item: any) => item.status === 'published');
       setAllBerita(publishedData); 
     } catch (error) {
@@ -45,26 +43,20 @@ export default function BeritaBencanaPage() {
     }
   }, [setAllBerita]);
 
-  // Handle Hydration
   useEffect(() => {
     setHasHydrated(true);
   }, []);
 
-  // Logika Realtime & Refresh Otomatis
   useEffect(() => {
     if (!hasHydrated) return;
 
-    // Ambil data awal (silent jika sudah ada cache di store)
     loadData(allBerita.length > 0);
-
-    // Subscribe ke perubahan tabel berita_acara secara realtime
     const channel = supabase
       .channel('realtime-berita')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'berita_acara' },
         () => {
-          // Jika ada update/insert dari admin, langsung tarik data terbaru tanpa reload
           loadData(true); 
         }
       )
@@ -102,7 +94,7 @@ export default function BeritaBencanaPage() {
     id: item.id,
     title: item.judul,
     description: cleanHtml(item.isi_berita), 
-    date: item.created_at || item.tanggal, // Otomatis terurut dari backend
+    date: item.created_at || item.tanggal, 
     category: item.kategori_berita?.nama || "Umum",
     image: item.file_url, 
     status: item.status,
@@ -123,7 +115,7 @@ export default function BeritaBencanaPage() {
   return (
     <div className="w-full px-4 md:px-14 mx-auto py-8 mb-48 animate-in fade-in duration-500">
       {/* Search & Filter Bar */}
-      <div className="mb-8 flex gap-4">
+      <div className="mb-8 flex gap-4  px-4 sm:px-8">
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#044BB1] transition-colors" />
           <input
@@ -137,7 +129,7 @@ export default function BeritaBencanaPage() {
 
         <motion.button
           onClick={() => setShowFilter(!showFilter)}
-          className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl cursor-pointer text-sm font-medium transition-all shadow-md ${
+          className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl cursor-pointer text-sm font-medium transition-all shadow-md   ${
             showFilter ? 'bg-[#044BB1] text-white shadow-blue-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
           }`}
           whileHover={{ scale: 1.02 }}
@@ -151,7 +143,7 @@ export default function BeritaBencanaPage() {
       <AnimatePresence>
         {showFilter && (
           <motion.div 
-            className="mb-8 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 shadow-inner"
+            className="mb-8 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 shadow-inner "
             initial={{ opacity: 0, height: 0, y: -10 }}
             animate={{ opacity: 1, height: "auto", y: 0 }}
             exit={{ opacity: 0, height: 0, y: -10 }}
@@ -163,7 +155,7 @@ export default function BeritaBencanaPage() {
       </AnimatePresence>
 
       {/* Status Loading & Stats */}
-      <div className="mb-8 flex justify-between items-center px-2">
+      <div className="mb-8 flex justify-between items-center   px-4 sm:px-9">
         <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
           {isLoading ? (
             <span className="flex items-center gap-2 text-[#044BB1]">

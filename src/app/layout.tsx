@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased overflow-x-hidden font-sans `}>
+      <body className={`${inter.variable} antialiased overflow-x-hidden font-sans  `}>
           <LayoutProvider>
             {children}
           </LayoutProvider>

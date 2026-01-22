@@ -49,8 +49,8 @@ export function Navbar() {
   return (
     <>
       <nav
-        className="sticky top-0 z-50 bg-white shadow-md transition-shadow duration-300">
-        <div className="w-full mx-auto px-4 sm:px-14 relative">
+        className="sticky top-0 z-50 bg-white shadow-md transition-shadow duration-300  ">
+        <div className="w-full mx-auto px-4 sm:px-20 relative">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
             <div className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group shrink-0">
               <div className="relative">

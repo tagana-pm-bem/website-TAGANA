@@ -29,9 +29,9 @@ export default function EventListPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-100 via-white to-blue-50 w-full px-4 md:px-14 mx-auto">
+    <div className="min-h-screen bg-linear-to-br from-blue-100 via-white to-blue-50 w-full mx-auto">
 
-      <div className="mx-auto w-full py-6">
+      <div className="mx-auto px-4 sm:px-19 py-6">
       <MobileCalendar onSelectDate={setFilterDate} events={allEvents} />
 
       {/* Layout grid untuk keterangan dan list */}

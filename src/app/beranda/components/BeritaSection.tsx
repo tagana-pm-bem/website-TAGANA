@@ -140,7 +140,7 @@ export default function BeritaSection() {
                       berita={news}
                       formatDate={formatDate}
                       onReadMore={(id) =>
-                        (window.location.href = `/BeritaBencana/${id}`)
+                        (window.location.href = `/BeritaBencana/detail?id=${id}`)
                       }
                     />
                   </motion.div>
