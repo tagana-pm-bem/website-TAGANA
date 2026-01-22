@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSweetAlert } from "@/components/ui/SweetAlertProvider";
+import { toast } from 'sonner';
 import { X } from 'lucide-react'; 
 
 interface Field {
@@ -21,7 +21,6 @@ interface EditModalProps {
 }
 
 export default function EditModal({ title, fields, initialData, onSave, onClose }: EditModalProps) {
-  const { showCenterSuccess, showCenterFailed, showLoading } = useSweetAlert();
   const [formData, setFormData] = useState(initialData);
 
   useEffect(() => {
@@ -34,14 +33,14 @@ export default function EditModal({ title, fields, initialData, onSave, onClose 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loadingToast = toast.loading("Menyimpan Perubahan...");
     try {
-      showLoading("Menyimpan Perubahan...");
       await onSave(formData);
-      await showCenterSuccess("Berhasil Disimpan");
+      toast.success("Berhasil Disimpan", { id: loadingToast });
       onClose();
     } catch (error) {
       console.error(error);
-      showCenterFailed("Gagal Menyimpan Data");
+      toast.error("Gagal Menyimpan Data", { id: loadingToast });
     }
   };
 

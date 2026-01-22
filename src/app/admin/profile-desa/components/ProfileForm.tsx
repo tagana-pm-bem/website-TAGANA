@@ -23,7 +23,6 @@ import { useDusun } from "@/hooks/useDusun.hooks";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -65,34 +64,19 @@ export default function DusunProfilePage() {
   // --- LOADING STATE DENGAN SKELETON ---
   if (isLoading) {
     return (
-      <div className="container mx-auto py-1 max-w-full space-y-8 animate-pulse">
-        <Card className="border-none shadow-xl h-[700px] shadow-slate-200/50 rounded-[2rem] overflow-hidden bg-white flex flex-col">
-          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 shrink-0">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-2xl bg-slate-200" />
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-48 bg-slate-200" />
-                <Skeleton className="h-4 w-64 bg-slate-200" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-8 space-y-10 flex-1 overflow-y-auto">
-            <div className="space-y-4 max-w-md">
-              <Skeleton className="h-4 w-32 bg-slate-100" />
-              <Skeleton className="h-12 w-full rounded-xl bg-slate-100" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-              <div className="md:col-span-4 space-y-4">
-                <Skeleton className="h-4 w-32 bg-slate-100" />
-                <Skeleton className="aspect-square w-full rounded-[2rem] bg-slate-100" />
-              </div>
-              <div className="md:col-span-8 space-y-6">
-                <Skeleton className="h-4 w-40 bg-slate-100" />
-                <Skeleton className="h-56 w-full rounded-2xl bg-slate-100" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-lg shadow-sm animate-pulse">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-48 bg-slate-200" />
+          <Skeleton className="h-4 w-64 bg-slate-200" />
+        </div>
+        <div className="border-b border-gray-300" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full max-w-md rounded-lg bg-slate-100" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Skeleton className="aspect-square w-full rounded-2xl bg-slate-100" />
+            <Skeleton className="h-64 w-full rounded-2xl bg-slate-100" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -137,111 +121,148 @@ export default function DusunProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-1 max-w-full space-y-8 ">
-      {/* HEADER CARD */}
-      <Card className="border-none shadow-xl h-[700px] shadow-slate-200/50 rounded-[2rem] overflow-hidden bg-white flex flex-col">
-        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-[#044BB1]">
-              <Building2 size={24} />
-            </div>
-            <div>
-              <CardTitle className="text-xl font-medium tracking-tight text-slate-900">
-                Profil & Identitas Wilayah
-              </CardTitle>
-              <CardDescription className="font-medium text-slate-500">
-                Kelola deskripsi publik dan representasi visual dusun.
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
+    <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-lg shadow-sm">
+      {/* HEADER */}
+      <div className="flex items-start gap-4">
+        <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+          <Building2 size={24} />
+        </div>
+        <div>
+          <h1 className="font-semibold text-lg text-gray-900">Profil & Identitas Wilayah</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola deskripsi dan foto representasi wilayah dusun</p>
+        </div>
+      </div>
 
-        <CardContent className="p-8 space-y-6 flex-1 overflow-y-auto">
-          {/* PEMILIHAN DUSUN */}
-          <div className="space-y-4 max-w-md">
-            <Label className="font-medium text-slate-700 flex items-center gap-2">
-              <Map size={14} className="text-slate-400" /> Pilih Wilayah Dusun
-            </Label>
-            <Select value={selectedDusunId} onValueChange={setSelectedDusunId}>
-              <SelectTrigger className="rounded-xl border-slate-200 h-12 focus:ring-blue-100 shadow-sm">
-                <SelectValue placeholder="-- Pilih Dusun Target --" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {(dusunList || []).map((d) => (
-                  <SelectItem key={d.id} value={d.id.toString()} className="font-medium">
-                    {d.nama}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="border-b border-gray-300" />
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-            {/* BAGIAN FOTO */}
-            <div className="md:col-span-4 space-y-4">
-              <Label className="font-medium text-slate-700 flex items-center gap-2">
-                <ImageIcon size={14} className="text-slate-400" /> Foto Utama Wilayah
-              </Label>
-              <div className="group relative aspect-square w-full rounded-[2rem] overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center transition-all hover:border-[#044BB1]/30">
-                {imagePreview ? (
-                  <>
-                    <Image src={imagePreview} alt="Preview Dusun" fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                       <Label htmlFor="photo-upload" className="cursor-pointer bg-white p-3 rounded-xl text-[#044BB1] hover:bg-slate-50 transition-colors">
-                          <Camera size={20} />
-                       </Label>
-                       <Button variant="destructive" size="icon" className="rounded-xl" onClick={() => setImagePreview(null)}>
-                          <Trash2 size={20} />
-                       </Button>
-                    </div>
-                  </>
-                ) : (
-                  <Label htmlFor="photo-upload" className="flex flex-col items-center gap-2 cursor-pointer text-slate-400 group-hover:text-[#044BB1] transition-colors">
-                    <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-                      <Camera size={32} />
-                    </div>
-                    <span className="text-xs font-medium uppercase tracking-wider">Unggah Foto</span>
-                  </Label>
-                )}
-                <input id="photo-upload" type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-              </div>
-            </div>
+      {/* PEMILIHAN DUSUN */}
+      <div className="space-y-3">
+        <Label className="font-medium text-gray-700 flex items-center gap-2 text-sm">
+          <Map size={16} className="text-gray-400" /> Pilih Wilayah Dusun
+        </Label>
+        <Select value={selectedDusunId} onValueChange={setSelectedDusunId}>
+          <SelectTrigger className="max-w-md rounded-lg border-gray-300 h-11 focus:ring-2 focus:ring-blue-500 shadow-sm">
+            <SelectValue placeholder="-- Pilih Dusun --" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg">
+            {(dusunList || []).map((d) => (
+              <SelectItem key={d.id} value={d.id.toString()} className="font-medium">
+                Dusun {d.nama}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-            {/* BAGIAN DESKRIPSI */}
-            <div className="md:col-span-8 space-y-6">
-              <div className="space-y-3">
-                <Label className="font-medium text-slate-700 flex items-center gap-2">
-                  <Info size={14} className="text-slate-400" /> Deskripsi Publik Wilayah
-                </Label>
-                <Textarea 
-                  value={deskripsi}
-                  onChange={(e) => setDeskripsi(e.target.value)}
-                  placeholder="Ceritakan tentang karakteristik wilayah ini..."
-                  className="rounded-2xl border-slate-200 min-h-[220px] p-6 focus:ring-blue-100 font-medium leading-relaxed shadow-sm"
-                  disabled={!selectedDusunId}
+      <div className="border-b border-gray-200" />
+
+      {/* KONTEN UTAMA */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* BAGIAN FOTO */}
+        <div className="space-y-4">
+          <Label className="font-medium text-gray-700 flex items-center gap-2 text-sm">
+            <ImageIcon size={16} className="text-gray-400" /> Foto Wilayah
+          </Label>
+          
+          <div className="group relative aspect-square w-full rounded-2xl overflow-hidden bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center transition-all hover:border-blue-400">
+            {imagePreview ? (
+              <>
+                <Image 
+                  src={imagePreview} 
+                  alt="Preview Dusun" 
+                  fill 
+                  className="object-cover transition-transform duration-300 group-hover:scale-105" 
                 />
-              </div>
-              <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={handleUpdateProfile}
-                  disabled={isUpdating || !selectedDusunId}
-                  className="bg-[#044BB1] hover:bg-blue-700 text-white px-10 py-7 rounded-2xl font-medium shadow-lg shadow-blue-900/10 gap-3 active:scale-95 transition-all"
-                >
-                  {isUpdating ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
-                  {isUpdating ? "Memproses..." : "Simpan Perubahan Profil"}
-                </Button>
-              </div>
-            </div>
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <Label 
+                    htmlFor="photo-upload" 
+                    className="cursor-pointer bg-white p-3 rounded-lg text-blue-600 hover:bg-gray-50 transition-colors shadow-lg"
+                  >
+                    <Camera size={20} />
+                  </Label>
+                  <button
+                    onClick={() => setImagePreview(null)}
+                    className="bg-red-500 p-3 rounded-lg text-white hover:bg-red-600 transition-colors shadow-lg"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <Label 
+                htmlFor="photo-upload" 
+                className="flex flex-col items-center gap-3 cursor-pointer text-gray-400 group-hover:text-blue-600 transition-colors p-8"
+              >
+                <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 group-hover:border-blue-400 transition-colors">
+                  <Camera size={36} />
+                </div>
+                <div className="text-center">
+                  <span className="text-sm font-semibold block">Klik untuk unggah foto</span>
+                  <span className="text-xs text-gray-400 mt-1">Format: JPG, PNG (Max 5MB)</span>
+                </div>
+              </Label>
+            )}
+            <input 
+              id="photo-upload" 
+              type="file" 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+            />
           </div>
-        </CardContent>
-      </Card>
 
-      {/* FOOTER INFO */}
-      <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 flex items-start gap-4">
-        <Info size={18} className="text-blue-500 mt-1" />
-        <p className="text-sm font-medium text-blue-600/80 leading-relaxed">
-          Deskripsi wilayah akan muncul di peta publik. Gunakan bahasa informatif untuk membantu mengenali potensi unik wilayah desa.
-        </p>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
+            <Info size={16} className="text-blue-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-blue-700 leading-relaxed">
+              Gunakan foto berkualitas baik yang merepresentasikan karakteristik wilayah dusun.
+            </p>
+          </div>
+        </div>
+
+        {/* BAGIAN DESKRIPSI */}
+        <div className="space-y-4">
+          <Label className="font-medium text-gray-700 flex items-center gap-2 text-sm">
+            <Info size={16} className="text-gray-400" /> Deskripsi Wilayah
+          </Label>
+          
+          <Textarea 
+            value={deskripsi}
+            onChange={(e) => setDeskripsi(e.target.value)}
+            placeholder="Masukkan deskripsi wilayah dusun...&#10;&#10;Contoh:&#10;- Lokasi dan batas wilayah&#10;- Karakteristik geografis&#10;- Potensi unggulan&#10;- Informasi penting lainnya"
+            className="rounded-lg border-gray-300 min-h-[320px] p-4 focus:ring-2 focus:ring-blue-500 font-normal text-sm leading-relaxed shadow-sm resize-none"
+            disabled={!selectedDusunId}
+          />
+
+          <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 flex items-start gap-3">
+            <Info size={16} className="text-amber-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-700 leading-relaxed">
+              Deskripsi ini akan ditampilkan di halaman publik. Gunakan bahasa yang informatif dan mudah dipahami.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-b border-gray-200" />
+
+      {/* TOMBOL SIMPAN */}
+      <div className="flex justify-end pt-2">
+        <Button 
+          onClick={handleUpdateProfile}
+          disabled={isUpdating || !selectedDusunId}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-lg font-medium shadow-sm gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isUpdating ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Menyimpan...
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              Simpan Perubahan
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
