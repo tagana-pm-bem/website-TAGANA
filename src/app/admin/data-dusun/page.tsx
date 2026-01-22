@@ -2,7 +2,7 @@
 
 import { useState } from "react"; // Tambahkan useState
 import { Card } from "@/components/ui/card";
-import PetaWilayah from "./components/petaWilayah";
+// import PetaWilayah from "./components/petaWilayah";
 import ManajemenRisiko from "./components/manajemenRisiko";
 import PotensiBencana from "./components/potensiBencana";
 

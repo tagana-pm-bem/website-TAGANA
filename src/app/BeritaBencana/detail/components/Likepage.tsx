@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { CommentPage } from "./CommentCard"; 
 import { interactionService } from "@/services/interactionService"; 
 
@@ -47,12 +48,42 @@ export function LikePage({ beritaId, initialLikes = 0 }: LikePageProps) {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({ title: document.title, url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link disalin!");
+  const handleShare = async () => {
+    const shareData = {
+      title: document.title || "Berita Bencana",
+      text: "Lihat berita bencana ini",
+      url: window.location.href
+    };
+
+    try {
+      // Cek apakah browser support Web Share API
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        toast.success("Berhasil dibagikan!");
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link berhasil disalin!", {
+          description: "Link berita telah disalin ke clipboard"
+        });
+      }
+    } catch (error: any) {
+      // Jika user cancel share dialog, jangan tampilkan error
+      if (error.name === 'AbortError') {
+        return;
+      }
+      
+      // Jika gagal, coba copy to clipboard sebagai fallback
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link berhasil disalin!", {
+          description: "Link berita telah disalin ke clipboard"
+        });
+      } catch (clipboardError) {
+        toast.error("Gagal membagikan", {
+          description: "Silakan salin link secara manual"
+        });
+      }
     }
   };
 
@@ -114,6 +145,7 @@ export function LikePage({ beritaId, initialLikes = 0 }: LikePageProps) {
         px-3 py-2 sm:px-4 sm:py-2 rounded-full border border-gray-200 
         bg-white text-gray-600 text-xs sm:text-sm
         hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200
+        active:scale-95
         "
       >
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

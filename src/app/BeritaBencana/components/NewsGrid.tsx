@@ -46,7 +46,7 @@ export function NewsGrid({
   // Berita akan tampil secara otomatis dari yang terbaru berkat query order di service
   return (
     <section
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-700"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-700 px-4 sm:px-9"
       aria-label="Daftar Berita Bencana"
     >
       {beritaList.map((b) => (

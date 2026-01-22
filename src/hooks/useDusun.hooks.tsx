@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { dusunService, DusunDB } from "@/services/dusunService";
-import { toast } from "sonner"; // Menggunakan Sonner sesuai standar shadcn terbaru
+import { toast } from "sonner"; 
 
 export function useDusun() {
   const [data, setData] = useState<DusunDB[]>([]);

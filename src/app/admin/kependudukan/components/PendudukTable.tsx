@@ -1,13 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import EditModal from './modals/EditModal';
-import { toast } from 'sonner'; // Menggunakan sonner (shadcn default recomendation)
+import { toast } from 'sonner';
 import { useDusun } from '@/hooks/useDusun.hooks';
-import { Pencil, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Pencil, Loader2, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { uploadImageByType } from "@/services/fileService";
 import { getPublicImageUrl } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/Badge";
 
 interface DusunDB {
   id: number;
@@ -28,10 +45,23 @@ export function PendudukTable() {
   const { data: pendudukData, isLoading, updateDusunStats } = useDusun();
   const [editingItem, setEditingItem] = useState<DusunDB | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [selectedDusun, setSelectedDusun] = useState<string>("all");
 
   const ITEMS_PER_PAGE = 5;
   const safeData = (pendudukData as unknown as DusunDB[]) || [];
-  const displayData = showAll ? safeData : safeData.slice(0, ITEMS_PER_PAGE);
+  
+  // Filter data berdasarkan dusun yang dipilih
+  const filteredData = useMemo(() => {
+    if (selectedDusun === "all") return safeData;
+    return safeData.filter(item => item.nama === selectedDusun);
+  }, [safeData, selectedDusun]);
+
+  const displayData = showAll ? filteredData : filteredData.slice(0, ITEMS_PER_PAGE);
+
+  // Get unique dusun names for filter
+  const dusunOptions = useMemo(() => {
+    return safeData.map(item => item.nama);
+  }, [safeData]);
 
   const handleEdit = (item: DusunDB) => {
     setEditingItem(item);
@@ -99,81 +129,157 @@ export function PendudukTable() {
 
   if (isLoading) {
     return (
-      <div className="p-12 flex flex-col items-center justify-center gap-3 min-h-[300px] bg-white rounded-xl">
-        <Loader2 className="h-8 w-8 animate-spin text-[#044BB1]" />
-        <span className="text-slate-500 font-medium animate-pulse">Sinkronisasi data penduduk...</span>
-      </div>
+      <Card className="border-slate-100">
+        <CardContent className="p-12 flex flex-col items-center justify-center gap-3 min-h-[300px]">
+          <Loader2 className="h-8 w-8 animate-spin text-[#044BB1]" />
+          <span className="text-slate-500 font-medium animate-pulse">Sinkronisasi data penduduk...</span>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-bold text-xl text-slate-900 tracking-tight">Data Penduduk per Dusun</h1>
-          <p className="text-sm text-slate-500 mt-1">Kelola data demografi dan statistik wilayah.</p>
+    <Card className="border-slate-100 shadow-sm">
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-xl tracking-tight">Data Penduduk per Dusun</CardTitle>
+            <CardDescription>Kelola data demografi dan statistik wilayah.</CardDescription>
+          </div>
+          
+          {/* Filter Dropdown */}
+          <div className="flex items-center gap-3">
+            <Filter className="w-4 h-4 text-slate-500" />
+            <Select value={selectedDusun} onValueChange={setSelectedDusun}>
+              <SelectTrigger className="w-[200px] rounded-xl border-slate-200">
+                <SelectValue placeholder="Pilih Dusun" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Dusun</SelectItem>
+                {dusunOptions.map((dusun) => (
+                  <SelectItem key={dusun} value={dusun}>
+                    {dusun}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
+        
+        {/* Active Filter Badge */}
+        {selectedDusun !== "all" && (
+          <div className="flex items-center gap-2 pt-2">
+            <span className="text-xs text-slate-500">Filter aktif:</span>
+            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+              {selectedDusun}
+              <button 
+                onClick={() => setSelectedDusun("all")} 
+                className="ml-2 hover:text-blue-900 font-bold"
+              >
+                ×
+              </button>
+            </Badge>
+          </div>
+        )}
+      </CardHeader>
       
-      <div className="border-b border-slate-100" />
-
-      <div className="overflow-x-auto rounded-xl border border-slate-100">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-slate-50/50">
-              {["No", "Dusun", "KK", "L", "P", "Balita", "Lansia", "Bumil", "Disabilitas", "Miskin", "Aksi"].map((h) => (
-                <th key={h} className="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center border-b border-slate-100">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {displayData.map((item, index) => (
-              <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                <td className="py-4 text-center text-sm text-slate-600">{index + 1}</td>
-                <td className="py-4 text-center text-sm font-bold text-slate-900 whitespace-nowrap px-2">{item.nama}</td>
-                <td className="py-4 text-center text-sm font-medium text-slate-700">{item.jumlah_kk}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_laki_laki}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_perempuan}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_balita}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_lansia}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_ibu_hamil}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_disabilitas}</td>
-                <td className="py-4 text-center text-sm text-slate-600">{item.jumlah_miskin}</td>
-                <td className="py-4">
-                  <div className="flex justify-center">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleEdit(item)}
-                      className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-[#044BB1] transition-all"
-                    >
-                      <Pencil size={14} />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      {safeData.length > ITEMS_PER_PAGE && (
-        <div className="flex justify-center mt-2">
-            <Button 
-              variant="outline"
-              onClick={() => setShowAll(!showAll)} 
-              className="rounded-xl px-8 font-bold border-slate-200 text-slate-700 hover:bg-slate-50"
-            >
-                {showAll ? (
-                  <> <ChevronUp className="mr-2 h-4 w-4" /> Lihat Lebih Sedikit </>
-                ) : (
-                  <> <ChevronDown className="mr-2 h-4 w-4" /> Lihat Selengkapnya ({safeData.length - ITEMS_PER_PAGE}) </>
-                )}
-            </Button>
-        </div>
-      )}
+      <CardContent className="space-y-4">
+        {filteredData.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="text-slate-500 font-medium">
+              Tidak ada data untuk dusun yang dipilih
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="rounded-xl border border-slate-100 overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                    <TableHead className="text-center font-bold text-slate-500">No</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Dusun</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">KK</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">L</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">P</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Balita</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Lansia</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Bumil</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Disabilitas</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Miskin</TableHead>
+                    <TableHead className="text-center font-bold text-slate-500">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {displayData.map((item, index) => (
+                    <TableRow key={item.id} className="hover:bg-slate-50/50">
+                      <TableCell className="text-center text-sm text-slate-600">{index + 1}</TableCell>
+                      <TableCell className="text-center text-sm font-bold text-slate-900 whitespace-nowrap">
+                        {item.nama}
+                      </TableCell>
+                      <TableCell className="text-center text-sm font-medium text-slate-700">
+                        {item.jumlah_kk}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_laki_laki}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_perempuan}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_balita}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_lansia}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_ibu_hamil}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_disabilitas}
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-600">
+                        {item.jumlah_miskin}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEdit(item)}
+                          className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-[#044BB1]"
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            
+            {filteredData.length > ITEMS_PER_PAGE && (
+              <div className="flex justify-center pt-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowAll(!showAll)} 
+                  className="rounded-xl px-8 font-bold border-slate-200 text-slate-700 hover:bg-slate-50"
+                >
+                  {showAll ? (
+                    <>
+                      <ChevronUp className="mr-2 h-4 w-4" /> 
+                      Lihat Lebih Sedikit
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="mr-2 h-4 w-4" /> 
+                      Lihat Selengkapnya ({filteredData.length - ITEMS_PER_PAGE})
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
 
       {editingItem && (
         <EditModal
@@ -195,6 +301,6 @@ export function PendudukTable() {
           onClose={() => setEditingItem(null)}
         />
       )}
-    </div>
+    </Card>
   );
 }

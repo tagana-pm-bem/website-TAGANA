@@ -1,29 +1,26 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDemographics } from "@/hooks/useDemographics";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import { Users, Home, TrendingUp, MapPin, ArrowRight } from "lucide-react";
 
 function Homepage() {
   const router = useRouter();
-  
   const { totalPenduduk, totalKK, isLoading } = useDemographics();
 
   const [counters, setCounters] = useState({
     volunteers: 0, 
     missions: 0,   
-    provinces: 0
   });
-
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // Gunakan data asli sebagai target, bukan angka hardcoded
     const targets = { 
       volunteers: totalPenduduk, 
       missions: totalKK,         
-      provinces: 0 
     };
     
     const duration = 1200;
@@ -46,7 +43,6 @@ function Homepage() {
       const timer = setInterval(() => {
         current += increment;
         
-        // Update state
         setCounters(prev => {
           const nextVal = Math.floor(current);
           if (nextVal >= targetValue) {
@@ -55,7 +51,6 @@ function Homepage() {
           return { ...prev, [key]: nextVal };
         });
 
-      
         if (current >= targetValue) {
           clearInterval(timer);
         }
@@ -64,7 +59,6 @@ function Homepage() {
       timers.push(timer);
     });
 
-    // Cleanup timers saat unmount
     return () => {
       timers.forEach(timer => clearInterval(timer));
     };
@@ -76,145 +70,93 @@ function Homepage() {
   };
 
   return (
-    <main>
-      <style>{`
-        .hero {
-          min-height: 100vh;
-          width: 100vw;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          overflow: hidden;
-        }
-        .hero-video-bg {
-          position: absolute;
-          top: 0; left: 0;
-          width: 100vw;
-          height: 100vh;
-          min-width: 100%;
-          min-height: 100%;
-          object-fit: cover;
-          z-index: 0;
-        }
-        .hero-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(0,0,0,0.5);
-          z-index: 1;
-        }
-        .hero-content, .hero-stats {
-          position: relative;
-          z-index: 2;
-        }
-        .hero-content {
-          text-align: center;
-          padding: 3rem 1rem 1rem 1rem;
-        }
-        .hero-title {
-          font-size: 5rem;
-          font-weight: bold;
-          margin-bottom: 0.5rem;
-        }
-        .hero-description {
-          font-size: 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .hero-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          margin-bottom: 2rem;
-        }
-        .btn {
-          padding: 0.7rem 1.5rem;
-          border-radius: 25px;
-          border: none;
-          font-weight: 500;
-          cursor: pointer;
-          background: #1b7213ff;
-          color: #fff;
-          transition: background 0.2s;
-        }
-        .btn.secondary {
-          background: transparent;
-          border: 2px solid #fff;
-        }
-        .btn:hover {
-          background: #687213ff;
-        }
-        .hero-stats {
-          display: flex;
-          gap: 3rem; /* Sedikit diperlebar agar rapi */
-          justify-content: center;
-          margin-bottom: 2rem;
-        }
-        .stat-item {
-          text-align: center;
-        }
-        .stat-item h3 {
-          font-size: 2rem; /* Diperbesar sedikit */
-          font-weight: bold;
-          margin-bottom: 0.3rem;
-        }
-        .stat-item p {
-          font-size: 0.9rem;
-          opacity: 0.9;
-        }
-       @media (max-width: 600px) {
-          .hero-title { font-size: 1.5rem; }
-          .hero-stats { flex-direction: column; gap: 1rem; }
-          .hero {
-            min-height: 100vh;
-            width: 100vw;
-          }
-          .hero-video-bg {
-            width: 100vw;
-            height: 100vh;
-          }
-        }
-      `}</style>
-      <div className="hero">
+    <main className="min-h-screen w-full relative overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
         <img
-          className="hero-video-bg"
+          className="w-full h-full object-cover"
           src="/assets/bgsplash.png"
           alt="Background"
         />
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <h1 className="hero-title">SRIHARJO</h1>
-          <p className="hero-description">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/70 via-emerald-800/60 to-emerald-900/70" />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        {/* Badge */}
+        <Badge 
+          variant="secondary" 
+          className="mb-8 bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2 text-sm font-normal hover:bg-white/30 transition-colors"
+        >
+          <MapPin className="w-4 h-4 mr-2" />
+          Sistem Informasi Desa
+        </Badge>
+
+        {/* Hero Title */}
+        <div className="text-center mb-8 max-w-4xl">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight">
+            SRIHARJO
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
             Peta interaktif desa Sriharjo, menyediakan informasi lengkap mengenai potensi, fasilitas, dan demografi desa kami.
           </p>
-          <div className="hero-buttons">
-            <button
-              className="btn"
-              onClick={handlePelajariClick}
-            >
-              Selengkapnya
-            </button>
-            {/* <button className="btn secondary" onClick={() => {router.push('/auth/login')}}>
-              Admin login
-            </button> */}
-          </div>
         </div>
-        
-        {/* Tampilkan statistik hanya jika tidak loading */}
+
+        {/* Stats Cards */}
         {!isLoading && (
-          <div className="hero-stats">
-            <div className="stat-item">
-              <h3>{counters.volunteers.toLocaleString('id-ID')}</h3>
-              <p>Total Penduduk</p>
-            </div>
-            
-            <div className="stat-item">
-              <h3>{counters.missions.toLocaleString('id-ID')}</h3>
-              <p>Kepala Keluarga</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-8">
+            {/* Total Penduduk Card */}
+            <Card className="bg-white/95 backdrop-blur-sm border-none shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 bg-emerald-500 rounded-xl">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <TrendingUp className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                </div>
+                <p className="text-gray-600 text-sm mb-2">Total Penduduk</p>
+                <h3 className="text-4xl font-bold text-emerald-700">
+                  {counters.volunteers.toLocaleString('id-ID')}
+                </h3>
+                <p className="text-xs text-gray-500 mt-2">Jiwa</p>
+              </CardContent>
+            </Card>
+
+            {/* Kepala Keluarga Card */}
+            <Card className="bg-white/95 backdrop-blur-sm border-none shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 bg-emerald-500 rounded-xl">
+                    <Home className="w-6 h-6 text-white" />
+                  </div>
+                  <TrendingUp className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                </div>
+                <p className="text-gray-600 text-sm mb-2">Kepala Keluarga</p>
+                <h3 className="text-4xl font-bold text-emerald-700">
+                  {counters.missions.toLocaleString('id-ID')}
+                </h3>
+                <p className="text-xs text-gray-500 mt-2">KK</p>
+              </CardContent>
+            </Card>
           </div>
         )}
+
+        {/* CTA Button */}
+        <button
+          onClick={handlePelajariClick}
+          className="group bg-white text-emerald-700 px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+        >
+          <span className="flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Selengkapnya
+          </span>
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </button>
+
+        {/* Footer Text */}
+        <p className="text-white/70 text-sm mt-8 text-center">
+          Jelajahi informasi lengkap tentang Desa Sriharjo
+        </p>
       </div>
     </main>
   );

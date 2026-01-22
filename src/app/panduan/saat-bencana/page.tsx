@@ -4,72 +4,73 @@ import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { Waves, Activity, Mountain, Flame, AlertTriangle, AlertCircle } from "lucide-react";
 
 export default function SaatBencanaPage() {
-  const disasters = [
-    {
-      title: "Banjir",
-      icon: Waves,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      steps: [
-        "Bersihkan rumah dan lingkungan dari sisa lumpur menggunakan antiseptik.",
-        "Periksa instalasi listrik dan gas sebelum dinyalakan kembali untuk mencegah kebakaran.",
-        "Buang makanan yang terendam banjir karena berpotensi tercemar bakteri."
-      ],
-      warning: {
-        type: "info",
-        message: "Waspadai munculnya penyakit kulit, diare, dan leptospirosis pasca banjir."
-      }
-    },
-    {
-      title: "Gempa Bumi",
-      icon: Activity,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      steps: [
-        "Periksa kondisi bangunan (retakan dinding, atap miring) sebelum memutuskan masuk kembali.",
-        "Jangan menyalakan api (korek/lilin) jika tercium bau gas yang menyengat.",
-        "Ikuti informasi resmi dari BMKG terkait potensi gempa susulan."
-      ],
-      warning: {
-        type: "warning",
-        message: "Tetap waspada terhadap puing-puing bangunan yang belum stabil."
-      }
-    },
-    {
-      title: "Tanah Longsor",
-      icon: Mountain,
-      color: "text-amber-700",
-      bgColor: "bg-amber-50",
-      steps: [
-        "Jangan mendekati area longsoran karena tanah mungkin masih labil dan bergerak.",
-        "Bantu petugas dalam pendataan korban atau kerusakan jika kondisi aman.",
-        "Lakukan penghijauan kembali (reboisasi) pada lahan kritis setelah dinyatakan aman."
-      ],
-      warning: {
-        type: "warning",
-        message: "Hindari membangun rumah kembali tepat di jalur bekas longsor."
-      }
-    },
-    {
-      title: "Kebakaran",
-      icon: Flame,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      steps: [
-        "Pastikan api benar-benar padam (pendinginan) sebelum memilih barang sisa.",
-        "Inventarisir kerugian dan dokumen penting yang rusak untuk pelaporan ke desa.",
-        "Bersihkan puing-puing dengan menggunakan masker dan sarung tangan tebal."
-      ],
-      warning: {
-        type: "info",
-        message: "Segera urus surat keterangan kebakaran dari kepolisian/desa untuk keperluan asuransi."
-      }
+const disasters = [
+  {
+    title: "Banjir",
+    icon: Waves,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    steps: [
+      "Segera evakuasi ke tempat yang lebih tinggi jika air terus meningkat.",
+      "Matikan aliran listrik dan gas untuk mencegah sengatan listrik atau kebakaran.",
+      "Hindari berjalan di arus banjir karena berisiko terseret dan terdapat benda tajam."
+    ],
+    warning: {
+      type: "warning",
+      message: "Jangan menyeberangi banjir yang arusnya deras meskipun terlihat dangkal."
     }
-  ];
+  },
+  {
+    title: "Gempa Bumi",
+    icon: Activity,
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+    steps: [
+      "Lindungi kepala dan tubuh dengan posisi berlindung (drop, cover, and hold on).",
+      "Menjauhi kaca, lemari, dan benda berat yang dapat roboh.",
+      "Jika berada di luar, menjauh dari bangunan, tiang listrik, dan pohon."
+    ],
+    warning: {
+      type: "warning",
+      message: "Tetap waspada terhadap gempa susulan setelah guncangan utama berhenti."
+    }
+  },
+  {
+    title: "Tanah Longsor",
+    icon: Mountain,
+    color: "text-amber-700",
+    bgColor: "bg-amber-50",
+    steps: [
+      "Segera menjauh dari lereng atau tebing yang berpotensi longsor.",
+      "Evakuasi ke area aman jika terdengar suara gemuruh atau retakan tanah.",
+      "Ikuti arahan petugas dan jangan kembali sebelum dinyatakan aman."
+    ],
+    warning: {
+      type: "warning",
+      message: "Hujan deras dapat memicu longsor susulan dalam waktu singkat."
+    }
+  },
+  {
+    title: "Kebakaran",
+    icon: Flame,
+    color: "text-red-600",
+    bgColor: "bg-red-50",
+    steps: [
+      "Segera keluar dari bangunan dan cari jalur evakuasi terdekat.",
+      "Tutup hidung dan mulut dengan kain basah untuk menghindari asap.",
+      "Jika api kecil dan aman, gunakan alat pemadam api ringan (APAR)."
+    ],
+    warning: {
+      type: "info",
+      message: "Jangan kembali ke dalam bangunan sebelum petugas menyatakan aman."
+    }
+  }
+];
+
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold mb-2">Panduan Saat Bencana</h1>
         <p className="text-muted-foreground">
           Langkah-langkah penting yang harus dilakukan saat terjadi bencana

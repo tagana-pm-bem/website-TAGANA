@@ -12,8 +12,10 @@ const contacts = [
 export default function NomorDarurat() {
   return (
     <div>
+      <div className="text-center mb-8">
       <h1 className="text-3xl font-bold text-slate-900 mb-2">Nomor Darurat</h1>
       <p className="text-slate-500 mb-10">Simpan dan hubungi nomor-nomor penting di bawah ini jika Anda menghadapi situasi darurat.</p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {contacts.map((c) => (
